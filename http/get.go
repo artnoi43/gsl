@@ -42,14 +42,5 @@ func GetAndParse(u string, v interface{}) error {
 			),
 		)
 	}
-	if err := json.Unmarshal(body, &v); err != nil {
-		return errors.Wrap(
-			err,
-			fmt.Sprintf(
-				"failed to unmarshal: %s",
-				body,
-			),
-		)
-	}
-	return nil
+	return json.Unmarshal(body, &v)
 }
