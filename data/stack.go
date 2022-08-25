@@ -8,8 +8,12 @@ func (self *Stack) Push(x interface{}) {
 
 func (self *Stack) Pop() interface{} {
 	h := *self
-	var elem interface{}
 	l := len(h)
+	if l == 0 {
+		return nil
+	}
+
+	var elem interface{}
 	elem, *self = h[l-1], h[0:l-1]
 
 	return elem
@@ -18,6 +22,11 @@ func (self *Stack) Pop() interface{} {
 func (self *Stack) Len() int {
 	h := *self
 	return len(h)
+}
+
+func (self *Stack) IsEmpty() bool {
+	h := *self
+	return len(h) == 0
 }
 
 func NewStack() *Stack {

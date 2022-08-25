@@ -33,4 +33,13 @@ func TestQueue(t *testing.T) {
 			t.Fatalf("Queue.Pop failed - expected %v, got %v", expected, popped)
 		}
 	}
+
+	// Test IsEmpty
+	if !q.IsEmpty() {
+		t.Fatal("Stack.IsEmpty failed - expected true")
+	}
+
+	// Test Pop after emptied
+	v := q.Pop()
+	t.Logf("value of Pop() after emptied: %v\n", v)
 }

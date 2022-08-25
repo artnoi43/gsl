@@ -33,4 +33,13 @@ func TestStack(t *testing.T) {
 			t.Fatalf("Stack.Pop failed - expected %v, got %v", expected, popped)
 		}
 	}
+
+	// Test IsEmpty
+	if !stack.IsEmpty() {
+		t.Fatal("Stack.IsEmpty failed - expected true")
+	}
+
+	// Test Pop after emptied
+	v := stack.Pop()
+	t.Logf("value of Pop() after emptied: %v\n", v)
 }
