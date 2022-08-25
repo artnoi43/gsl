@@ -3,15 +3,48 @@ package data
 import "testing"
 
 func TestStack(t *testing.T) {
+	values0 := []uint8{0, 1, 2, 3}
+	stack0 := NewStack[uint8]()
+	testStack(t, values0, stack0)
 
-	values := []interface{}{0, 1, 2, "last"}
-	stack := NewStack()
+	values1 := []string{"one"}
+	stack1 := NewStack[string]()
+	testStack(t, values1, stack1)
 
+	// Composite type stack - any comparable types should be ok in this tests
+	valuesComposite := []interface{}{1, true, "second last"}
+	stackComposite := NewStack[interface{}]()
+	// Test Push for composite queue
+	for _, value := range valuesComposite {
+		stackComposite.Push(value)
+	}
+	// Test Pop for composite queue
+	for i, qLen := 0, stackComposite.Len(); i < qLen; i++ {
+		expected := valuesComposite[qLen-i-1]
+		p := stackComposite.Pop()
+		if p == nil {
+			t.Fatalf("Queue.Pop failed - expected %v, got nil", expected)
+		}
+		value := *p
+		if value != expected {
+			t.Fatalf("Queue.Pop failed - expected %v, got %v", expected, value)
+		}
+	}
+	// Test Queue.IsEmpty for composite queue
+	if !stackComposite.IsEmpty() {
+		t.Fatalf("Queue.IsEmpty failed - expected to be emptied")
+	}
+}
+
+func testStack[T comparable](t *testing.T, values []T, stack *Stack[T]) {
 	// Test Push
 	for _, expected := range values {
 		stack.Push(expected)
 		v := stack.Pop()
-		if v != expected {
+		if v == nil {
+			t.Fatalf("Stack.Pop failed - expect %v, got nil", expected)
+		}
+		if *v != expected {
 			t.Fatalf("Stack.Pop failed - expected %v, got %v", expected, v)
 		}
 	}
@@ -29,7 +62,7 @@ func TestStack(t *testing.T) {
 	for i, qLen := 0, stack.Len(); i < qLen; i++ {
 		popped := stack.Pop()
 		expected := values[qLen-i-1]
-		if popped != expected {
+		if *popped != expected {
 			t.Fatalf("Stack.Pop failed - expected %v, got %v", expected, popped)
 		}
 	}

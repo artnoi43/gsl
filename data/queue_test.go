@@ -1,17 +1,52 @@
 package data
 
-import "testing"
+// Queue can be used in many scenarios, including when implementing a graph.
+// See queueForGraph below for examples.
+
+import (
+	"testing"
+)
 
 func TestQueue(t *testing.T) {
+	values0 := []uint8{0, 1, 200, 20}
+	q0 := NewQueue[uint8]()
+	testQueue(t, values0, q0)
 
-	values := []interface{}{0, 1, 2, "last"}
-	q := NewQueue()
+	values1 := []string{"foo", "bar", "baz"}
+	q1 := NewQueue[string]()
+	testQueue(t, values1, q1)
 
+	// Composite type queue - any comparable types should be ok in tests
+	valuesComposite := []interface{}{1, 2, "last"}
+	qComposite := NewQueue[interface{}]()
+	// Test Push for composite queue
+	for _, value := range valuesComposite {
+		qComposite.Push(value)
+	}
+	// Test Pop for composite queue
+	for i, qLen := 0, qComposite.Len(); i < qLen; i++ {
+		expected := valuesComposite[i]
+		p := qComposite.Pop()
+		if p == nil {
+			t.Fatalf("Queue.Pop failed - expected %v, got nil", expected)
+		}
+		value := *p
+		if value != expected {
+			t.Fatalf("Queue.Pop failed - expected %v, got %v", expected, value)
+		}
+	}
+	// Test Queue.IsEmpty for composite queue
+	if !qComposite.IsEmpty() {
+		t.Fatalf("Queue.IsEmpty failed - expected to be emptied")
+	}
+}
+
+func testQueue[T comparable](t *testing.T, values []T, q *Queue[T]) {
 	// Test Push
 	for _, expected := range values {
 		q.Push(expected)
 		v := q.Pop()
-		if v != expected {
+		if *v != expected {
 			t.Fatalf("Queue.Pop failed - expected %v, got %v", expected, v)
 		}
 	}
@@ -29,7 +64,7 @@ func TestQueue(t *testing.T) {
 	for i, qLen := 0, q.Len(); i < qLen; i++ {
 		popped := q.Pop()
 		expected := values[i]
-		if popped != expected {
+		if *popped != expected {
 			t.Fatalf("Queue.Pop failed - expected %v, got %v", expected, popped)
 		}
 	}
@@ -42,4 +77,67 @@ func TestQueue(t *testing.T) {
 	// Test Pop after emptied
 	v := q.Pop()
 	t.Logf("value of Pop() after emptied: %v\n", v)
+}
+
+func queueForGraph(t *testing.T) {
+	const (
+		art  = "art"
+		bob  = "bob"
+		may  = "may"
+		liz  = "liz"
+		abe  = "abe"
+		chad = "chad"
+	)
+
+	// Implement a graph with Go hash map
+	graph := make(map[string][]string)
+	graph[art] = []string{bob, liz}
+	graph[bob] = []string{art, liz}
+	graph[may] = []string{liz}
+	graph[liz] = []string{art, bob, may}
+	graph[abe] = []string{chad}
+	graph[chad] = []string{abe}
+
+	if !isConnected(graph, art, liz) {
+		t.Fatal("queueForGraph: expected true")
+	}
+	if isConnected(graph, art, chad) {
+		t.Fatal("queueForGraph: expected false")
+	}
+}
+
+func isConnected[T comparable](graph map[T][]T, src, dst T) bool {
+	neighbors := graph[src]
+	delete(graph, src)
+	if neighbors == nil {
+		return false
+	}
+
+	q := NewQueue[T]()
+	// Check 1st-degree connection
+	for _, neighbor := range neighbors {
+		if neighbor == src {
+			return true
+		}
+		q.Push(neighbor)
+	}
+
+	// Check 2nd-degree connection
+	for i, qLen := 0, q.Len(); i < qLen; i++ {
+		popped := q.Pop()
+		if popped == nil {
+			continue
+		}
+		poppedItem := *popped
+		if poppedItem == src {
+			continue
+		}
+		if poppedItem == dst {
+			return true
+		}
+		if found := isConnected(graph, poppedItem, dst); found {
+			return true
+		}
+	}
+	return false
 }
