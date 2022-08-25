@@ -8,6 +8,12 @@ func (self *Queue[T]) Push(x T) {
 	*self = append(*self, x)
 }
 
+func (self *Queue[T]) PushSlice(slice ...T) {
+	for _, elem := range slice {
+		self.Push(elem)
+	}
+}
+
 // Pop pops and returns the left-most element of self,
 // returning nil if self is empty
 func (self *Queue[T]) Pop() *T {
