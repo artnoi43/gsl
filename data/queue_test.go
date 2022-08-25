@@ -83,6 +83,7 @@ func TestQueueForGraph(t *testing.T) {
 	const (
 		art  = "art"
 		bob  = "bob"
+		ron  = "ron"
 		may  = "may"
 		liz  = "liz"
 		abe  = "abe"
@@ -93,51 +94,72 @@ func TestQueueForGraph(t *testing.T) {
 	graph := make(map[string][]string)
 	graph[art] = []string{bob, liz}
 	graph[bob] = []string{art, liz}
-	graph[may] = []string{liz}
+	graph[ron] = []string{may}
+	graph[may] = []string{liz, ron}
 	graph[liz] = []string{art, bob, may}
 	graph[abe] = []string{chad}
 	graph[chad] = []string{abe}
 
-	if !isConnected(graph, art, liz) {
-		t.Fatal("queueForGraph: expected true")
+	if hops, found := isConnected(graph, art, may, 0); !found {
+		t.Fatalf("queueForGraph (hops: %d): expected true", hops)
 	}
-	if isConnected(graph, art, chad) {
-		t.Fatal("queueForGraph: expected false")
+	if hops, found := isConnected(graph, ron, liz, 0); !found {
+		t.Fatalf("queueForGraph (hops: %d): expected true", hops)
+	}
+	if hops, found := isConnected(graph, art, chad, 0); found {
+		t.Fatalf("queueForGraph (hops: %d): expected false", hops)
 	}
 }
 
-func isConnected[T comparable](graph map[T][]T, src, dst T) bool {
-	neighbors := graph[src]
+// isConnected recursively traveses through a copy of inGraph to find dst.
+// inGraph elements can point to themselves for this function.
+func isConnected[T comparable](inGraph map[T][]T, src, dst T, r int) (int, bool) {
+	if src == dst {
+		return r, true
+	}
+
+	// Copy graph
+	graph := make(map[T][]T, len(inGraph))
+	for k, v := range inGraph {
+		graph[k] = v
+	}
+
+	directNeighbors := graph[src]
+	// Delete key src to avoid redundant works
 	delete(graph, src)
-	if neighbors == nil {
-		return false
+
+	// If node src points to nothing
+	if directNeighbors == nil {
+		return r, false
 	}
 
+	// Check 1st-degree connection (src's direct directNeighbors)
+	// (1) If we found dst, that's it
+	// (2) Otherwise, push the neighbor into q
+	r++
 	q := NewQueue[T]()
-	// Check 1st-degree connection
-	for _, neighbor := range neighbors {
-		if neighbor == src {
-			return true
+	for _, directNeighbor := range directNeighbors {
+		if directNeighbor == src {
+			continue
 		}
-		q.Push(neighbor)
+		if directNeighbor == dst {
+			// We found dst within the first neighbor
+			return r, true
+		}
+		q.Push(directNeighbor)
 	}
 
-	// Check 2nd-degree connection
+	// Check 2nd-degree connection, or directNeighbor's directNeighbors.
+	// We do this by first popping q to get pointer to the directNeighbor
+	// And then call this func recursively again on the neighbor.
 	for i, qLen := 0, q.Len(); i < qLen; i++ {
-		popped := q.Pop()
-		if popped == nil {
+		pDirectNeighbor := q.Pop()
+		if pDirectNeighbor == nil {
 			continue
 		}
-		poppedItem := *popped
-		if poppedItem == src {
-			continue
-		}
-		if poppedItem == dst {
-			return true
-		}
-		if found := isConnected(graph, poppedItem, dst); found {
-			return true
+		if r, found := isConnected(graph, *pDirectNeighbor, dst, r); found {
+			return r, true
 		}
 	}
-	return false
+	return r, false
 }
