@@ -79,7 +79,7 @@ func testQueue[T comparable](t *testing.T, values []T, q *Queue[T]) {
 	t.Logf("value of Pop() after emptied: %v\n", v)
 }
 
-func queueForGraph(t *testing.T) {
+func TestQueueForGraph(t *testing.T) {
 	const (
 		art  = "art"
 		bob  = "bob"
