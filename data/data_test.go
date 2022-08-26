@@ -10,7 +10,6 @@ func TestBasicList(t *testing.T) {
 	valuesComposite := []interface{}{make(chan int), []byte("test"), &struct{ n int }{n: 69}}
 	qComposite := NewQueue[interface{}]()
 	sComposite := NewStack[interface{}]()
-
 	testBasicList[interface{}](t, valuesComposite, qComposite)
 	testBasicList[interface{}](t, valuesComposite, sComposite)
 }

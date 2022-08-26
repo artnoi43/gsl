@@ -13,9 +13,8 @@ const (
 	MaxHeap
 )
 
-type ItemPQ[T constraints.Ordered] interface {
-	Value() T
-}
+// ItemPQ constraints Valuer to constraints.Ordered, because we need this to compare the values
+type ItemPQ[T constraints.Ordered] Valuer[T]
 
 type PriorityQueue[T constraints.Ordered] struct {
 	Items []ItemPQ[T]
@@ -57,4 +56,8 @@ func (self *PriorityQueue[T]) Pop() any {
 	old.Items[n-1] = nil // avoid memory leak
 	self.Items = old.Items[0 : n-1]
 	return item
+}
+
+func (self *PriorityQueue[T]) IsEmpty() bool {
+	return self.Len() == 0
 }
