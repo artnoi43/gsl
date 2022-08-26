@@ -3,8 +3,9 @@ package http
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -12,7 +13,10 @@ import (
 // GetAndParse fetches data from the HTTP endpoint,
 // and parses response's JSON body into the interface.
 func GetAndParse(u string, v interface{}) error {
-	resp, err := http.Get(u)
+	client := http.Client{
+		Timeout: time.Second * 3,
+	}
+	resp, err := client.Get(u)
 	if err != nil {
 		return errors.Wrap(
 			err,
@@ -32,7 +36,7 @@ func GetAndParse(u string, v interface{}) error {
 		return errors.New("non-200 status code")
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return errors.Wrap(
 			err,
