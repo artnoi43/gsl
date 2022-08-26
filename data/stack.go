@@ -1,8 +1,6 @@
 package data
 
-type stackType any
-
-type Stack[T stackType] []T
+type Stack[T any] []T
 
 func (self *Stack[T]) Push(x T) {
 	*self = append(*self, x)
@@ -33,6 +31,6 @@ func (self *Stack[T]) IsEmpty() bool {
 	return len(state) == 0
 }
 
-func NewStack[T stackType]() *Stack[T] {
+func NewStack[T any]() *Stack[T] {
 	return &Stack[T]{}
 }

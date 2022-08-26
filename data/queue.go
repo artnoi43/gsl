@@ -1,8 +1,6 @@
 package data
 
-type queueType any
-
-type Queue[T queueType] []T
+type Queue[T any] []T
 
 func (self *Queue[T]) Push(x T) {
 	*self = append(*self, x)
@@ -39,6 +37,6 @@ func (self *Queue[T]) IsEmpty() bool {
 	return len(state) == 0
 }
 
-func NewQueue[T queueType]() *Queue[T] {
+func NewQueue[T any]() *Queue[T] {
 	return &Queue[T]{}
 }
