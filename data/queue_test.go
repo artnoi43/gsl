@@ -126,25 +126,22 @@ func searchBreadthFirst[T comparable](mapGraph map[T][]T, src, dst T) bool {
 	for k, v := range mapGraph {
 		graph[k] = v
 	}
-	// Get first neigbors and delete from map
-	firstNeighbors := graph[src]
-	delete(graph, src)
-
-	var found bool
-	var searched = make(map[T]bool)
+	// Get first-degree neigbors
+	rootNeighbors := graph[src]
 
 	if src == dst {
 		return true
 	}
-	searched[src] = true
+	visited := make(map[T]bool)
+	visited[src] = true
 
-	if firstNeighbors == nil {
+	if rootNeighbors == nil {
 		return false
 	}
 
 	// Prepare for 1st hop
 	q := NewQueue[T]()
-	q.PushSlice(firstNeighbors...)
+	q.PushSlice(rootNeighbors...)
 
 	for {
 		if q.IsEmpty() {
@@ -155,21 +152,20 @@ func searchBreadthFirst[T comparable](mapGraph map[T][]T, src, dst T) bool {
 			continue
 		}
 
-		thisNeighbor := *popped
-		if searched[thisNeighbor] {
+		qNode := *popped
+		if visited[qNode] {
 			continue
 		}
-		searched[thisNeighbor] = true
+		visited[qNode] = true
 
-		if thisNeighbor == dst {
-			found = true
-			continue
+		if qNode == dst {
+			return true
 		}
 		// Push nth-degree connections to queue
-		q.PushSlice(graph[thisNeighbor]...)
+		q.PushSlice(graph[qNode]...)
 	}
 
-	return found
+	return false
 }
 
 func pront[T comparable](t *testing.T, g map[T][]T, src, dst T, expectToFind bool) {
