@@ -79,75 +79,72 @@ func testQueue[T comparable](t *testing.T, values []T, q *Queue[T]) {
 
 func TestQueueForGraph(t *testing.T) {
 	const (
-		art  = "art"
-		bob  = "bob"
-		ron  = "ron"
-		may  = "may"
-		liz  = "liz"
+		// These are 'the majority', a closed, well-connected group of people
+		art = "art"
+		bob = "bob"
+		liz = "liz"
+		mac = "mac"
+		ron = "ron"
+		may = "may"
+		// weired0 helps connect the majority to aloof via may,
+		// and weird1 bridges weird0 to aloof
+		weird0 = "weird0"
+		weird1 = "weird1"
+		aloof  = "aloof"
+		// abe and chad just have no friends
 		abe  = "abe"
 		chad = "chad"
 	)
 
-	// Implement a graph with Go hash map
 	graph := make(map[string][]string)
 	graph[art] = []string{bob, liz}
-	graph[bob] = []string{art, liz}
+	graph[bob] = []string{art, liz, mac}
+	graph[liz] = []string{art, bob, mac, may}
+	graph[mac] = []string{bob, liz}
 	graph[ron] = []string{may}
-	graph[may] = []string{liz, ron}
-	graph[liz] = []string{art, bob, may}
+	graph[may] = []string{liz, ron, weird0}
+	// weird0 links may to weird1
+	graph[weird0] = []string{may, weird1}
+	graph[weird1] = []string{weird0, aloof}
+	graph[aloof] = []string{weird1}
+	// abe and chad is not connected to the majority
 	graph[abe] = []string{chad}
 	graph[chad] = []string{abe}
 
-	if hops, found := isConnectedBreadthFirst(graph, art, may); !found {
-		t.Fatalf("queueForGraph (hops: %d): expected true", hops)
-	} else {
-		t.Logf("queueForGraph (hops: %d)", hops)
-	}
-	//	if hops, found := isConnectedBreadthFirst(graph, ron, liz); !found {
-	//		t.Fatalf("queueForGraph (hops: %d): expected true", hops)
-	//	} else {
-	//
-	//		t.Logf("queueForGraph (hops: %d)", hops)
-	//	}
-	//
-	//	if hops, found := isConnectedBreadthFirst(graph, art, chad); found {
-	//		t.Fatalf("queueForGraph (hops: %d): expected false", hops)
-	//	} else {
-	//
-	//		t.Logf("queueForGraph (hops: %d)", hops)
-	//	}
+	t.Logf("graph %+v\n", graph)
+	pront(t, graph, art, liz, true)
+	pront(t, graph, art, bob, true)
+	pront(t, graph, art, mac, true)
+	pront(t, graph, art, may, true)
+	pront(t, graph, art, abe, false) // expects not found
 }
 
-// isConnectedBreadthFirst returns the number of hops needed to look from node src to dst and whether dst is found.
-// The returned returned number of hops is not neccessarily shortest path (which sucks).
-func isConnectedBreadthFirst[T comparable](inGraph map[T][]T, src, dst T) (int, bool) {
+// searchBreadthFirst returns the number of hops needed to look from node src to dst and whether dst is found.
+func searchBreadthFirst[T comparable](mapGraph map[T][]T, src, dst T) bool {
 	// Copy graph
-	graph := make(map[T][]T, len(inGraph))
-	for k, v := range inGraph {
+	graph := make(map[T][]T, len(mapGraph))
+	for k, v := range mapGraph {
 		graph[k] = v
 	}
 	// Get first neigbors and delete from map
 	firstNeighbors := graph[src]
 	delete(graph, src)
 
-	var hops int
-	var bestHops int
 	var found bool
 	var searched = make(map[T]bool)
 
 	if src == dst {
-		return bestHops, true
+		return true
 	}
 	searched[src] = true
 
 	if firstNeighbors == nil {
-		return hops, false
+		return false
 	}
 
 	// Prepare for 1st hop
 	q := NewQueue[T]()
 	q.PushSlice(firstNeighbors...)
-	hops++
 
 	for {
 		if q.IsEmpty() {
@@ -165,20 +162,21 @@ func isConnectedBreadthFirst[T comparable](inGraph map[T][]T, src, dst T) (int, 
 		searched[thisNeighbor] = true
 
 		if thisNeighbor == dst {
-			if hops > bestHops {
-				found = true
-				bestHops = hops
-			}
+			found = true
 			continue
 		}
 		// Push nth-degree connections to queue
 		q.PushSlice(graph[thisNeighbor]...)
-
-		hops++
 	}
 
-	if found {
-		return bestHops, true
+	return found
+}
+
+func pront[T comparable](t *testing.T, g map[T][]T, src, dst T, expectToFind bool) {
+	t.Log(src, "->", dst)
+	found := searchBreadthFirst(g, src, dst)
+	if found != expectToFind {
+		t.Fatalf("unexpected result 'found' - expected %v, got %v\n", expectToFind, found)
 	}
-	return hops, false
+	t.Logf("shortestPath %v->%v found: %v\n", src, dst, found)
 }
