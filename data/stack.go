@@ -11,26 +11,26 @@ func (self *Stack[T]) Push(x T) {
 // Pop pops and returns the left-most element of self,
 // returning nil if self is empty
 func (self *Stack[T]) Pop() *T {
-	h := *self
-	l := len(h)
+	state := *self
+	l := len(state)
 	if l == 0 {
 		return nil
 	}
 
 	var elem T
-	elem, *self = h[l-1], h[0:l-1]
+	elem, *self = state[l-1], state[0:l-1]
 
 	return &elem
 }
 
 func (self *Stack[T]) Len() int {
-	h := *self
-	return len(h)
+	state := *self
+	return len(state)
 }
 
 func (self *Stack[T]) IsEmpty() bool {
-	h := *self
-	return len(h) == 0
+	state := *self
+	return len(state) == 0
 }
 
 func NewStack[T stackType]() *Stack[T] {

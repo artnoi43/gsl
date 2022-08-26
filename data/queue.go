@@ -17,26 +17,26 @@ func (self *Queue[T]) PushSlice(slice ...T) {
 // Pop pops and returns the left-most element of self,
 // returning nil if self is empty
 func (self *Queue[T]) Pop() *T {
-	h := *self
-	l := len(h)
+	state := *self
+	l := len(state)
 	if l == 0 {
 		return nil
 	}
 
 	var elem T
-	elem, *self = h[0], h[1:l]
+	elem, *self = state[0], state[1:l]
 
 	return &elem
 }
 
 func (self *Queue[T]) Len() int {
-	h := *self
-	return len(h)
+	state := *self
+	return len(state)
 }
 
 func (self *Queue[T]) IsEmpty() bool {
-	h := *self
-	return len(h) == 0
+	state := *self
+	return len(state) == 0
 }
 
 func NewQueue[T queueType]() *Queue[T] {
