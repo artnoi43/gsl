@@ -6,7 +6,7 @@ func (self *Stack[T]) Push(x T) {
 	*self = append(*self, x)
 }
 
-// Pop pops and returns the left-most element of self,
+// Pop pops and returns the right-most element of self,
 // returning nil if self is empty
 func (self *Stack[T]) Pop() *T {
 	state := *self
