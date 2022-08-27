@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"sync"
 
 	"golang.org/x/exp/constraints"
 )
@@ -19,15 +20,21 @@ type ItemPQ[T constraints.Ordered] Valuer[T]
 type PriorityQueue[T constraints.Ordered] struct {
 	Items []ItemPQ[T]
 	Type  TypePQ
+	mut   *sync.RWMutex
 }
 
 func NewPriorityQueue[T constraints.Ordered](t TypePQ) *PriorityQueue[T] {
 	return &PriorityQueue[T]{
 		Type: t,
+		mut:  &sync.RWMutex{},
 	}
 }
 
-func (self *PriorityQueue[T]) Len() int { return len(self.Items) }
+func (self *PriorityQueue[T]) Len() int {
+	self.mut.RLock()
+	defer self.mut.RUnlock()
+	return len(self.Items)
+}
 
 func (self *PriorityQueue[T]) Less(i, j int) bool {
 	if self.Type == MinHeap {
@@ -37,10 +44,14 @@ func (self *PriorityQueue[T]) Less(i, j int) bool {
 }
 
 func (self *PriorityQueue[T]) Swap(i, j int) {
+	self.mut.Lock()
+	defer self.mut.Unlock()
 	self.Items[i], self.Items[j] = self.Items[j], self.Items[i]
 }
 
 func (self *PriorityQueue[T]) Push(x any) {
+	self.mut.Lock()
+	defer self.mut.Unlock()
 	item, ok := x.(ItemPQ[T])
 	if !ok {
 		typeOfT := fmt.Sprintf("%T", new(T))
@@ -50,6 +61,8 @@ func (self *PriorityQueue[T]) Push(x any) {
 }
 
 func (self *PriorityQueue[T]) Pop() any {
+	self.mut.Lock()
+	defer self.mut.Unlock()
 	old := *self
 	n := len(old.Items)
 	item := old.Items[n-1]
@@ -59,5 +72,7 @@ func (self *PriorityQueue[T]) Pop() any {
 }
 
 func (self *PriorityQueue[T]) IsEmpty() bool {
+	self.mut.RLock()
+	defer self.mut.RUnlock()
 	return self.Len() == 0
 }

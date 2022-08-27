@@ -23,9 +23,7 @@ type DjikstraGraph[T djiskstraWeight] struct {
 
 func NewDjikstraGraph[T djiskstraWeight]() *DjikstraGraph[T] {
 	return &DjikstraGraph[T]{
-		graph: &WeightedGraphImpl[T]{
-			Edges: make(map[*Node[T]][]*Edge[T]),
-		},
+		graph: NewWeightedGraph[T](),
 	}
 }
 
@@ -34,8 +32,8 @@ func (self *DjikstraGraph[T]) AddDjikstraEdge(n1, n2 *Node[T], weight T) error {
 	if weight < zeroValue {
 		return errors.Wrapf(ErrNegativeWeightEdge, "negative edge weight %v", weight)
 	}
-
-	return self.graph.AddEdge(n1, n2, weight)
+	err := self.graph.AddEdge(n1, n2, weight)
+	return err
 }
 
 func (self *DjikstraGraph[T]) DjikstraFrom(startNode *Node[T]) (shortestPaths map[*Node[T]][]*Node[T]) {

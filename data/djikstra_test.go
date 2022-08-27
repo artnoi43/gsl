@@ -50,18 +50,33 @@ func testDjikstra[T constraints.Unsigned](t *testing.T) {
 		Cost: infinity,
 	}
 	nodes := []*Node[T]{nodeStart, nodeA, nodeB, nodeC, nodeD, nodeFinish}
-
 	for _, node := range nodes {
 		djikGraph.graph.AddNode(node)
 	}
-	djikGraph.AddDjikstraEdge(nodeStart, nodeA, T(2))
-	djikGraph.AddDjikstraEdge(nodeStart, nodeB, T(4))
-	djikGraph.AddDjikstraEdge(nodeStart, nodeD, T(4))
-	djikGraph.AddDjikstraEdge(nodeA, nodeB, T(1))
-	djikGraph.AddDjikstraEdge(nodeA, nodeC, T(2))
-	djikGraph.AddDjikstraEdge(nodeC, nodeD, T(2))
-	djikGraph.AddDjikstraEdge(nodeB, nodeFinish, T(5))
-	djikGraph.AddDjikstraEdge(nodeD, nodeFinish, T(3))
+	if err := djikGraph.AddDjikstraEdge(nodeStart, nodeA, T(2)); err != nil {
+		t.Error(err.Error())
+	}
+	if err := djikGraph.AddDjikstraEdge(nodeStart, nodeB, T(4)); err != nil {
+		t.Error(err.Error())
+	}
+	if err := djikGraph.AddDjikstraEdge(nodeStart, nodeD, T(4)); err != nil {
+		t.Error(err.Error())
+	}
+	if err := djikGraph.AddDjikstraEdge(nodeA, nodeB, T(1)); err != nil {
+		t.Error(err.Error())
+	}
+	if err := djikGraph.AddDjikstraEdge(nodeA, nodeC, T(2)); err != nil {
+		t.Error(err.Error())
+	}
+	if err := djikGraph.AddDjikstraEdge(nodeC, nodeD, T(2)); err != nil {
+		t.Error(err.Error())
+	}
+	if err := djikGraph.AddDjikstraEdge(nodeB, nodeFinish, T(5)); err != nil {
+		t.Error(err.Error())
+	}
+	if err := djikGraph.AddDjikstraEdge(nodeD, nodeFinish, T(3)); err != nil {
+		t.Error(err.Error())
+	}
 
 	shortestPaths := djikGraph.DjikstraFrom(nodeStart)
 	fatalMsgCost := "invalid answer for (%s->%s): %d, expecting %d"
@@ -104,7 +119,6 @@ func testDjikstra[T constraints.Unsigned](t *testing.T) {
 		if node.Cost != expectedCost {
 			t.Fatalf(fatalMsgCost, nameStart, node.Name, node.Cost, expectedCost)
 		}
-
 		// Test paths
 		shortestPath := shortestPaths[node]
 		if hops := len(shortestPath); hops != expectedHops {
