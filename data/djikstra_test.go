@@ -51,7 +51,7 @@ func testDjikstra[T constraints.Unsigned](t *testing.T) {
 	}
 	nodes := []*Node[T]{nodeStart, nodeA, nodeB, nodeC, nodeD, nodeFinish}
 	for _, node := range nodes {
-		djikGraph.graph.AddNode(node)
+		djikGraph.AddDjikstraNode(node)
 	}
 	if err := djikGraph.AddDjikstraEdge(nodeStart, nodeA, T(2)); err != nil {
 		t.Error(err.Error())

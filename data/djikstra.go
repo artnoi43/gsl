@@ -11,22 +11,27 @@ import (
 
 var ErrNegativeWeightEdge = errors.New("Djikstra edge must not be negative")
 
-type djiskstraWeight interface{ constraints.Ordered }
+type djikstraWeight interface{ constraints.Ordered }
 
 // DjikstraGraph[T] wraps WeightedGraphImpl[T], where T is generic type numeric types.
 // Only constraints.Unsigned T is being tested.
 // To prevent bugs, so if the weight data source is of non-T type (i.e. a float), users will need to perform
 // multiplications on the data, e.g. 0.1 -> 1000, 0.01 -> 100.
-type DjikstraGraph[T djiskstraWeight] struct {
+type DjikstraGraph[T djikstraWeight] struct {
 	graph WeightedGraph[T]
 }
 
-func NewDjikstraGraph[T djiskstraWeight]() *DjikstraGraph[T] {
+func NewDjikstraGraph[T djikstraWeight]() *DjikstraGraph[T] {
 	return &DjikstraGraph[T]{
 		graph: NewWeightedGraph[T](),
 	}
 }
 
+func (self *DjikstraGraph[T]) AddDjikstraNode(node *Node[T]) {
+	self.graph.AddNode(node)
+}
+
+// AddDjikstraEdge validates if weight is valid, and then calls WeightedGraph.AddEdge
 func (self *DjikstraGraph[T]) AddDjikstraEdge(n1, n2 *Node[T], weight T) error {
 	var zeroValue T
 	if weight < zeroValue {
