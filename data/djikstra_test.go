@@ -15,6 +15,7 @@ func TestDjikstra(t *testing.T) {
 	testDjikstra[uint64](t)
 }
 
+// The weighted graph used in this test can be viewed at assets/djikstra_test_graph.png
 func testDjikstra[T constraints.Unsigned](t *testing.T) {
 	const (
 		nameStart  = "start"
