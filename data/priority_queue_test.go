@@ -45,7 +45,6 @@ func testPop[T constraints.Ordered](t *testing.T, pqType TypePQ, items []foo[T])
 	for _, item := range items {
 		heap.Push(pq, item)
 	}
-	heap.Init(pq)
 
 	p := heap.Pop(pq)
 	popped, ok := p.(foo[T])
@@ -73,7 +72,7 @@ func testArbitaryUpdate(t *testing.T) {
 	for _, item := range foosFloat {
 		heap.Push(pq, item)
 	}
-	heap.Init(pq)
+
 	p := heap.Pop(pq)
 	popped, ok := p.(foo[float64])
 	if !ok {
