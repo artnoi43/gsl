@@ -9,7 +9,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-var ErrNegativeWeightEdge = errors.New("Djikstra edge must not be negative")
+var ErrDjikstraNegativeWeightEdge = errors.New("Djikstra edge must not be negative")
 
 type djikstraWeight interface{ constraints.Ordered }
 
@@ -35,10 +35,11 @@ func (self *DjikstraGraph[T]) AddDjikstraNode(node *Node[T]) {
 func (self *DjikstraGraph[T]) AddDjikstraEdge(n1, n2 *Node[T], weight T) error {
 	var zeroValue T
 	if weight < zeroValue {
-		return errors.Wrapf(ErrNegativeWeightEdge, "negative edge weight %v", weight)
+		return errors.Wrapf(ErrDjikstraNegativeWeightEdge, "negative edge weight %v", weight)
 	}
-	err := self.graph.AddEdge(n1, n2, weight)
-	return err
+
+	self.graph.AddEdge(n1, n2, weight)
+	return nil
 }
 
 func (self *DjikstraGraph[T]) DjikstraFrom(startNode *Node[T]) (shortestPaths map[*Node[T]][]*Node[T]) {
@@ -52,11 +53,11 @@ func (self *DjikstraGraph[T]) DjikstraFrom(startNode *Node[T]) (shortestPaths ma
 	visited := make(map[*Node[T]]bool)
 	for !pq.IsEmpty() {
 		// Pop the top of pq and mark it as visited
-		currentHeap := heap.Pop(pq)
-		if currentHeap == nil {
+		popped := heap.Pop(pq)
+		if popped == nil {
 			panic("popped nil - should not happen")
 		}
-		current, ok := currentHeap.(*Node[T])
+		current, ok := popped.(*Node[T])
 		if !ok {
 			typeOfCurrent := reflect.TypeOf(current)
 			panic(fmt.Sprintf("current is %s, not *Node[T]", typeOfCurrent))

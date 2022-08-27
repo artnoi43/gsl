@@ -15,7 +15,7 @@ type graphWeight interface {
 // See WeightedGraphImpl
 type WeightedGraph[T graphWeight] interface {
 	AddNode(node *Node[T])
-	AddEdge(n1, n2 *Node[T], weight T) error
+	AddEdge(n1, n2 *Node[T], weight T)
 	GetNodes() []*Node[T]
 	GetEdges() map[*Node[T]][]*Edge[T]
 	GetNodeEdges(node *Node[T]) []*Edge[T]
@@ -76,10 +76,9 @@ func (self *WeightedGraphImpl[T]) AddNode(node *Node[T]) {
 	self.Nodes = append(self.Nodes, node)
 }
 
-func (self *WeightedGraphImpl[T]) AddEdge(n1, n2 *Node[T], weight T) error {
+func (self *WeightedGraphImpl[T]) AddEdge(n1, n2 *Node[T], weight T) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 	self.Edges[n1] = append(self.Edges[n1], &Edge[T]{Node: n2, weight: weight})
 	self.Edges[n2] = append(self.Edges[n2], &Edge[T]{Node: n1, weight: weight})
-	return nil
 }
