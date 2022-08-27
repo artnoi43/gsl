@@ -1,4 +1,4 @@
-package data
+package list
 
 type Stack[T any] []T
 

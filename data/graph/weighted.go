@@ -1,4 +1,4 @@
-package data
+package graph
 
 // TODO: more relaxed generic types
 
@@ -28,7 +28,7 @@ type Node[T graphWeight] struct {
 }
 
 // Implements data.ItemPQ[T]
-func (self *Node[T]) Value() T {
+func (self *Node[T]) GetValue() T {
 	return self.Cost
 }
 

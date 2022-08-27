@@ -1,4 +1,4 @@
-package data
+package graph
 
 import (
 	"testing"

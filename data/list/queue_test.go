@@ -1,4 +1,4 @@
-package data
+package list
 
 // Queue can be used in many scenarios, including when implementing a graph.
 // See queueForGraph below for examples.

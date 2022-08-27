@@ -1,4 +1,4 @@
-package data
+package list
 
 type Queue[T any] []T
 

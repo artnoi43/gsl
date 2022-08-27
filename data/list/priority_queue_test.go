@@ -1,4 +1,4 @@
-package data
+package list
 
 import (
 	"container/heap"
@@ -13,7 +13,8 @@ type foo[T constraints.Ordered] struct {
 	value T
 }
 
-func (self foo[T]) Value() T {
+// Implements data.Valuer[T] and list.ItemPQ[T]
+func (self foo[T]) GetValue() T {
 	return self.value
 }
 

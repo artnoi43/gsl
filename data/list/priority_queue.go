@@ -1,9 +1,10 @@
-package data
+package list
 
 import (
 	"fmt"
 	"sync"
 
+	"github.com/artnoi43/mgl/data"
 	"golang.org/x/exp/constraints"
 )
 
@@ -15,7 +16,7 @@ const (
 )
 
 // ItemPQ constraints Valuer to constraints.Ordered, because we need this to compare the values
-type ItemPQ[T constraints.Ordered] Valuer[T]
+type ItemPQ[T constraints.Ordered] data.Valuer[T]
 
 type PriorityQueue[T constraints.Ordered] struct {
 	Items []ItemPQ[T]
@@ -38,9 +39,9 @@ func (self *PriorityQueue[T]) Len() int {
 
 func (self *PriorityQueue[T]) Less(i, j int) bool {
 	if self.Type == MinHeap {
-		return self.Items[i].Value() < self.Items[j].Value()
+		return self.Items[i].GetValue() < self.Items[j].GetValue()
 	}
-	return self.Items[i].Value() > self.Items[j].Value()
+	return self.Items[i].GetValue() > self.Items[j].GetValue()
 }
 
 func (self *PriorityQueue[T]) Swap(i, j int) {
