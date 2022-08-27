@@ -58,7 +58,7 @@ func (self *DjikstraGraph[T]) DjikstraFrom(startNode *Node[T]) (shortestPaths ma
 		}
 		visited[current] = true
 
-		Edges := self.graph.GetEdges(current)[current]
+		Edges := self.graph.GetNodeEdges(current)
 		for _, Edge := range Edges {
 			// Skip visited
 			if visited[Edge.Node] {
