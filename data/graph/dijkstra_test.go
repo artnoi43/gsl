@@ -8,21 +8,21 @@ import (
 
 // TODO: Add tests for other types
 
-func TestDjikstra(t *testing.T) {
-	testDjikstra[uint](t)
-	testDjikstra[uint8](t)
-	testDjikstra[uint32](t)
-	testDjikstra[uint64](t)
+func TestDijkstra(t *testing.T) {
+	testDijkstra[uint](t)
+	testDijkstra[uint8](t)
+	testDijkstra[uint32](t)
+	testDijkstra[uint64](t)
 }
 
-// The weighted graph used in this test can be viewed at assets/djikstra_test_graph.png
-func testDjikstra[T constraints.Unsigned](t *testing.T) {
+// The weighted graph used in this test can be viewed at assets/dijkstra_test_graph.png
+func testDijkstra[T constraints.Unsigned](t *testing.T) {
 	const (
 		nameStart  = "start"
 		nameFinish = "finish"
 	)
 
-	djikGraph := NewDjikstraGraph[T]()
+	djikGraph := NewDijkstraGraph[T]()
 	infinity := ^T(0)
 
 	nodeStart := &Node[T]{
@@ -51,34 +51,34 @@ func testDjikstra[T constraints.Unsigned](t *testing.T) {
 	}
 	nodes := []*Node[T]{nodeStart, nodeA, nodeB, nodeC, nodeD, nodeFinish}
 	for _, node := range nodes {
-		djikGraph.AddDjikstraNode(node)
+		djikGraph.AddDijkstraNode(node)
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeStart, nodeA, T(2)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeStart, nodeA, T(2)); err != nil {
 		t.Error(err.Error())
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeStart, nodeB, T(4)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeStart, nodeB, T(4)); err != nil {
 		t.Error(err.Error())
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeStart, nodeD, T(4)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeStart, nodeD, T(4)); err != nil {
 		t.Error(err.Error())
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeA, nodeB, T(1)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeA, nodeB, T(1)); err != nil {
 		t.Error(err.Error())
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeA, nodeC, T(2)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeA, nodeC, T(2)); err != nil {
 		t.Error(err.Error())
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeC, nodeD, T(2)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeC, nodeD, T(2)); err != nil {
 		t.Error(err.Error())
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeB, nodeFinish, T(5)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeB, nodeFinish, T(5)); err != nil {
 		t.Error(err.Error())
 	}
-	if err := djikGraph.AddDjikstraEdge(nodeD, nodeFinish, T(3)); err != nil {
+	if err := djikGraph.AddDijkstraEdge(nodeD, nodeFinish, T(3)); err != nil {
 		t.Error(err.Error())
 	}
 
-	shortestPaths := djikGraph.DjikstraFrom(nodeStart)
+	shortestPaths := djikGraph.DijkstraFrom(nodeStart)
 	fatalMsgCost := "invalid answer for (%s->%s): %d, expecting %d"
 	fatalMsgPathLen := "invalid returned path (%s->%s): %d, expecting %d"
 	fatalMsgPathVia := "invalid via path (%s->%s)[%d]: %s, expecting %s"

@@ -11,33 +11,33 @@ import (
 	"github.com/artnoi43/mgl/data/list"
 )
 
-var ErrDjikstraNegativeWeightEdge = errors.New("Djikstra edge must not be negative")
+var ErrDijkstraNegativeWeightEdge = errors.New("Dijkstra edge must not be negative")
 
-type djikstraWeight interface{ constraints.Ordered }
+type dijkstraWeight interface{ constraints.Ordered }
 
-// DjikstraGraph[T] wraps WeightedGraphImpl[T], where T is generic type numeric types.
+// DijkstraGraph[T] wraps WeightedGraphImpl[T], where T is generic type numeric types.
 // Only constraints.Unsigned T is being tested.
 // To prevent bugs, so if the weight data source is of non-T type (i.e. a float), users will need to perform
 // multiplications on the data, e.g. 0.1 -> 1000, 0.01 -> 100.
-type DjikstraGraph[T djikstraWeight] struct {
+type DijkstraGraph[T dijkstraWeight] struct {
 	graph WeightedGraph[T]
 }
 
-func NewDjikstraGraph[T djikstraWeight]() *DjikstraGraph[T] {
-	return &DjikstraGraph[T]{
+func NewDijkstraGraph[T dijkstraWeight]() *DijkstraGraph[T] {
+	return &DijkstraGraph[T]{
 		graph: NewWeightedGraph[T](),
 	}
 }
 
-func (self *DjikstraGraph[T]) AddDjikstraNode(node *Node[T]) {
+func (self *DijkstraGraph[T]) AddDijkstraNode(node *Node[T]) {
 	self.graph.AddNode(node)
 }
 
-// AddDjikstraEdge validates if weight is valid, and then calls WeightedGraph.AddEdge
-func (self *DjikstraGraph[T]) AddDjikstraEdge(n1, n2 *Node[T], weight T) error {
+// AddDijkstraEdge validates if weight is valid, and then calls WeightedGraph.AddEdge
+func (self *DijkstraGraph[T]) AddDijkstraEdge(n1, n2 *Node[T], weight T) error {
 	var zeroValue T
 	if weight < zeroValue {
-		return errors.Wrapf(ErrDjikstraNegativeWeightEdge, "negative edge weight %v", weight)
+		return errors.Wrapf(ErrDijkstraNegativeWeightEdge, "negative edge weight %v", weight)
 	}
 
 	self.graph.AddEdge(n1, n2, weight)
@@ -48,7 +48,7 @@ func (self *DjikstraGraph[T]) AddDjikstraEdge(n1, n2 *Node[T], weight T) error {
 // This implementation uses PriorityQueue[T], so the nodes' values must satisfy constraints.Ordered.
 // It returns a hash map, where the key is the destination node, and the values are all other previous nodes
 // between the destination (map key) and startNode.
-func (self *DjikstraGraph[T]) DjikstraFrom(startNode *Node[T]) (shortestPaths map[*Node[T]][]*Node[T]) {
+func (self *DijkstraGraph[T]) DijkstraFrom(startNode *Node[T]) (shortestPaths map[*Node[T]][]*Node[T]) {
 	var zeroValue T
 	startNode.Cost = zeroValue
 	startNode.Through = nil
