@@ -17,26 +17,26 @@ type dijkstraWeight interface {
 	constraints.Integer | constraints.Float
 }
 
-// DijkstraGraph[T] wraps WeightedGraphImpl[T], where T is generic type numeric types.
+// DijkstraGraphUndirected[T] wraps WeightedGraphImpl[T], where T is generic type numeric types and S is ~string.
 // Only constraints.Unsigned T is being tested.
 // To prevent bugs, so if the weight data source is of non-T type (i.e. a float), users will need to perform
 // multiplications on the data, e.g. 0.1 -> 1000, 0.01 -> 100.
-type DijkstraGraph[T dijkstraWeight] struct {
-	graph WeightedGraph[T]
+type DijkstraGraphUndirected[T dijkstraWeight, S ~string] struct {
+	graph UndirectedWeightedGraph[T, S]
 }
 
-func NewDijkstraGraph[T dijkstraWeight]() *DijkstraGraph[T] {
-	return &DijkstraGraph[T]{
-		graph: NewWeightedGraph[T](),
+func NewDijkstraGraph[T dijkstraWeight, S ~string]() *DijkstraGraphUndirected[T, S] {
+	return &DijkstraGraphUndirected[T, S]{
+		graph: NewWeightedGraph[T, S](),
 	}
 }
 
-func (self *DijkstraGraph[T]) AddDijkstraNode(node *Node[T]) {
+func (self *DijkstraGraphUndirected[T, S]) AddDijkstraNode(node UndirectedWeightedNode[T, S]) {
 	self.graph.AddNode(node)
 }
 
 // AddDijkstraEdge validates if weight is valid, and then calls WeightedGraph.AddEdge
-func (self *DijkstraGraph[T]) AddDijkstraEdge(n1, n2 *Node[T], weight T) error {
+func (self *DijkstraGraphUndirected[T, S]) AddDijkstraEdge(n1, n2 UndirectedWeightedNode[T, S], weight T) error {
 	var zeroValue T
 	if weight < zeroValue {
 		return errors.Wrapf(ErrDijkstraNegativeWeightEdge, "negative edge weight %v", weight)
@@ -46,26 +46,26 @@ func (self *DijkstraGraph[T]) AddDijkstraEdge(n1, n2 *Node[T], weight T) error {
 	return nil
 }
 
-// DjisktraFrom takes a *Node[T] startNode, and finds the shortest path from startNode to all other nodes.
+// DjisktraFrom takes a *NodeImpl[T] startNode, and finds the shortest path from startNode to all other nodes.
 // This implementation uses PriorityQueue[T], so the nodes' values must satisfy constraints.Ordered.
 // It returns a hash map, where the key is the destination node, and the values are all other previous nodes
 // between the destination (map key) and startNode.
-func (self *DijkstraGraph[T]) DijkstraFrom(startNode *Node[T]) (shortestPaths map[*Node[T]][]*Node[T]) {
+func (self *DijkstraGraphUndirected[T, S]) DijkstraFrom(startNode UndirectedWeightedNode[T, S]) (shortestPaths map[UndirectedWeightedNode[T, S]][]UndirectedWeightedNode[T, S]) {
 	var zeroValue T
-	startNode.Cost = zeroValue
-	startNode.Through = nil
+	startNode.SetValue(zeroValue)
+	startNode.SetThrough(nil)
 
 	pq := list.NewPriorityQueue[T](list.MinHeap)
 	heap.Push(pq, startNode)
 
-	visited := make(map[*Node[T]]bool)
+	visited := make(map[UndirectedWeightedNode[T, S]]bool)
 	for !pq.IsEmpty() {
 		// Pop the top of pq and mark it as visited
 		popped := heap.Pop(pq)
 		if popped == nil {
 			panic("popped nil - should not happen")
 		}
-		current, ok := popped.(*Node[T])
+		current, ok := popped.(UndirectedWeightedNode[T, S])
 		if !ok {
 			typeOfCurrent := reflect.TypeOf(current)
 			panic(fmt.Sprintf("current is %s, not *Node[T]", typeOfCurrent))
@@ -82,20 +82,20 @@ func (self *DijkstraGraph[T]) DijkstraFrom(startNode *Node[T]) (shortestPaths ma
 			heap.Push(pq, edge.Node)
 			// If getting to edge from current is cheaper that the edge current cost state,
 			// update it to pass via current instead
-			if newCost := current.Cost + edge.weight; newCost < edge.Node.Cost {
-				edge.Node.Cost = newCost
-				edge.Node.Through = current
+			if newCost := current.GetValue() + edge.weight; newCost < edge.Node.GetValue() {
+				edge.Node.SetValue(newCost)
+				edge.Node.SetThrough(current)
 			}
 		}
 	}
 
 	// Reconstruct path
-	shortestPaths = make(map[*Node[T]][]*Node[T], len(self.graph.GetNodes()))
+	shortestPaths = make(map[UndirectedWeightedNode[T, S]][]UndirectedWeightedNode[T, S], len(self.graph.GetNodes()))
 	for _, node := range self.graph.GetNodes() {
-		var path []*Node[T]
+		var path []UndirectedWeightedNode[T, S]
 		// Keep going back until start (nil Through)
 		// i.e. backward path
-		for via := node; via.Through != nil; via = via.Through {
+		for via := node; via.GetThrough() != nil; via = via.GetThrough() {
 			path = append(path, via)
 		}
 		lenPath := len(path)

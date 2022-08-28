@@ -5,6 +5,7 @@ package graph
 import (
 	"sync"
 
+	"github.com/artnoi43/mgl/data/list"
 	"golang.org/x/exp/constraints"
 )
 
@@ -12,73 +13,95 @@ type graphWeight interface {
 	constraints.Ordered
 }
 
-// See WeightedGraphImpl
-type WeightedGraph[T graphWeight] interface {
-	AddNode(node *Node[T])
-	AddEdge(n1, n2 *Node[T], weight T)
-	GetNodes() []*Node[T]
-	GetEdges() map[*Node[T]][]*Edge[T]
-	GetNodeEdges(node *Node[T]) []*Edge[T]
+// See UndirectedWeightedGraphImpl
+type UndirectedWeightedGraph[T graphWeight, S ~string] interface {
+	AddNode(node UndirectedWeightedNode[T, S])
+	AddEdge(n1, n2 UndirectedWeightedNode[T, S], weight T)
+	GetNodes() []UndirectedWeightedNode[T, S]
+	GetEdges() map[UndirectedWeightedNode[T, S]][]*UndirectedWeightedEdge[T, S]
+	GetNodeEdges(node UndirectedWeightedNode[T, S]) []*UndirectedWeightedEdge[T, S]
 }
 
-type Node[T graphWeight] struct {
-	Name    string
+type UndirectedWeightedNode[T graphWeight, S ~string] interface {
+	list.ItemPQ[T]
+	GetKey() S
+	GetThrough() UndirectedWeightedNode[T, S]
+	SetValue(T)
+	SetThrough(UndirectedWeightedNode[T, S])
+}
+
+type UndirectedWeightedNodeImpl[T graphWeight, S ~string] struct {
+	Name    S
 	Cost    T
-	Through *Node[T]
+	Through UndirectedWeightedNode[T, S]
 }
 
 // Implements data.ItemPQ[T]
-func (self *Node[T]) GetValue() T {
+func (self *UndirectedWeightedNodeImpl[T, S]) GetValue() T {
 	return self.Cost
 }
+func (self *UndirectedWeightedNodeImpl[T, S]) GetKey() S {
+	return self.Name
+}
+func (self *UndirectedWeightedNodeImpl[T, S]) GetThrough() UndirectedWeightedNode[T, S] {
+	return self.Through
+}
+func (self *UndirectedWeightedNodeImpl[T, S]) SetValue(value T) {
+	self.Cost = value
+}
 
-type Edge[T graphWeight] struct {
-	Node   *Node[T]
+func (self *UndirectedWeightedNodeImpl[T, S]) SetThrough(node UndirectedWeightedNode[T, S]) {
+	self.Through = node
+}
+
+type UndirectedWeightedEdge[T graphWeight, S ~string] struct {
+	Node   UndirectedWeightedNode[T, S]
 	weight T
 }
 
-type WeightedGraphImpl[T graphWeight] struct {
-	Nodes []*Node[T]
-	Edges map[*Node[T]][]*Edge[T] // Edges is a map of a Node's edges
+type UndirectedWeightedGraphImpl[T graphWeight, S ~string] struct {
+	Nodes []UndirectedWeightedNode[T, S]
+	Edges map[UndirectedWeightedNode[T, S]][]*UndirectedWeightedEdge[T, S] // Edges is a map of a UndirectedWeightedNodeImpl's edges
 
 	// TODO: should we make mut public/exported?
 	mut *sync.RWMutex
 }
 
-func NewWeightedGraph[T graphWeight]() *WeightedGraphImpl[T] {
-	return &WeightedGraphImpl[T]{
-		Edges: make(map[*Node[T]][]*Edge[T]),
+func NewWeightedGraph[T graphWeight, S ~string]() UndirectedWeightedGraph[T, S] {
+	return &UndirectedWeightedGraphImpl[T, S]{
+		Nodes: []UndirectedWeightedNode[T, S]{},
+		Edges: make(map[UndirectedWeightedNode[T, S]][]*UndirectedWeightedEdge[T, S]),
 		mut:   &sync.RWMutex{},
 	}
 }
 
-func (self *WeightedGraphImpl[T]) GetNodes() []*Node[T] {
+func (self *UndirectedWeightedGraphImpl[T, S]) GetNodes() []UndirectedWeightedNode[T, S] {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
 	return self.Nodes
 }
 
-func (self *WeightedGraphImpl[T]) GetEdges() map[*Node[T]][]*Edge[T] {
+func (self *UndirectedWeightedGraphImpl[T, S]) GetEdges() map[UndirectedWeightedNode[T, S]][]*UndirectedWeightedEdge[T, S] {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
 	return self.Edges
 }
 
-func (self *WeightedGraphImpl[T]) GetNodeEdges(node *Node[T]) []*Edge[T] {
+func (self *UndirectedWeightedGraphImpl[T, S]) GetNodeEdges(node UndirectedWeightedNode[T, S]) []*UndirectedWeightedEdge[T, S] {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
 	return self.Edges[node]
 }
 
-func (self *WeightedGraphImpl[T]) AddNode(node *Node[T]) {
+func (self *UndirectedWeightedGraphImpl[T, S]) AddNode(node UndirectedWeightedNode[T, S]) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 	self.Nodes = append(self.Nodes, node)
 }
 
-func (self *WeightedGraphImpl[T]) AddEdge(n1, n2 *Node[T], weight T) {
+func (self *UndirectedWeightedGraphImpl[T, S]) AddEdge(n1, n2 UndirectedWeightedNode[T, S], weight T) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
-	self.Edges[n1] = append(self.Edges[n1], &Edge[T]{Node: n2, weight: weight})
-	self.Edges[n2] = append(self.Edges[n2], &Edge[T]{Node: n1, weight: weight})
+	self.Edges[n1] = append(self.Edges[n1], &UndirectedWeightedEdge[T, S]{Node: n2, weight: weight})
+	self.Edges[n2] = append(self.Edges[n2], &UndirectedWeightedEdge[T, S]{Node: n1, weight: weight})
 }
