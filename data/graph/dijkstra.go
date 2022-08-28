@@ -70,19 +70,19 @@ func (self *DijkstraGraph[T]) DijkstraFrom(startNode *Node[T]) (shortestPaths ma
 		}
 		visited[current] = true
 
-		Edges := self.graph.GetNodeEdges(current)
-		for _, Edge := range Edges {
+		edges := self.graph.GetNodeEdges(current)
+		for _, edge := range edges {
 			// Skip visited
-			if visited[Edge.Node] {
+			if visited[edge.Node] {
 				continue
 			}
 
-			heap.Push(pq, Edge.Node)
-			// If getting to Edge from current is cheaper that the Edge current cost state,
+			heap.Push(pq, edge.Node)
+			// If getting to edge from current is cheaper that the edge current cost state,
 			// update it to pass via current instead
-			if newCost := current.Cost + Edge.weight; newCost < Edge.Node.Cost {
-				Edge.Node.Cost = newCost
-				Edge.Node.Through = current
+			if newCost := current.Cost + edge.weight; newCost < edge.Node.Cost {
+				edge.Node.Cost = newCost
+				edge.Node.Through = current
 			}
 		}
 	}
