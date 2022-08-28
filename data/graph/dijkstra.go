@@ -13,7 +13,9 @@ import (
 
 var ErrDijkstraNegativeWeightEdge = errors.New("Dijkstra edge must not be negative")
 
-type dijkstraWeight interface{ constraints.Ordered }
+type dijkstraWeight interface {
+	constraints.Integer | constraints.Float
+}
 
 // DijkstraGraph[T] wraps WeightedGraphImpl[T], where T is generic type numeric types.
 // Only constraints.Unsigned T is being tested.

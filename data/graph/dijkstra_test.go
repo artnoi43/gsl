@@ -2,29 +2,36 @@ package graph
 
 import (
 	"testing"
-
-	"golang.org/x/exp/constraints"
 )
+
+type dijkTestUtil[T dijkstraWeight] struct {
+	inititalValue      T
+	expectedFinalValue T
+	expectedPathHops   int
+	expectedPathway    []*Node[T]
+
+	edges []*struct {
+		to     *Node[T]
+		weight T
+	}
+}
 
 // TODO: Add tests for other types
 
 func TestDijkstra(t *testing.T) {
-	testDijkstra[uint](t)
-	testDijkstra[uint8](t)
-	testDijkstra[uint32](t)
-	testDijkstra[uint64](t)
-}
-
-// The weighted graph used in this test can be viewed at assets/dijkstra_test_graph.png
-func testDijkstra[T constraints.Unsigned](t *testing.T) {
 	const (
 		nameStart  = "start"
 		nameFinish = "finish"
 	)
+	testDijkstra[uint](t, nameStart, nameFinish)
+	testDijkstra[uint8](t, nameStart, nameFinish)
+	testDijkstra[int32](t, nameStart, nameFinish)
+	testDijkstra[float64](t, nameStart, nameFinish)
+}
 
-	djikGraph := NewDijkstraGraph[T]()
-	infinity := ^T(0)
-
+func constructDijkstraTestGraph[T dijkstraWeight](nameStart, nameFinish string) map[*Node[T]]*dijkTestUtil[T] {
+	// TODO: infinity is way too low, because dijkstraWeight also has uint8
+	infinity := T(100)
 	nodeStart := &Node[T]{
 		Name: nameStart,
 		Cost: T(0),
@@ -49,84 +56,150 @@ func testDijkstra[T constraints.Unsigned](t *testing.T) {
 		Name: nameFinish,
 		Cost: infinity,
 	}
-	nodes := []*Node[T]{nodeStart, nodeA, nodeB, nodeC, nodeD, nodeFinish}
-	for _, node := range nodes {
+	m := map[*Node[T]]*dijkTestUtil[T]{
+		nodeStart: {
+			inititalValue:      T(0),
+			expectedFinalValue: T(0),
+			expectedPathHops:   0,
+			expectedPathway:    []*Node[T]{},
+			edges: []*struct {
+				to     *Node[T]
+				weight T
+			}{
+				{
+					to:     nodeA,
+					weight: T(2),
+				}, {
+					to:     nodeB,
+					weight: T(4),
+				}, {
+					to:     nodeD,
+					weight: T(4),
+				},
+			},
+		},
+		nodeFinish: {
+			inititalValue:      infinity,
+			expectedFinalValue: T(7),
+			expectedPathHops:   2,
+			expectedPathway:    []*Node[T]{nodeD, nodeFinish},
+			edges: []*struct {
+				to     *Node[T]
+				weight T
+			}{},
+		},
+		nodeA: {
+			inititalValue:      infinity,
+			expectedFinalValue: T(2),
+			expectedPathHops:   1,
+			expectedPathway:    []*Node[T]{nodeA},
+			edges: []*struct {
+				to     *Node[T]
+				weight T
+			}{
+				{
+					to:     nodeB,
+					weight: T(1),
+				},
+				{
+					to:     nodeC,
+					weight: T(2),
+				},
+			},
+		},
+		nodeB: {
+			inititalValue:      infinity,
+			expectedFinalValue: T(3),
+			expectedPathHops:   2,
+			expectedPathway:    []*Node[T]{nodeA, nodeB},
+			edges: []*struct {
+				to     *Node[T]
+				weight T
+			}{
+				{
+					to:     nodeFinish,
+					weight: T(5),
+				},
+			},
+		},
+		nodeC: {
+			inititalValue:      infinity,
+			expectedFinalValue: T(4),
+			expectedPathHops:   2,
+			expectedPathway:    []*Node[T]{nodeA, nodeC},
+			edges: []*struct {
+				to     *Node[T]
+				weight T
+			}{
+				{
+					to:     nodeD,
+					weight: T(2),
+				},
+			},
+		},
+		nodeD: {
+			inititalValue:      infinity,
+			expectedFinalValue: T(4),
+			expectedPathHops:   1,
+			expectedPathway:    []*Node[T]{nodeD},
+			edges: []*struct {
+				to     *Node[T]
+				weight T
+			}{
+				{
+					to:     nodeFinish,
+					weight: T(3),
+				},
+			},
+		},
+	}
+	return m
+}
+
+// The weighted graph used in this test can be viewed at assets/dijkstra_test_graph.png
+func testDijkstra[T dijkstraWeight](t *testing.T, nameStart, nameFinish string) {
+	nodesMap := constructDijkstraTestGraph[T](nameStart, nameFinish)
+
+	// Prepare graph
+	djikGraph := NewDijkstraGraph[T]()
+	for node, util := range nodesMap {
+		// Add node
 		djikGraph.AddDijkstraNode(node)
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeStart, nodeA, T(2)); err != nil {
-		t.Error(err.Error())
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeStart, nodeB, T(4)); err != nil {
-		t.Error(err.Error())
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeStart, nodeD, T(4)); err != nil {
-		t.Error(err.Error())
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeA, nodeB, T(1)); err != nil {
-		t.Error(err.Error())
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeA, nodeC, T(2)); err != nil {
-		t.Error(err.Error())
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeC, nodeD, T(2)); err != nil {
-		t.Error(err.Error())
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeB, nodeFinish, T(5)); err != nil {
-		t.Error(err.Error())
-	}
-	if err := djikGraph.AddDijkstraEdge(nodeD, nodeFinish, T(3)); err != nil {
-		t.Error(err.Error())
+		// Add edges
+		nodeEdges := util.edges
+		for _, edge := range nodeEdges {
+			if err := djikGraph.AddDijkstraEdge(node, edge.to, edge.weight); err != nil {
+				t.Error(err.Error())
+			}
+		}
 	}
 
-	shortestPaths := djikGraph.DijkstraFrom(nodeStart)
+	var startNode *Node[T]
+	for node := range nodesMap {
+		if node.Name == nameStart {
+			startNode = node
+		}
+	}
+
+	shortestPaths := djikGraph.DijkstraFrom(startNode)
 	fatalMsgCost := "invalid answer for (%s->%s): %d, expecting %d"
 	fatalMsgPathLen := "invalid returned path (%s->%s): %d, expecting %d"
 	fatalMsgPathVia := "invalid via path (%s->%s)[%d]: %s, expecting %s"
 
 	// The check is hard-coded
-	for _, node := range nodes {
-		var expectedCost T
-		var expectedHops int
-		var expectedVias []*Node[T]
-		switch node {
-		case nodeStart:
-			expectedCost = T(0)
-			expectedHops = 0
-			expectedVias = []*Node[T]{}
-		case nodeFinish:
-			expectedCost = T(7)
-			expectedHops = 2 // -> d -> finish
-			expectedVias = []*Node[T]{nodeD, nodeFinish}
-		case nodeA:
-			expectedCost = T(2)
-			expectedHops = 1 // -> a
-			expectedVias = []*Node[T]{nodeA}
-		case nodeB:
-			expectedCost = T(3)
-			expectedHops = 2 // -> a -> b
-			expectedVias = []*Node[T]{nodeA, nodeB}
-		case nodeC:
-			expectedCost = T(4)
-			expectedHops = 2 // -> a -> c
-			expectedVias = []*Node[T]{nodeA, nodeC}
-		case nodeD:
-			expectedCost = T(4)
-			expectedHops = 1 // -> d
-			expectedVias = []*Node[T]{nodeD}
-		}
-
+	for node, util := range nodesMap {
 		// Test costs
-		if node.Cost != expectedCost {
-			t.Fatalf(fatalMsgCost, nameStart, node.Name, node.Cost, expectedCost)
+		if node.Cost != util.expectedFinalValue {
+			t.Fatalf(fatalMsgCost, nameStart, node.Name, node.Cost, util.expectedFinalValue)
 		}
 		// Test paths
 		shortestPath := shortestPaths[node]
-		if hops := len(shortestPath); hops != expectedHops {
-			t.Fatalf(fatalMsgPathLen, nameStart, node.Name, hops, expectedHops)
+		if hops := len(shortestPath); hops != util.expectedPathHops {
+			t.Fatalf(fatalMsgPathLen, nameStart, node.Name, hops, util.expectedPathHops)
 		}
-		for i, actualVia := range shortestPath {
-			if expectedVia := expectedVias[i]; expectedVia != actualVia {
-				t.Fatalf(fatalMsgPathVia, nameStart, node.Name, i, actualVia.Name, expectedVia.Name)
+		for i, actualPathway := range shortestPath {
+			if expectedPathway := util.expectedPathway[i]; expectedPathway != actualPathway {
+				t.Fatalf(fatalMsgPathVia, nameStart, node.Name, i, actualPathway.Name, expectedPathway.Name)
 			}
 		}
 	}
