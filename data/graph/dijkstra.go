@@ -75,16 +75,16 @@ func (self *DijkstraGraphUndirected[T, S]) DijkstraFrom(startNode UndirectedWeig
 		edges := self.graph.GetNodeEdges(current)
 		for _, edge := range edges {
 			// Skip visited
-			if visited[edge.Node] {
+			if visited[edge.GetNode()] {
 				continue
 			}
 
-			heap.Push(pq, edge.Node)
+			heap.Push(pq, edge.GetNode())
 			// If getting to edge from current is cheaper that the edge current cost state,
 			// update it to pass via current instead
-			if newCost := current.GetValue() + edge.weight; newCost < edge.Node.GetValue() {
-				edge.Node.SetValue(newCost)
-				edge.Node.SetThrough(current)
+			if newCost := current.GetValue() + edge.GetWeight(); newCost < edge.GetNode().GetValue() {
+				edge.GetNode().SetValue(newCost)
+				edge.GetNode().SetThrough(current)
 			}
 		}
 	}
