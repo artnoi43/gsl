@@ -18,13 +18,14 @@ type city struct {
 func main() {
 	infinity := math.MaxFloat64
 
-	tokyo := &city{name: "tokyo", value: 0, through: nil}
-	bangkok := &city{name: "bangkok", value: infinity, through: nil}
-	hongkong := &city{name: "hongkong", value: infinity, through: nil}
-	dubai := &city{name: "dubai", value: infinity, through: nil}
-	helsinki := &city{name: "helsinki", value: infinity, through: nil}
-	budapest := &city{name: "budapest", value: infinity, through: nil}
+	tokyo := &city{name: "Tokyo", value: 0, through: nil}
+	bangkok := &city{name: "Bangkok", value: infinity, through: nil}
+	hongkong := &city{name: "Hongkong", value: infinity, through: nil}
+	dubai := &city{name: "Dubai", value: infinity, through: nil}
+	helsinki := &city{name: "Helsinki", value: infinity, through: nil}
+	budapest := &city{name: "Budapest", value: infinity, through: nil}
 
+	// See file flight_graph.png
 	graphEdges := map[wgraph.UndirectedNode[float64, string]][]struct {
 		to       wgraph.UndirectedNode[float64, string]
 		flighDur float64
@@ -66,7 +67,7 @@ func main() {
 			},
 			{
 				to:       budapest,
-				flighDur: 7,
+				flighDur: 5,
 			},
 		},
 		helsinki: {
@@ -95,7 +96,7 @@ func main() {
 		fmt.Println(">", "from", tokyo.GetKey(), "to", dst.GetKey(), "dur", dst.GetValue())
 		fmt.Print("via")
 		for _, via := range vias {
-			fmt.Print(" " + via.GetKey() + " ")
+			fmt.Print(" " + via.GetKey())
 		}
 		fmt.Println()
 	}
