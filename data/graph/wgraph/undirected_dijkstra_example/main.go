@@ -11,19 +11,19 @@ import (
 // *city implements wgraph.UndirectedNode
 type city struct {
 	name    string
-	value   float64
+	cost    float64
 	through *city
 }
 
 func main() {
 	infinity := math.MaxFloat64
 
-	tokyo := &city{name: "Tokyo", value: 0, through: nil}
-	bangkok := &city{name: "Bangkok", value: infinity, through: nil}
-	hongkong := &city{name: "Hongkong", value: infinity, through: nil}
-	dubai := &city{name: "Dubai", value: infinity, through: nil}
-	helsinki := &city{name: "Helsinki", value: infinity, through: nil}
-	budapest := &city{name: "Budapest", value: infinity, through: nil}
+	tokyo := &city{name: "Tokyo", cost: 0, through: nil}
+	bangkok := &city{name: "Bangkok", cost: infinity, through: nil}
+	hongkong := &city{name: "Hongkong", cost: infinity, through: nil}
+	dubai := &city{name: "Dubai", cost: infinity, through: nil}
+	helsinki := &city{name: "Helsinki", cost: infinity, through: nil}
+	budapest := &city{name: "Budapest", cost: infinity, through: nil}
 
 	// See file flight_graph.png
 	graphEdges := map[wgraph.UndirectedNode[float64, string]][]struct {
@@ -103,7 +103,7 @@ func main() {
 }
 
 func (self *city) GetValue() float64 {
-	return self.value
+	return self.cost
 }
 
 func (self *city) GetKey() string {
@@ -117,8 +117,8 @@ func (self *city) GetThrough() wgraph.UndirectedNode[float64, string] {
 	return self.through
 }
 
-func (self *city) SetValue(value float64) {
-	self.value = value
+func (self *city) SetCost(newCost float64) {
+	self.cost = newCost
 }
 
 func (self *city) SetThrough(node wgraph.UndirectedNode[float64, string]) {

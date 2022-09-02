@@ -64,7 +64,7 @@ func (self *DijkstraGraphUndirected[T, S]) GetNodeEdges(node UndirectedNode[T, S
 // between the destination (map key) and startNode.
 func (self *DijkstraGraphUndirected[T, S]) DijkstraFrom(startNode UndirectedNode[T, S]) (shortestPaths map[UndirectedNode[T, S]][]UndirectedNode[T, S]) {
 	var zeroValue T
-	startNode.SetValue(zeroValue)
+	startNode.SetCost(zeroValue)
 	startNode.SetThrough(nil)
 
 	pq := list.NewPriorityQueue[T](list.MinHeap)
@@ -95,7 +95,7 @@ func (self *DijkstraGraphUndirected[T, S]) DijkstraFrom(startNode UndirectedNode
 			// If getting to edge from current is cheaper that the edge current cost state,
 			// update it to pass via current instead
 			if newCost := current.GetValue() + edge.GetWeight(); newCost < edge.GetNode().GetValue() {
-				edge.GetNode().SetValue(newCost)
+				edge.GetNode().SetCost(newCost)
 				edge.GetNode().SetThrough(current)
 			}
 		}

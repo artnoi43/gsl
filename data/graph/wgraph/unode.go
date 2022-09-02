@@ -16,7 +16,7 @@ func (self *UndirectedNodeImpl[T, S]) GetKey() S {
 func (self *UndirectedNodeImpl[T, S]) GetThrough() UndirectedNode[T, S] {
 	return self.Through
 }
-func (self *UndirectedNodeImpl[T, S]) SetValue(value T) {
+func (self *UndirectedNodeImpl[T, S]) SetCost(value T) {
 	self.Cost = value
 }
 

@@ -22,7 +22,7 @@ type UndirectedNode[T graphWeight, S ~string] interface {
 	list.ItemPQ[T]
 	GetKey() S
 	GetThrough() UndirectedNode[T, S]
-	SetValue(T)
+	SetCost(T)
 	SetThrough(UndirectedNode[T, S])
 }
 
