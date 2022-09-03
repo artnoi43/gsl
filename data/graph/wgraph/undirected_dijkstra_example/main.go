@@ -5,6 +5,7 @@ import (
 	"math"
 	"reflect"
 
+	graphlib "github.com/artnoi43/mgl/data/graph"
 	"github.com/artnoi43/mgl/data/graph/wgraph"
 	"github.com/artnoi43/mgl/mglutils"
 )
@@ -84,20 +85,25 @@ func main() {
 
 	hasDirection := false
 	graph := wgraph.NewDijkstraGraph[float64, cityName](hasDirection)
+	dumbGraph := graphlib.NewGraph(false)
+
 	// Add nodes
 	for node, nodeEdges := range graphEdges {
 		graph.AddNode(node)
+		dumbGraph.AddNode(node)
 		for _, nodeEdge := range nodeEdges {
 			// fmt.Println(node.GetKey()+":", "adding edge", nodeEdge.to.GetKey(), "weight", nodeEdge.flighDur)
 			if err := graph.AddEdge(node, nodeEdge.to, nodeEdge.flighDur); err != nil {
 				panic("failed to add dijkstra-compatible graph edge: " + err.Error())
 			}
+			dumbGraph.AddEdge(node, nodeEdge.to)
 		}
 	}
 
 	fromNode := tokyo
 	shortestPathsFromTokyo := graph.DijkstraShortestPathFrom(fromNode)
 
+	fmt.Println("Dijkstra result")
 	for _, dst := range graph.GetNodes() {
 		if dst == fromNode {
 			continue
@@ -110,6 +116,14 @@ func main() {
 			fmt.Printf("%s (%v) ", via.GetKey(), via.GetValue())
 		}
 		fmt.Println()
+	}
+
+	fmt.Println("BFS result")
+	shortestHopsFromTokyo, hops, found := graphlib.BFSShortestPath(dumbGraph, fromNode, budapest)
+	fmt.Println("found", found, "shortestHops", hops)
+	for i, hop := range shortestHopsFromTokyo {
+		hopNode := hop.(*city)
+		fmt.Println("hop", i, hopNode.GetKey())
 	}
 }
 
