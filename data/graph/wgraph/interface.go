@@ -21,10 +21,11 @@ type WeightedGraph[T graphWeight, S ~string] interface {
 }
 
 type WeightedNode[T graphWeight, S ~string] interface {
-	list.ItemPQ[T]
+	list.ItemPQ[T] // For priority queue
+	SetCost(T)     // Set accumulated cost to the node
+
 	GetKey() S
 	GetThrough() WeightedNode[T, S]
-	SetCost(T)
 	SetThrough(WeightedNode[T, S])
 }
 
