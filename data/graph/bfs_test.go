@@ -9,7 +9,7 @@ func TestBFS(t *testing.T) {
 	t.Run("Undirected BFS", testUBFS)
 }
 
-// See visualization
+// See visualization in directory assets
 func testBFS(t *testing.T) {
 	art := person{name: "art", age: 25}
 	beagie := person{name: "beagie", age: 3}
