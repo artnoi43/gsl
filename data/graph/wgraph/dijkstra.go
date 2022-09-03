@@ -13,8 +13,17 @@ import (
 
 var ErrDijkstraNegativeWeightEdge = errors.New("Dijkstra edge must not be negative")
 
+// TODO: integrate more comparable types, like big.Int and big.Float
+// dijkstraWeight represents the allowed types for edge weights and node costs.
 type dijkstraWeight interface {
 	constraints.Integer | constraints.Float
+}
+
+// This type is the Dijkstra shortest path answer. It has 2 fields, (1) `From` the 'from' node, and (2) `Paths`.
+// DijkstraShortestPath.Paths is a hash map where the key is a node, and the value is the previous node with the lowest cost to that key node.
+type DijstraShortestPath[T dijkstraWeight, S ~string] struct {
+	From  UndirectedNode[T, S]
+	Paths map[UndirectedNode[T, S]]UndirectedNode[T, S]
 }
 
 // DijkstraGraphUndirected[T] wraps WeightedGraphImpl[T], where T is generic type numeric types and S is ~string.
@@ -60,17 +69,17 @@ func (self *DijkstraGraphUndirected[T, S]) GetNodeEdges(node UndirectedNode[T, S
 
 // DjisktraFrom takes a *NodeImpl[T] startNode, and finds the shortest path from startNode to all other nodes.
 // This implementation uses PriorityQueue[T], so the nodes' values must satisfy constraints.Ordered.
-// It returns a hash map, where the key is the destination node, and the values are all other previous nodes
-// between the destination (map key) and startNode.
-func (self *DijkstraGraphUndirected[T, S]) DijkstraFrom(startNode UndirectedNode[T, S]) (shortestPaths map[UndirectedNode[T, S]][]UndirectedNode[T, S]) {
+func (self *DijkstraGraphUndirected[T, S]) DijkstraShortestPathFrom(startNode UndirectedNode[T, S]) *DijstraShortestPath[T, S] {
 	var zeroValue T
 	startNode.SetCost(zeroValue)
 	startNode.SetThrough(nil)
 
+	visited := make(map[UndirectedNode[T, S]]bool)
+	prev := make(map[UndirectedNode[T, S]]UndirectedNode[T, S])
+
 	pq := list.NewPriorityQueue[T](list.MinHeap)
 	heap.Push(pq, startNode)
 
-	visited := make(map[UndirectedNode[T, S]]bool)
 	for !pq.IsEmpty() {
 		// Pop the top of pq and mark it as visited
 		popped := heap.Pop(pq)
@@ -82,43 +91,72 @@ func (self *DijkstraGraphUndirected[T, S]) DijkstraFrom(startNode UndirectedNode
 			typeOfCurrent := reflect.TypeOf(current)
 			panic(fmt.Sprintf("current is %s, not *Node[T]", typeOfCurrent))
 		}
-		visited[current] = true
 
+		visited[current] = true
 		edges := self.GetNodeEdges(current)
+
 		for _, edge := range edges {
+			edgeNode := edge.GetNode()
+
 			// Skip visited
-			if visited[edge.GetNode()] {
+			if visited[edgeNode] {
 				continue
 			}
 
-			heap.Push(pq, edge.GetNode())
+			heap.Push(pq, edgeNode)
 			// If getting to edge from current is cheaper that the edge current cost state,
 			// update it to pass via current instead
-			if newCost := current.GetValue() + edge.GetWeight(); newCost < edge.GetNode().GetValue() {
-				edge.GetNode().SetCost(newCost)
-				edge.GetNode().SetThrough(current)
+			if newCost := current.GetValue() + edge.GetWeight(); newCost < edgeNode.GetValue() {
+				edgeNode.SetCost(newCost)
+				edgeNode.SetThrough(current)
+				// Save path answer to prev
+				prev[edgeNode] = current
 			}
 		}
 	}
 
-	// Reconstruct path
-	shortestPaths = make(map[UndirectedNode[T, S]][]UndirectedNode[T, S], len(self.graph.GetNodes()))
-	for _, node := range self.GetNodes() {
-		var path []UndirectedNode[T, S]
-		// Keep going back until start (nil Through)
-		// i.e. backward path
-		for via := node; via.GetThrough() != nil; via = via.GetThrough() {
-			path = append(path, via)
-		}
-		lenPath := len(path)
-		if lenPath == 0 {
+	return &DijstraShortestPath[T, S]{
+		From:  startNode,
+		Paths: prev,
+	}
+}
+
+// DijkstraShortestPathReconstruct reconstructs a path as an array of nodes
+// from dst back until it found nil, that is, the first node after the start node.
+// For example, if you have a shortestPaths map lile this:
+/*
+	dubai: nil
+	helsinki: dubai
+	budapest: helsinki
+*/
+// Then, the returned slice will be [budapest, helsinki, dubai],
+// and the returned length will be 3 (inclusive). The path reconstruct from this function
+// starts from the destination and goes all the way back to the source.
+func DijkstraShortestPathReconstruct[T dijkstraWeight, S ~string](
+	shortestPaths map[UndirectedNode[T, S]]UndirectedNode[T, S],
+	src UndirectedNode[T, S],
+	dst UndirectedNode[T, S],
+) []UndirectedNode[T, S] {
+	prevNodes := []UndirectedNode[T, S]{dst}
+	prev, found := shortestPaths[dst]
+	if !found {
+		return prevNodes
+	}
+	prevNodes = append(prevNodes, prev)
+
+	for prev.GetThrough() != nil {
+		prevPrev, found := shortestPaths[prev]
+		if !found {
 			continue
 		}
-		// Reverse path, i.e. to forward path
-		for i, j := 0, lenPath-1; i < j; i, j = i+1, j-1 {
-			path[i], path[j] = path[j], path[i]
+
+		prevNodes = append(prevNodes, prevPrev)
+		prev = prevPrev
+
+		// This allows us to have partial path
+		if prev == src {
+			break
 		}
-		shortestPaths[node] = path
 	}
-	return shortestPaths
+	return prevNodes
 }

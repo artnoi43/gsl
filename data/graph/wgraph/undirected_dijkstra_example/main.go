@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/artnoi43/mgl/data/graph/wgraph"
+	"github.com/artnoi43/mgl/mglutils"
 )
 
 // *city implements wgraph.UndirectedNode
@@ -91,12 +92,19 @@ func main() {
 		}
 	}
 
-	shortestPaths := graph.DijkstraFrom(tokyo)
-	for dst, vias := range shortestPaths {
-		fmt.Println(">", "from", tokyo.GetKey(), "to", dst.GetKey(), "dur", dst.GetValue())
-		fmt.Print("via")
-		for _, via := range vias {
-			fmt.Print(" " + via.GetKey())
+	fromNode := tokyo
+	shortestPathsFromTokyo := graph.DijkstraShortestPathFrom(fromNode)
+
+	for _, dst := range graph.GetNodes() {
+		if dst == fromNode {
+			continue
+		}
+		pathToNode := wgraph.DijkstraShortestPathReconstruct(shortestPathsFromTokyo.Paths, shortestPathsFromTokyo.From, dst)
+		mglutils.ReverseInPlace(pathToNode)
+
+		fmt.Println("> from", fromNode.GetKey(), "to", dst.GetKey(), "min cost", dst.GetValue())
+		for _, via := range pathToNode {
+			fmt.Printf("%s (%v) ", via.GetKey(), via.GetValue())
 		}
 		fmt.Println()
 	}

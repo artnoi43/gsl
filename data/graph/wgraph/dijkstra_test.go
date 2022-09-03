@@ -2,9 +2,11 @@ package wgraph
 
 import (
 	"testing"
+
+	"github.com/artnoi43/mgl/mglutils"
 )
 
-type dijkTestUtil[T dijkstraWeight, S ~string] struct {
+type dijkstraTestUtils[T dijkstraWeight, S ~string] struct {
 	inititalValue      T
 	expectedFinalValue T
 	expectedPathHops   int
@@ -29,7 +31,7 @@ func TestDijkstra(t *testing.T) {
 	testDijkstra[float64](t, nameStart, nameFinish)
 }
 
-func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFinish S) map[UndirectedNode[T, S]]*dijkTestUtil[T, S] {
+func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFinish S) map[UndirectedNode[T, S]]*dijkstraTestUtils[T, S] {
 	// TODO: infinity is way too low, because dijkstraWeight also has uint8
 	infinity := T(100)
 	nodeStart := &UndirectedNodeImpl[T, S]{
@@ -37,30 +39,30 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 		Cost: T(0),
 	}
 	nodeA := &UndirectedNodeImpl[T, S]{
-		Name: "a",
+		Name: "A",
 		Cost: infinity,
 	}
 	nodeB := &UndirectedNodeImpl[T, S]{
-		Name: "b",
+		Name: "B",
 		Cost: infinity,
 	}
 	nodeC := &UndirectedNodeImpl[T, S]{
-		Name: "c",
+		Name: "C",
 		Cost: infinity,
 	}
 	nodeD := &UndirectedNodeImpl[T, S]{
-		Name: "d",
+		Name: "D",
 		Cost: infinity,
 	}
 	nodeFinish := &UndirectedNodeImpl[T, S]{
 		Name: nameFinish,
 		Cost: infinity,
 	}
-	m := map[UndirectedNode[T, S]]*dijkTestUtil[T, S]{
+	m := map[UndirectedNode[T, S]]*dijkstraTestUtils[T, S]{
 		nodeStart: {
 			inititalValue:      T(0),
 			expectedFinalValue: T(0),
-			expectedPathHops:   0,
+			expectedPathHops:   1,
 			expectedPathway:    []*UndirectedNodeImpl[T, S]{},
 			edges: []*struct {
 				to     *UndirectedNodeImpl[T, S]
@@ -81,8 +83,8 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 		nodeFinish: {
 			inititalValue:      infinity,
 			expectedFinalValue: T(7),
-			expectedPathHops:   2,
-			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeD, nodeFinish},
+			expectedPathHops:   3,
+			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeStart, nodeD, nodeFinish},
 			edges: []*struct {
 				to     *UndirectedNodeImpl[T, S]
 				weight T
@@ -91,8 +93,8 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 		nodeA: {
 			inititalValue:      infinity,
 			expectedFinalValue: T(2),
-			expectedPathHops:   1,
-			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeA},
+			expectedPathHops:   2,
+			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeStart, nodeA},
 			edges: []*struct {
 				to     *UndirectedNodeImpl[T, S]
 				weight T
@@ -110,8 +112,8 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 		nodeB: {
 			inititalValue:      infinity,
 			expectedFinalValue: T(3),
-			expectedPathHops:   2,
-			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeA, nodeB},
+			expectedPathHops:   3,
+			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeStart, nodeA, nodeB},
 			edges: []*struct {
 				to     *UndirectedNodeImpl[T, S]
 				weight T
@@ -125,8 +127,8 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 		nodeC: {
 			inititalValue:      infinity,
 			expectedFinalValue: T(4),
-			expectedPathHops:   2,
-			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeA, nodeC},
+			expectedPathHops:   3,
+			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeStart, nodeA, nodeC},
 			edges: []*struct {
 				to     *UndirectedNodeImpl[T, S]
 				weight T
@@ -140,8 +142,8 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 		nodeD: {
 			inititalValue:      infinity,
 			expectedFinalValue: T(4),
-			expectedPathHops:   1,
-			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeD},
+			expectedPathHops:   2,
+			expectedPathway:    []*UndirectedNodeImpl[T, S]{nodeStart, nodeD},
 			edges: []*struct {
 				to     *UndirectedNodeImpl[T, S]
 				weight T
@@ -181,9 +183,9 @@ func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFini
 		}
 	}
 
-	shortestPaths := djikGraph.DijkstraFrom(startNode)
+	dijkShortestPaths := djikGraph.DijkstraShortestPathFrom(startNode)
 	fatalMsgCost := "invalid answer for (%s->%s): %d, expecting %d"
-	fatalMsgPathLen := "invalid returned path (%s->%s): %d, expecting %d"
+	fatalMsgPathLen := "invalid returned path length (%s->%s): %d, expecting %d"
 	fatalMsgPathVia := "invalid via path (%s->%s)[%d]: %s, expecting %s"
 
 	// The check is hard-coded
@@ -192,16 +194,24 @@ func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFini
 		if node.GetValue() != util.expectedFinalValue {
 			t.Fatalf(fatalMsgCost, nameStart, node.GetKey(), node.GetValue(), util.expectedFinalValue)
 		}
-		// Test paths
-		shortestPath := shortestPaths[node]
-		if hops := len(shortestPath); hops != util.expectedPathHops {
-			t.Fatalf(fatalMsgPathLen, nameStart, node.GetKey(), hops, util.expectedPathHops)
+
+		if node == startNode {
+			continue
 		}
-		for i, actualPathway := range shortestPath {
-			if expectedPathway := util.expectedPathway[i]; expectedPathway != actualPathway {
-				t.Fatalf(fatalMsgPathVia, nameStart, node.GetKey(), i, actualPathway.GetKey(), expectedPathway.Name)
+		nodeKey := node.GetKey()
+		t.Logf("dst node: %v\n", nodeKey)
+		// Test paths
+		pathToNode := DijkstraShortestPathReconstruct(dijkShortestPaths.Paths, startNode, node)
+		mglutils.ReverseInPlace(pathToNode)
+		if hops := len(pathToNode); hops != util.expectedPathHops {
+			t.Fatalf(fatalMsgPathLen, nameStart, nodeKey, hops, util.expectedPathHops)
+		}
+		for i, actual := range pathToNode {
+			expected := util.expectedPathway[i]
+			// t.Logf("prev[%d]: %v, expected: %v\n", i, actual.GetKey(), expected.GetKey())
+			if expected != actual {
+				t.Fatalf(fatalMsgPathVia, nameStart, nodeKey, i, actual.GetKey(), expected.GetKey())
 			}
 		}
-		// t.Log("src", nameStart, "to", node.GetKey(), "shortest", node.GetValue())
 	}
 }
