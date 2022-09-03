@@ -9,9 +9,11 @@ import (
 	"github.com/artnoi43/mgl/mglutils"
 )
 
+type cityName string
+
 // *city implements wgraph.UndirectedNode
 type city struct {
-	name    string
+	name    cityName
 	cost    float64
 	through *city
 }
@@ -19,16 +21,16 @@ type city struct {
 func main() {
 	infinity := math.MaxFloat64
 
-	tokyo := &city{name: "Tokyo", cost: 0, through: nil}
-	bangkok := &city{name: "Bangkok", cost: infinity, through: nil}
-	hongkong := &city{name: "Hongkong", cost: infinity, through: nil}
-	dubai := &city{name: "Dubai", cost: infinity, through: nil}
-	helsinki := &city{name: "Helsinki", cost: infinity, through: nil}
-	budapest := &city{name: "Budapest", cost: infinity, through: nil}
+	tokyo := &city{name: cityName("Tokyo"), cost: 0, through: nil}
+	bangkok := &city{name: cityName("Bangkok"), cost: infinity, through: nil}
+	hongkong := &city{name: cityName("Hongkong"), cost: infinity, through: nil}
+	dubai := &city{name: cityName("Dubai"), cost: infinity, through: nil}
+	helsinki := &city{name: cityName("Helsinki"), cost: infinity, through: nil}
+	budapest := &city{name: cityName("Budapest"), cost: infinity, through: nil}
 
 	// See file flight_graph.png
-	graphEdges := map[wgraph.UndirectedNode[float64, string]][]struct {
-		to       wgraph.UndirectedNode[float64, string]
+	graphEdges := map[wgraph.WeightedNode[float64, cityName]][]struct {
+		to       wgraph.WeightedNode[float64, cityName]
 		flighDur float64
 	}{
 		tokyo: {
@@ -80,7 +82,8 @@ func main() {
 		budapest: {},
 	}
 
-	graph := wgraph.NewDijkstraGraph[float64, string]()
+	hasDirection := false
+	graph := wgraph.NewDijkstraGraph[float64, cityName](hasDirection)
 	// Add nodes
 	for node, nodeEdges := range graphEdges {
 		graph.AddNode(node)
@@ -114,11 +117,11 @@ func (self *city) GetValue() float64 {
 	return self.cost
 }
 
-func (self *city) GetKey() string {
+func (self *city) GetKey() cityName {
 	return self.name
 }
 
-func (self *city) GetThrough() wgraph.UndirectedNode[float64, string] {
+func (self *city) GetThrough() wgraph.WeightedNode[float64, cityName] {
 	if self.through == nil {
 		return nil
 	}
@@ -129,7 +132,7 @@ func (self *city) SetCost(newCost float64) {
 	self.cost = newCost
 }
 
-func (self *city) SetThrough(node wgraph.UndirectedNode[float64, string]) {
+func (self *city) SetThrough(node wgraph.WeightedNode[float64, cityName]) {
 	if node == nil {
 		self.through = nil
 		return

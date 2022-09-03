@@ -10,23 +10,25 @@ type graphWeight interface {
 	constraints.Ordered
 }
 
-type UndirectedGraph[T graphWeight, S ~string] interface {
-	AddNode(node UndirectedNode[T, S])
-	AddEdge(n1, n2 UndirectedNode[T, S], weight T)
-	GetNodes() []UndirectedNode[T, S]
-	GetEdges() map[UndirectedNode[T, S]][]UndirectedEdge[T, S]
-	GetNodeEdges(node UndirectedNode[T, S]) []UndirectedEdge[T, S]
+type WeightedGraph[T graphWeight, S ~string] interface {
+	SetDirection(bool)
+	HasDirection() bool
+	AddNode(node WeightedNode[T, S])
+	AddEdge(n1, n2 WeightedNode[T, S], weight T)
+	GetNodes() []WeightedNode[T, S]
+	GetEdges() map[WeightedNode[T, S]][]WeightedEdge[T, S]
+	GetNodeEdges(node WeightedNode[T, S]) []WeightedEdge[T, S]
 }
 
-type UndirectedNode[T graphWeight, S ~string] interface {
+type WeightedNode[T graphWeight, S ~string] interface {
 	list.ItemPQ[T]
 	GetKey() S
-	GetThrough() UndirectedNode[T, S]
+	GetThrough() WeightedNode[T, S]
 	SetCost(T)
-	SetThrough(UndirectedNode[T, S])
+	SetThrough(WeightedNode[T, S])
 }
 
-type UndirectedEdge[T graphWeight, S ~string] interface {
-	GetNode() UndirectedNode[T, S]
+type WeightedEdge[T graphWeight, S ~string] interface {
+	GetNode() WeightedNode[T, S]
 	GetWeight() T
 }
