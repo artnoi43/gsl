@@ -133,15 +133,25 @@ func main() {
 		}
 	}
 
-	takeGraph(unweightedGraph, fromNode)
+	takeUnweightedGraph(unweightedGraph, fromNode)
 	takeWeightedGraph(dijkGraph, fromNode)
 	// Compile error: wgraph.WeightedGraph are not compatible with graph.Graph.
 	// But the node types are pretty much interchangable.
-	// takeGraph(dijkGraph, fromNode)
+	// takeUnweightedGraph(dijkGraph, fromNode)
 	// takeWeightedGraph(unweightedGraph, fromNode)
+
+	// Compile error: graph.GenericGraph is too primitive to be used easily. Use graph.Graph or wgraph.GraphWeighted instead
+	// takeGenericGraph(unweightedGraph, fromNode)
+	// takeGenericGraph(dijkGraph, fromNode)
+
 }
 
-func takeGraph(g graph.Graph[float64], from graph.Node[float64]) {
+// graph.GenericGraph is impractical
+func takeGenericGraph(g graph.GenericGraph[*city, *city, float64, map[*city]*city], from graph.Node[float64]) {
+
+}
+
+func takeUnweightedGraph(g graph.Graph[float64], from graph.Node[float64]) {
 
 }
 

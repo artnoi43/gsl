@@ -11,14 +11,15 @@ import (
 
 var ErrEdgeWeightNotNull = errors.New("found edge weight in unweighted graph")
 
-type Directioner interface {
-}
-
+// GenericGraph represents what an mgl graph should look like.
+// It is not intended to be used by production code, but more like an internal building block for mgl graphs.
+// It's not minimal, and was designed around flexibility and coverage.
+// This interface can be used for both unweighted and weighted graph (see wgraph package).
 type GenericGraph[
 	N any, // Type for graph node
 	E any, // Type for graph edge
+	M any, // Type representing the edge implementation of the graph, typically map[N]E.
 	W any, // Type for graph weight
-	M any, // Type representing the edge implementation of the graph.
 ] interface {
 	// SetDirection sets the directionality of the graph.
 	SetDirection(bool)
@@ -42,16 +43,17 @@ type GenericGraph[
 
 type nodeValue any
 
-// The Graph interface was modeled after wgraph.WeightedGraph, to try to make both interfaces
-// very similar, in case I'll be good at Go enough to compose a single interface.
-type Graph[T nodeValue] interface {
-	GenericGraph[
-		Node[T],
-		Node[T],
-		any,
-		map[Node[T]][]Node[T],
-	]
-}
+// Graph is a GenericGraph, but with more node constraints.
+type Graph[T nodeValue] GenericGraph[
+	// The graph node is Node[T]
+	Node[T],
+	// Since there's no edge weight, this graph will use the connected nodes to represent a node's edges
+	Node[T],
+	// The graph's implements edges as a map of node to other nodes
+	map[Node[T]][]Node[T],
+	// The weight can be of any types, but only nil is valid if using the default implementation of unweighted graph
+	any,
+]
 
 type Node[T nodeValue] interface {
 	data.Valuer[T]
