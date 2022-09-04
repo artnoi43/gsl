@@ -11,37 +11,46 @@ import (
 
 var ErrEdgeWeightNotNull = errors.New("found edge weight in unweighted graph")
 
-type nodeValue any
-
 type Directioner interface {
-	SetDirection(bool)
-	HasDirection() bool
 }
 
-type NodeUtils[N any] interface {
+type GenericGraph[
+	N any, // Type for graph node
+	E any, // Type for graph edge
+	W any, // Type for graph weight
+	M any, // Type representing the edge implementation of the graph.
+] interface {
+	// SetDirection sets the directionality of the graph.
+	SetDirection(bool)
+	// HasDirection
+	HasDirection() bool
 	AddNode(node N)
 	GetNodes() []N
+	// AddEdge adds an edge to the graph. If the graph is directional, then AddEdge will only adds edge from n1 to n2.
+	// If the graph is undirectional, then both n1->n2 and n2->n1 edges are added.
+	AddEdge(n1, n2 N, weight W) error
+	// GetNodeEdge takes in a node, and returns the connections from that node. If the graph is unweighted,
+	// the so-called "edges" are just a list of nodes. If the graph is weighted, then the edges returned are
+	// slice of the actual edges.
+	GetNodeEdges(node N) []E
+	// GetEdges returns all the edges in the graph.
+	// In the actual implementations provided by mgl, the type M differs between unweighted and weighted graphs.
+	// If the graph is weighted, then the returned type M is usually a map of node to its edges,
+	// otherwise if the graph has unweighted edges, It returns a slice of nodes accessible by Node.
+	GetEdges() M
 }
 
-type EdgeUtils[N any, E any, W any] interface {
-	AddEdge(n1, n2 N, weight any) error
-	GetNodeEdges(node N) []E
-}
+type nodeValue any
 
 // The Graph interface was modeled after wgraph.WeightedGraph, to try to make both interfaces
 // very similar, in case I'll be good at Go enough to compose a single interface.
 type Graph[T nodeValue] interface {
-	Directioner
-	NodeUtils[Node[T]]
-	EdgeUtils[Node[T], Node[T], any]
-
-	// AddNode(node Node[T])
-	// GetNodes() []Node[T]
-	// AddEdge for unweighted graph DOES NOT do anything with weight when adding an edge.
-	// In the real implementation provided in this package, AddEdge returns an error if weight is not nil.
-	// AddEdge(n1, n2 Node[T], weight any) error
-	// GetNodeEdges(node Node[T]) []Node[T]
-	GetEdges() map[Node[T]][]Node[T]
+	GenericGraph[
+		Node[T],
+		Node[T],
+		any,
+		map[Node[T]][]Node[T],
+	]
 }
 
 type Node[T nodeValue] interface {

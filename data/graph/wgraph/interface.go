@@ -12,17 +12,12 @@ type graphWeight interface {
 }
 
 type WeightedGraph[T graphWeight, S ~string] interface {
-	graph.Directioner
-	graph.NodeUtils[WeightedNode[T, S]]
-	// graph.EdgeUtils[WeightedNode[T, S], WeightedEdge[T, S], T]
-
-	// AddNode(node WeightedNode[T, S])
-	// GetNodes() []WeightedNode[T, S]
-	// GetEdges gets all of the graph's edges.
-	// GetNodeEdges returns all the edge eminating from node
-	AddEdge(n1, n2 WeightedNode[T, S], weight T) error
-	GetNodeEdges(node WeightedNode[T, S]) []WeightedEdge[T, S]
-	GetEdges() map[WeightedNode[T, S]][]WeightedEdge[T, S]
+	graph.GenericGraph[
+		WeightedNode[T, S],
+		WeightedEdge[T, S],
+		T,
+		map[WeightedNode[T, S]][]WeightedEdge[T, S],
+	]
 }
 
 type WeightedNode[T graphWeight, S ~string] interface {
