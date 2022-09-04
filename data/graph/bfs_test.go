@@ -71,16 +71,16 @@ func testBFS(t *testing.T) {
 		g.AddNode(friend)
 	}
 
-	g.AddEdge(art, beagie)
-	g.AddEdge(art, black)
-	g.AddEdge(art, banana)
-	g.AddEdge(art, muji)
-	g.AddEdge(beagie, art)
-	g.AddEdge(beagie, banana)
-	g.AddEdge(beagie, black)
-	g.AddEdge(banana, art)
-	g.AddEdge(banana, beagie)
-	g.AddEdge(black, makam)
+	g.AddEdge(art, beagie, nil)
+	g.AddEdge(art, black, nil)
+	g.AddEdge(art, banana, nil)
+	g.AddEdge(art, muji, nil)
+	g.AddEdge(beagie, art, nil)
+	g.AddEdge(beagie, banana, nil)
+	g.AddEdge(beagie, black, nil)
+	g.AddEdge(banana, art, nil)
+	g.AddEdge(banana, beagie, nil)
+	g.AddEdge(black, makam, nil)
 
 	for fromNode, m := range tests {
 		for toNode, expected := range m {
@@ -144,13 +144,13 @@ func testUBFS(t *testing.T) {
 		g.AddNode(friend)
 	}
 
-	g.AddEdge(art, beagie)
-	g.AddEdge(art, black)
-	g.AddEdge(art, banana)
-	g.AddEdge(beagie, black)
-	g.AddEdge(beagie, banana)
-	g.AddEdge(black, makam)
-	g.AddEdge(black, banana)
+	g.AddEdge(art, beagie, nil)
+	g.AddEdge(art, black, nil)
+	g.AddEdge(art, banana, nil)
+	g.AddEdge(beagie, black, nil)
+	g.AddEdge(beagie, banana, nil)
+	g.AddEdge(black, makam, nil)
+	g.AddEdge(black, banana, nil)
 
 	for fromNode, m := range tests {
 		for toNode, expected := range m {

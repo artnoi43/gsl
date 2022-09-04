@@ -100,7 +100,7 @@ func main() {
 			if err := dijkGraph.AddEdge(node, nodeEdge.to, nodeEdge.flighDur); err != nil {
 				panic("failed to add dijkstra-compatible graph edge: " + err.Error())
 			}
-			unweightedGraph.AddEdge(node, nodeEdge.to)
+			unweightedGraph.AddEdge(node, nodeEdge.to, nil)
 		}
 	}
 
@@ -132,6 +132,21 @@ func main() {
 			fmt.Println("hop", i, hop.(*city).GetKey())
 		}
 	}
+
+	takeGraph(unweightedGraph, fromNode)
+	takeWeightedGraph(dijkGraph, fromNode)
+	// Compile error: wgraph.WeightedGraph are not compatible with graph.Graph.
+	// But the node types are pretty much interchangable.
+	// takeGraph(dijkGraph, fromNode)
+	// takeWeightedGraph(unweightedGraph, fromNode)
+}
+
+func takeGraph(g graph.Graph, from graph.Node) {
+
+}
+
+func takeWeightedGraph(g wgraph.WeightedGraph[float64, cityName], from wgraph.WeightedNode[float64, cityName]) {
+
 }
 
 func (self *city) GetValue() float64 {

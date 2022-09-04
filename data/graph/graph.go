@@ -59,7 +59,10 @@ func (g *GraphImpl) AddNode(node Node) {
 	g.Nodes = append(g.Nodes, node)
 }
 
-func (g *GraphImpl) AddEdge(n1, n2 Node) error {
+func (g *GraphImpl) AddEdge(n1, n2 Node, weight any) error {
+	if weight != nil {
+		return ErrEdgeWeightNotNull
+	}
 	g.mut.Lock()
 	defer g.mut.Unlock()
 
