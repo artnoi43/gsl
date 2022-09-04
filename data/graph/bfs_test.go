@@ -65,7 +65,7 @@ func testBFS(t *testing.T) {
 	}
 
 	people := []person{art, beagie, black, makam}
-	g := NewGraph(true)
+	g := NewGraph[int](true)
 
 	for _, friend := range people {
 		g.AddNode(friend)
@@ -85,7 +85,7 @@ func testBFS(t *testing.T) {
 	for fromNode, m := range tests {
 		for toNode, expected := range m {
 			// t.Logf("from %v to %v", fromNode, toNode)
-			shortestPath, hops, found := BFSShortestPath(g, fromNode, toNode)
+			shortestPath, hops, found := BFSShortestPath[int](g, fromNode, toNode)
 			if found != expected.found {
 				t.Log(shortestPath)
 				t.Fatalf("unexpected found: %v, expected %v\n", found, expected.found)
@@ -138,7 +138,7 @@ func testUBFS(t *testing.T) {
 	}
 
 	people := []person{art, beagie, black, makam}
-	g := NewGraph(false)
+	g := NewGraph[int](false)
 
 	for _, friend := range people {
 		g.AddNode(friend)
@@ -155,7 +155,7 @@ func testUBFS(t *testing.T) {
 	for fromNode, m := range tests {
 		for toNode, expected := range m {
 			// t.Logf("from %v to %v", fromNode, toNode)
-			shortestPath, hops, found := BFSShortestPath(g, fromNode, toNode)
+			shortestPath, hops, found := BFSShortestPath[int](g, fromNode, toNode)
 			if found != expected.found {
 				t.Log(shortestPath)
 				t.Fatalf("unexpected found: %v, expected %v\n", found, expected.found)

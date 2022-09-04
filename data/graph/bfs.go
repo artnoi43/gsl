@@ -8,7 +8,7 @@ import (
 // It then returns the shortest path (slice of nodes), the number of hops it takes from `src` to `dst`,
 // and a true boolean value if there's a path from `src` to `dst`.
 // Otherwise, a nil slice, -1, and false is returned if there's no such path.
-func BFSShortestPath(g Graph, src Node, dst Node) ([]Node, int, bool) {
+func BFSShortestPath[T nodeValue](g Graph[T], src Node[T], dst Node[T]) ([]Node[T], int, bool) {
 	rawPath, found := BFSSearch(g, src, dst)
 	if !found {
 		return nil, -1, false
@@ -19,12 +19,12 @@ func BFSShortestPath(g Graph, src Node, dst Node) ([]Node, int, bool) {
 }
 
 // BFSSearch traverses the graph in BFS manner, and collecting VFS traversal information in a map `prev`. It returns the map, and a boolean value denoting if dst was reachable from src
-func BFSSearch(g Graph, src Node, dst Node) (map[Node]Node, bool) {
-	q := list.NewQueue[Node]()
+func BFSSearch[T nodeValue](g Graph[T], src Node[T], dst Node[T]) (map[Node[T]]Node[T], bool) {
+	q := list.NewQueue[Node[T]]()
 	q.Push(src)
 
-	visited := make(map[Node]bool)
-	prev := make(map[Node]Node)
+	visited := make(map[Node[T]]bool)
+	prev := make(map[Node[T]]Node[T])
 	var found bool
 	for !q.IsEmpty() {
 		popped := q.Pop()
@@ -54,9 +54,9 @@ func BFSSearch(g Graph, src Node, dst Node) (map[Node]Node, bool) {
 // BFSShortestPathReconstruct reconstructs inclusive path from src to dst,
 // and returns the slice of reconstructed path. The path is backward, that is,
 // the first element is dst, and the last element is src.
-func BFSShortestPathReconstruct(backwardPath map[Node]Node, src, dst Node) ([]Node, int) {
+func BFSShortestPathReconstruct[T nodeValue](backwardPath map[Node[T]]Node[T], src, dst Node[T]) ([]Node[T], int) {
 	current := dst
-	shortestPath := []Node{current}
+	shortestPath := []Node[T]{current}
 	var hops int
 	if current == src {
 		return shortestPath, hops

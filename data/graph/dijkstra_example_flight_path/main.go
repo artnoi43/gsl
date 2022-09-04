@@ -89,7 +89,7 @@ func main() {
 
 	hasDirection := false
 	dijkGraph := wgraph.NewDijkstraGraph[float64, cityName](hasDirection)
-	unweightedGraph := graph.NewGraph(hasDirection)
+	unweightedGraph := graph.NewGraph[float64](hasDirection)
 
 	// Add edges and nodes to graphs
 	for node, nodeEdges := range graphEdges {
@@ -125,7 +125,7 @@ func main() {
 
 	fmt.Println("BFS result")
 	for _, dst := range unweightedGraph.GetNodes() {
-		shortestHopsFromTokyo, hops, found := graph.BFSShortestPath(unweightedGraph, fromNode, dst)
+		shortestHopsFromTokyo, hops, found := graph.BFSShortestPath[float64](unweightedGraph, fromNode, dst)
 		fmt.Println("path to", dst.(*city).GetKey(), "found", found, "shortestHops", hops)
 		mglutils.ReverseInPlace(shortestHopsFromTokyo)
 		for i, hop := range shortestHopsFromTokyo {
@@ -141,7 +141,7 @@ func main() {
 	// takeWeightedGraph(unweightedGraph, fromNode)
 }
 
-func takeGraph(g graph.Graph, from graph.Node) {
+func takeGraph(g graph.Graph[float64], from graph.Node[float64]) {
 
 }
 
