@@ -5,10 +5,12 @@ import (
 	"math"
 	"reflect"
 
-	graphlib "github.com/artnoi43/mgl/data/graph"
+	"github.com/artnoi43/mgl/data/graph"
 	"github.com/artnoi43/mgl/data/graph/wgraph"
 	"github.com/artnoi43/mgl/mglutils"
 )
+
+// This code purpose is to show an example of how to use the graph and wgraph packages.
 
 type cityName string
 
@@ -84,27 +86,27 @@ func main() {
 	}
 
 	hasDirection := false
-	graph := wgraph.NewDijkstraGraph[float64, cityName](hasDirection)
-	dumbGraph := graphlib.NewGraph(false)
+	dijkGraph := wgraph.NewDijkstraGraph[float64, cityName](hasDirection)
+	unweightedGraph := graph.NewGraph(hasDirection)
 
-	// Add nodes
+	// Add edges and nodes to graphs
 	for node, nodeEdges := range graphEdges {
-		graph.AddNode(node)
-		dumbGraph.AddNode(node)
+		dijkGraph.AddNode(node)
+		unweightedGraph.AddNode(node)
 		for _, nodeEdge := range nodeEdges {
 			// fmt.Println(node.GetKey()+":", "adding edge", nodeEdge.to.GetKey(), "weight", nodeEdge.flighDur)
-			if err := graph.AddEdge(node, nodeEdge.to, nodeEdge.flighDur); err != nil {
+			if err := dijkGraph.AddEdge(node, nodeEdge.to, nodeEdge.flighDur); err != nil {
 				panic("failed to add dijkstra-compatible graph edge: " + err.Error())
 			}
-			dumbGraph.AddEdge(node, nodeEdge.to)
+			unweightedGraph.AddEdge(node, nodeEdge.to)
 		}
 	}
 
 	fromNode := tokyo
-	shortestPathsFromTokyo := graph.DijkstraShortestPathFrom(fromNode)
+	shortestPathsFromTokyo := dijkGraph.DijkstraShortestPathFrom(fromNode)
 
 	fmt.Println("Dijkstra result")
-	for _, dst := range graph.GetNodes() {
+	for _, dst := range dijkGraph.GetNodes() {
 		if dst == fromNode {
 			continue
 		}
@@ -119,11 +121,11 @@ func main() {
 	}
 
 	fmt.Println("BFS result")
-	shortestHopsFromTokyo, hops, found := graphlib.BFSShortestPath(dumbGraph, fromNode, budapest)
+	shortestHopsFromTokyo, hops, found := graph.BFSShortestPath(unweightedGraph, fromNode, budapest)
 	fmt.Println("found", found, "shortestHops", hops)
+	mglutils.ReverseInPlace(shortestHopsFromTokyo)
 	for i, hop := range shortestHopsFromTokyo {
-		hopNode := hop.(*city)
-		fmt.Println("hop", i, hopNode.GetKey())
+		fmt.Println("hop", i, hop.(*city).GetKey())
 	}
 }
 
