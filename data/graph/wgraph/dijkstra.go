@@ -42,6 +42,14 @@ func NewDijkstraGraph[T dijkstraWeight, S ~string](hasDirection bool) *DijkstraG
 	}
 }
 
+func (self *DijkstraGraph[T, S]) SetDirection(hasDirection bool) {
+	self.graph.SetDirection(hasDirection)
+}
+
+func (self *DijkstraGraph[T, S]) HasDirection() bool {
+	return self.graph.HasDirection()
+}
+
 func (self *DijkstraGraph[T, S]) AddNode(node WeightedNode[T, S]) {
 	self.graph.AddNode(node)
 }

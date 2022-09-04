@@ -59,7 +59,7 @@ func (g *GraphImpl) AddNode(node Node) {
 	g.Nodes = append(g.Nodes, node)
 }
 
-func (g *GraphImpl) AddEdge(n1, n2 Node) {
+func (g *GraphImpl) AddEdge(n1, n2 Node) error {
 	g.mut.Lock()
 	defer g.mut.Unlock()
 
@@ -67,8 +67,9 @@ func (g *GraphImpl) AddEdge(n1, n2 Node) {
 	g.Edges[n1] = append(g.Edges[n1], n2)
 
 	if g.Direction {
-		return
+		return nil
 	}
 	// If it's not directed, then both nodes have links from and to each other
 	g.Edges[n2] = append(g.Edges[n2], n1)
+	return nil
 }

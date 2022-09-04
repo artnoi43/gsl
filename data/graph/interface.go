@@ -6,7 +6,7 @@ type Graph interface {
 	SetDirection(bool)
 	HasDirection() bool
 	AddNode(node Node)
-	AddEdge(n1, n2 Node)
+	AddEdge(n1, n2 Node) error
 	GetNodes() []Node
 	GetEdges() map[Node][]Node
 	GetNodeEdges(node Node) []Node

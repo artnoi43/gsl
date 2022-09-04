@@ -11,6 +11,8 @@ import (
 )
 
 // This code purpose is to show an example of how to use the graph and wgraph packages.
+// The code provides an example of solving the best flight path between major cities.
+// It uses a weight graph to do Dijkstra sort, and an unweighted graph for BFS.
 
 type cityName string
 
@@ -119,13 +121,16 @@ func main() {
 		}
 		fmt.Println()
 	}
+	fmt.Println()
 
 	fmt.Println("BFS result")
-	shortestHopsFromTokyo, hops, found := graph.BFSShortestPath(unweightedGraph, fromNode, budapest)
-	fmt.Println("found", found, "shortestHops", hops)
-	mglutils.ReverseInPlace(shortestHopsFromTokyo)
-	for i, hop := range shortestHopsFromTokyo {
-		fmt.Println("hop", i, hop.(*city).GetKey())
+	for _, dst := range unweightedGraph.GetNodes() {
+		shortestHopsFromTokyo, hops, found := graph.BFSShortestPath(unweightedGraph, fromNode, dst)
+		fmt.Println("path to", dst.(*city).GetKey(), "found", found, "shortestHops", hops)
+		mglutils.ReverseInPlace(shortestHopsFromTokyo)
+		for i, hop := range shortestHopsFromTokyo {
+			fmt.Println("hop", i, hop.(*city).GetKey())
+		}
 	}
 }
 

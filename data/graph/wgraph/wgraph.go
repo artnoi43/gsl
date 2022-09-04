@@ -66,7 +66,8 @@ func (self *WeightedGraphImpl[T, S]) AddNode(node WeightedNode[T, S]) {
 	self.Nodes = append(self.Nodes, node)
 }
 
-func (self *WeightedGraphImpl[T, S]) AddEdge(n1, n2 WeightedNode[T, S], weight T) {
+// AddEdge adds edge from n1 to n2. This particular method does not return error in any case.
+func (self *WeightedGraphImpl[T, S]) AddEdge(n1, n2 WeightedNode[T, S], weight T) error {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 
@@ -74,8 +75,10 @@ func (self *WeightedGraphImpl[T, S]) AddEdge(n1, n2 WeightedNode[T, S], weight T
 	self.Edges[n1] = append(self.Edges[n1], &WeightedEdgeImpl[T, S]{node: n2, weight: weight})
 
 	if self.Direction {
-		return
+		return nil
 	}
+
 	// If it's not directed, then both nodes have links from and to each other
 	self.Edges[n2] = append(self.Edges[n2], &WeightedEdgeImpl[T, S]{node: n1, weight: weight})
+	return nil
 }

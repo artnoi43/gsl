@@ -14,9 +14,11 @@ type WeightedGraph[T graphWeight, S ~string] interface {
 	SetDirection(bool)
 	HasDirection() bool
 	AddNode(node WeightedNode[T, S])
-	AddEdge(n1, n2 WeightedNode[T, S], weight T)
+	AddEdge(n1, n2 WeightedNode[T, S], weight T) error
 	GetNodes() []WeightedNode[T, S]
+	// GetEdges gets all of the graph's edges.
 	GetEdges() map[WeightedNode[T, S]][]WeightedEdge[T, S]
+	// GetNodeEdges returns all the edge eminating from node
 	GetNodeEdges(node WeightedNode[T, S]) []WeightedEdge[T, S]
 }
 
