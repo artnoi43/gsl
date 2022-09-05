@@ -2,10 +2,13 @@ package list
 
 import (
 	"container/heap"
+	"math/big"
 	"reflect"
 	"testing"
 
 	"golang.org/x/exp/constraints"
+
+	"github.com/artnoi43/mgl/data"
 )
 
 type foo[T constraints.Ordered] struct {
@@ -13,7 +16,7 @@ type foo[T constraints.Ordered] struct {
 	value T
 }
 
-// Implements data.Valuer[T] and list.ItemPQ[T]
+// Implements data.Valuer[T]
 func (self foo[T]) GetValue() T {
 	return self.value
 }
@@ -29,30 +32,42 @@ func TestPq(t *testing.T) {
 		lowest,
 	}
 
-	outMinHeap := testPop(t, MinHeap, items)
-	if outMinHeap != lowest {
-		t.Fatalf("unexpected MinHeap results - expected %+v, got %+v\n", lowest, outMinHeap)
+	minHeapResults := testPop(t, MinHeap, items)
+	for _, minHeapResult := range minHeapResults {
+		if minHeapResult != lowest {
+			t.Fatalf("unexpected MinHeap results - expected %+v, got %+v\n", lowest, minHeapResult)
+		}
 	}
-	outMaxHeap := testPop(t, MaxHeap, items)
-	if outMaxHeap != highest {
-		t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", highest, outMaxHeap)
+
+	maxHeapResults := testPop(t, MaxHeap, items)
+	for _, maxHeapResult := range maxHeapResults {
+		if maxHeapResult != highest {
+			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", highest, maxHeapResult)
+		}
 	}
 
 	testArbitaryUpdate(t)
 }
 
-func testPop[T constraints.Ordered](t *testing.T, pqType TypePQ, items []foo[T]) foo[T] {
+func testPop[T constraints.Ordered](t *testing.T, pqType HeapType, items []foo[T]) []foo[T] {
 	pq := NewPriorityQueue[T](pqType)
-	for _, item := range items {
-		heap.Push(pq, item)
-	}
+	pqCustom := NewPriorityQueueCustom(pqType, lessOrdered[T])
+	queues := []*PriorityQueue[T]{pq, pqCustom}
 
-	p := heap.Pop(pq)
-	popped, ok := p.(foo[T])
-	if !ok {
-		t.Fatalf("type assertion to *foo failed, got type: %s", reflect.TypeOf(p))
+	var ret []foo[T]
+	for _, q := range queues {
+		for _, item := range items {
+			heap.Push(q, item)
+		}
+
+		p := heap.Pop(q)
+		popped, ok := p.(foo[T])
+		if !ok {
+			t.Fatalf("type assertion to *foo failed, got type: %s", reflect.TypeOf(p))
+		}
+		ret = append(ret, popped)
 	}
-	return popped
+	return ret
 }
 
 func testArbitaryUpdate(t *testing.T) {
@@ -70,27 +85,96 @@ func testArbitaryUpdate(t *testing.T) {
 
 	// Arbitary pushes and inits
 	pq := NewPriorityQueue[float64](MaxHeap)
-	for _, item := range foosFloat {
-		heap.Push(pq, item)
-	}
+	pqCustom := NewPriorityQueueCustom(MaxHeap, lessOrdered[float64])
+	queues := []*PriorityQueue[float64]{pq, pqCustom}
 
-	p := heap.Pop(pq)
-	popped, ok := p.(foo[float64])
-	if !ok {
-		t.Fatalf("type assertion to *foo failed, got type: %s", reflect.TypeOf(p))
-	}
-	if popped != hundred {
-		t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", hundred, popped)
-	}
+	for _, q := range queues {
+		for _, item := range foosFloat {
+			heap.Push(q, item)
+		}
 
-	pq.Type = MinHeap
-	heap.Init(pq)
-	p = heap.Pop(pq)
-	popped, ok = p.(foo[float64])
-	if !ok {
-		t.Fatalf("type assertion to *foo failed, got type: %s", reflect.TypeOf(p))
+		p := heap.Pop(q)
+		popped, ok := p.(foo[float64])
+		if !ok {
+			t.Fatalf("type assertion to *foo failed, got type: %s", reflect.TypeOf(p))
+		}
+		if popped != hundred {
+			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", hundred, popped)
+		}
+
+		q.HeapType = MinHeap
+		heap.Init(q)
+		p = heap.Pop(q)
+		popped, ok = p.(foo[float64])
+		if !ok {
+			t.Fatalf("type assertion to *foo failed, got type: %s", reflect.TypeOf(p))
+		}
+		if popped != zero {
+			t.Fatalf("unexpected MinHeap results - expected %+v, got %+v\n", zero, popped)
+		}
 	}
-	if popped != zero {
-		t.Fatalf("unexpected MinHeap results - expected %+v, got %+v\n", zero, popped)
+}
+
+type bar struct {
+	val *big.Int
+}
+
+func (b *bar) GetValue() *big.Int {
+	return b.val
+}
+
+func TestPQCmp(t *testing.T) {
+	a := &bar{val: big.NewInt(69)}
+	b := &bar{val: big.NewInt(70)}
+	c := &bar{val: big.NewInt(100)}
+	d := &bar{val: big.NewInt(1000000)}
+
+	t.Run("MaxHeap with Cmp", func(t *testing.T) {
+		testPqCmpMax(t, []*bar{a, d, c, b}, d)
+	})
+	t.Run("MinHeap with Cmp", func(t *testing.T) {
+		testPqCmpMin(t, []*bar{a, d, c, b}, a)
+	})
+
+	lol(a) // Compiles and no panic
+}
+
+func lol(item data.Valuer[*big.Int]) {
+
+}
+
+func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
+	maxPq := NewPriorityQueueCmp[*big.Int](MaxHeap)
+	maxPqCustom := NewPriorityQueueCustom(MaxHeap, lessCmp[*big.Int])
+	queues := []*PriorityQueue[*big.Int]{maxPq, maxPqCustom}
+
+	for _, q := range queues {
+		for _, item := range messy {
+			heap.Push(q, item)
+		}
+		if popped := heap.Pop(q); popped != nil {
+			actual := popped.(*bar)
+			if actual != max {
+				t.Fatalf("unexpected max heap result: expected %v, got %v\n", max.GetValue(), actual.GetValue())
+			}
+		}
+	}
+}
+
+func testPqCmpMin(t *testing.T, messy []*bar, min *bar) {
+	minPq := NewPriorityQueueCmp[*big.Int](MinHeap)
+	minPqCustom := NewPriorityQueueCustom(MinHeap, lessCmp[*big.Int])
+	queues := []*PriorityQueue[*big.Int]{minPq, minPqCustom}
+
+	for _, q := range queues {
+		for _, item := range messy {
+			heap.Push(q, item)
+		}
+		if popped := heap.Pop(q); popped != nil {
+			actual := popped.(*bar)
+			if actual != min {
+				t.Fatalf("unexpected min heap result: expected %v, got %v\n", min.GetValue(), actual.GetValue())
+			}
+		}
 	}
 }
