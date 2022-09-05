@@ -2,7 +2,7 @@ package list
 
 type Queue[T any] []T
 
-func NewSafeQueue[T any]() *SafeList[T] {
+func NewSafeQueue[T any]() *SafeList[T, *Queue[T]] {
 	q := new(Queue[T])
 	return WrapSafeList[T](q)
 }

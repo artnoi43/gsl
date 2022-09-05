@@ -5,11 +5,19 @@ import "testing"
 func TestStack(t *testing.T) {
 	values0 := []uint8{0, 1, 2, 3}
 	stack0 := NewStack[uint8]()
-	testStack(t, values0, stack0)
+	sstack0 := NewSafeStack[uint8]()
+	uintStacks := []BasicList[uint8]{stack0, sstack0}
+	for _, s := range uintStacks {
+		testStack(t, values0, s)
+	}
 
 	values1 := []string{"one"}
 	stack1 := NewStack[string]()
-	testStack(t, values1, stack1)
+	sstack1 := NewSafeStack[string]()
+	stringStacks := []BasicList[string]{stack1, sstack1}
+	for _, s := range stringStacks {
+		testStack(t, values1, s)
+	}
 
 	// Composite type stack - any comparable types should be ok in this tests
 	valuesComposite := []interface{}{1, true, "second last"}
@@ -36,7 +44,7 @@ func TestStack(t *testing.T) {
 	}
 }
 
-func testStack[T comparable](t *testing.T, values []T, stack *Stack[T]) {
+func testStack[T comparable](t *testing.T, values []T, stack BasicList[T]) {
 	// Test Push
 	for _, expected := range values {
 		stack.Push(expected)
