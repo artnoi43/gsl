@@ -131,6 +131,12 @@ func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted
 	}
 }
 
+// ReconstructPathTo reconstructs shortest path as slice of nodes, from `d.from` to `to`
+// using DijkstraShortestPathReconstruct
+func (d *DijstraShortestPath[T, S]) ReconstructPathTo(to NodeWeighted[T, S]) []NodeWeighted[T, S] {
+	return DijkstraShortestPathReconstruct(d.Paths, d.From, to)
+}
+
 // DijkstraShortestPathReconstruct reconstructs a path as an array of nodes
 // from dst back until it found nil, that is, the first node after the start node.
 // For example, if you have a shortestPaths map lile this:

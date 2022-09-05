@@ -202,7 +202,7 @@ func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFini
 		nodeKey := node.GetKey()
 		// t.Logf("dst node: %v\n", nodeKey)
 		// Test paths
-		pathToNode := DijkstraShortestPathReconstruct(dijkShortestPaths.Paths, startNode, node)
+		pathToNode := dijkShortestPaths.ReconstructPathTo(node)
 		gslutils.ReverseInPlace(pathToNode)
 		if hops := len(pathToNode); hops != util.expectedPathHops {
 			t.Fatalf(fatalMsgPathLen, nameStart, nodeKey, hops, util.expectedPathHops)
