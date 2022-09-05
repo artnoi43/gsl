@@ -25,8 +25,8 @@ func (g *GraphImpl[T]) SetDirection(hasDirection bool) {
 }
 
 func (g *GraphImpl[T]) HasDirection() bool {
-	g.mut.Lock()
-	defer g.mut.Unlock()
+	g.mut.RLock()
+	defer g.mut.RUnlock()
 
 	return g.Direction
 }

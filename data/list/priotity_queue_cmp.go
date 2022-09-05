@@ -14,12 +14,9 @@ type CmpOrdered[T any] interface {
 	Cmp(T) int
 }
 
-// An ItemPQCmp is like a structure whose GetValue() method returns CmpOrdered type.
-// And example would be `struct foo { value *big.Int }`, with method `GetValue() *big.Int`
-type ItemPQCmp[T any] data.Valuer[T]
-
+// PriorityQueueCmp[T] is a priority queue whose priority is of type T, which is constrained by CmpOrdered[T]
 type PriorityQueueCmp[T CmpOrdered[T]] struct {
-	Items []ItemPQCmp[T]
+	Items []data.Valuer[T]
 	Type  TypePQ
 	mut   *sync.RWMutex
 }
@@ -63,7 +60,7 @@ func (pq *PriorityQueueCmp[T]) Swap(i, j int) {
 func (pq *PriorityQueueCmp[T]) Push(x any) {
 	pq.mut.Lock()
 	defer pq.mut.Unlock()
-	item, ok := x.(ItemPQCmp[T])
+	item, ok := x.(data.Valuer[T])
 	if !ok {
 		typeOfT := reflect.TypeOf(pq.Items).String()[2:]
 		panic(fmt.Sprintf("x is not of type %s", typeOfT))

@@ -32,8 +32,8 @@ func (self *GraphWeightedImpl[T, S]) SetDirection(hasDirection bool) {
 }
 
 func (self *GraphWeightedImpl[T, S]) HasDirection() bool {
-	self.mut.Lock()
-	defer self.mut.Unlock()
+	self.mut.RLock()
+	defer self.mut.RUnlock()
 
 	return self.Direction
 }

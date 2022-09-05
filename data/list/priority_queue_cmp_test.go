@@ -4,6 +4,8 @@ import (
 	"container/heap"
 	"math/big"
 	"testing"
+
+	"github.com/artnoi43/mgl/data"
 )
 
 type bar struct {
@@ -27,10 +29,10 @@ func TestPQCmp(t *testing.T) {
 		testPqCmpMin(t, []*bar{a, d, c, b}, a)
 	})
 
-	lol(a)
+	lol(a) // Compiles and no panic
 }
 
-func lol(item ItemPQCmp[*big.Int]) {
+func lol(item data.Valuer[*big.Int]) {
 
 }
 

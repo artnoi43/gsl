@@ -3,8 +3,8 @@ package wgraph
 import (
 	"golang.org/x/exp/constraints"
 
+	"github.com/artnoi43/mgl/data"
 	"github.com/artnoi43/mgl/data/graph"
-	"github.com/artnoi43/mgl/data/list"
 )
 
 type graphWeight interface {
@@ -28,7 +28,7 @@ type WeightedGraph[
 
 // WeightedNode should be able to put in a priority queue, just in case topological sort is needed.
 type WeightedNode[T graphWeight, S ~string] interface {
-	list.ItemPQ[T] // For priority queue
+	data.Valuer[T] // For priority queue
 	SetCost(T)     // Set accumulated cost to the node
 
 	GetKey() S

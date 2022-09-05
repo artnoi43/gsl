@@ -15,11 +15,8 @@ const (
 	MaxHeap
 )
 
-// ItemPQ constraints Valuer to constraints.Ordered, because we need this to compare the values
-type ItemPQ[T constraints.Ordered] data.Valuer[T]
-
 type PriorityQueue[T constraints.Ordered] struct {
-	Items []ItemPQ[T]
+	Items []data.Valuer[T]
 	Type  TypePQ
 	mut   *sync.RWMutex
 }
@@ -57,7 +54,7 @@ func (self *PriorityQueue[T]) Push(x any) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 
-	item, ok := x.(ItemPQ[T])
+	item, ok := x.(data.Valuer[T])
 	if !ok {
 		typeOfT := fmt.Sprintf("%T", new(T))
 		panic(fmt.Sprintf("x is not of type %s", typeOfT))

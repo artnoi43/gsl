@@ -6,7 +6,7 @@ type NodeWeightedImpl[T graphWeight, S ~string] struct {
 	Through WeightedNode[T, S]
 }
 
-// Implements data.ItemPQ[T]
+// Implements data.Valuer[T]
 func (self *NodeWeightedImpl[T, S]) GetValue() T {
 	return self.Cost
 }
