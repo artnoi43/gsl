@@ -1,4 +1,4 @@
-# gsl: G Soylib - where I store my boilerplate code
+# gsl: Go Soylib - where I store my boilerplate code
 gsl was conceived simply because I found myself writing too much duplicate boilerplate code.
 
 Code like handling errors concurrently, or priority queues, are duplicated all over my projects. Even with Go generics (>=1.18), there're still duplicate code. This is bad, because I'll have to change code in many places. And I ususally change code, since I'm a beginner who only learned to code like < 2 years.
