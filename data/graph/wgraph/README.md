@@ -1,12 +1,10 @@
 # Weighted Graphs
-This package provides basic building blocks and example implementations of weighted graphs. Package interfaces include 
+This package provides building blocks for graph with weighted edges. The graph types are:
 
-I'll be adding more types and algorithms as soon as I learn the new ones.
+1. `GraphWeighted[T, S]` interface, which is constrained `GenericGraph`.
 
-- `ugraph` undirected, weighted graph implementing interface `UndirectedGraph`
+2. `GraphWeightedImpl[T, S]` and `GraphWeightedImplSafe[T, S]`: default implementations of `GraphWeighted[T, S]`.
 
-- `unode` a node of a `ugraph`, implements `UndirectedNode`
+3. `DijkstraGraph[T, S]` a wrapper for `GraphWeightImpl[T, S]`. It checks whether the edge value is negative, and errs if so.
 
-- `uedge` an edge of a `ugraph`, implements `UndirectedEdge`
-
-> The Dijkstra algorithm here should work with any graphs, nodes, and edges that implement the interfaces in `interface.go`. When using code `dijkstra.go` from, be sure to use `*DijkstraGraphUndirected[T, S]) AddDijkstraEdge` instead of `UndirectedGraph.AddEdge` when adding edges to avoid adding negative-weight edges.
+The Dijkstra algorithm here should work with any graph that implement the `GraphWeighted` interfaces in `interface.go`. When using code `dijkstra.go` from, be sure to use `*DijkstraGraphUndirected[T, S]).AddDijkstraEdge` instead of `WeigtedGraph.AddEdge` when adding edges to avoid adding edges with bad weight.

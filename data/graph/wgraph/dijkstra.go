@@ -19,19 +19,21 @@ type dijkstraWeight interface {
 	constraints.Integer | constraints.Float
 }
 
-// This type is the Dijkstra shortest path answer. It has 2 fields, (1) `From` the 'from' node, and (2) `Paths`.
-// DijkstraShortestPath.Paths is a hash map where the key is a node, and the value is the previous node with the lowest cost to that key node.
-type DijstraShortestPath[T dijkstraWeight, S ~string] struct {
-	From  NodeWeighted[T, S]
-	Paths map[NodeWeighted[T, S]]NodeWeighted[T, S]
-}
-
 // DijkstraGraph[T] wraps GraphWeightedImpl[T], where T is generic type numeric types and S is ~string.
 // Only constraints.Unsigned T is being tested.
 // To prevent bugs, so if the weight data source is of non-T type (i.e. a float), users will need to perform
 // multiplications on the data, e.g. 0.1 -> 1000, 0.01 -> 100.
 type DijkstraGraph[T dijkstraWeight, S ~string] struct {
 	graph GraphWeighted[T, S]
+}
+
+// This type is the Dijkstra shortest path answer. It has 2 fields, (1) `From` the 'from' node, and (2) `Paths`.
+// DijkstraShortestPath.Paths is a hash map where the key is a node, and the value is the previous node with the lowest cost to that key node.
+// Because each instance holds all best route to every reachable node from From node, you can reconstruct the shortest path from any nodes in
+// that Paths map with ReconstructPathTo
+type DijstraShortestPath[T dijkstraWeight, S ~string] struct {
+	From  NodeWeighted[T, S]
+	Paths map[NodeWeighted[T, S]]NodeWeighted[T, S]
 }
 
 // NewDikstraGraph calls NewGraphWeighted[T, S], and return the graph.
@@ -82,7 +84,7 @@ func (self *DijkstraGraph[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWei
 func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted[T, S]) *DijstraShortestPath[T, S] {
 	var zeroValue T
 	startNode.SetValueOrCost(zeroValue)
-	startNode.SetThrough(nil)
+	startNode.SetPrevious(nil)
 
 	visited := make(map[NodeWeighted[T, S]]bool)
 	prev := make(map[NodeWeighted[T, S]]NodeWeighted[T, S])
@@ -118,7 +120,7 @@ func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted
 			// update it to pass via current instead
 			if newCost := current.GetValue() + edge.GetWeight(); newCost < edgeNode.GetValue() {
 				edgeNode.SetValueOrCost(newCost)
-				edgeNode.SetThrough(current)
+				edgeNode.SetPrevious(current)
 				// Save path answer to prev
 				prev[edgeNode] = current
 			}
@@ -160,7 +162,7 @@ func DijkstraShortestPathReconstruct[T dijkstraWeight, S ~string](
 	}
 	prevNodes = append(prevNodes, prev)
 
-	for prev.GetThrough() != nil {
+	for prev.GetPrevious() != nil {
 		prevPrev, found := shortestPaths[prev]
 		if !found {
 			continue

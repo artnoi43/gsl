@@ -28,16 +28,16 @@ type GraphWeighted[
 
 // NodeWeighted should be able to put in a priority queue, just in case topological sort is needed.
 type NodeWeighted[T graphWeight, S ~string] interface {
-	data.Valuer[T]    // For priority queue
-	SetValueOrCost(T) // Set accumulated cost to the node
+	data.Valuer[T]          // For priority queue
+	SetValueOrCost(value T) // Save cost or value to the node
 
-	GetKey() S
-	GetThrough() NodeWeighted[T, S]
-	SetThrough(NodeWeighted[T, S])
+	GetKey() S                           // Get the node's key, names, IDs
+	GetPrevious() NodeWeighted[T, S]     // When using with Dijkstra code, gets the previous (prior node) from in a Dijkstra walk.
+	SetPrevious(prev NodeWeighted[T, S]) // In Dijkstra code, set a node's previous node value
 }
 
 // EdgeWeighted represents what a weighted edge should be able to do.
 type EdgeWeighted[T graphWeight, S ~string] interface {
-	GetNode() NodeWeighted[T, S]
+	GetNode() (to NodeWeighted[T, S])
 	GetWeight() T
 }

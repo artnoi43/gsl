@@ -174,14 +174,14 @@ func (self *city) GetKey() cityName {
 	return self.name
 }
 
-func (self *city) GetThrough() wgraph.NodeWeighted[float64, cityName] {
+func (self *city) GetPrevious() wgraph.NodeWeighted[float64, cityName] {
 	if self.through == nil {
 		return nil
 	}
 	return self.through
 }
 
-func (self *city) SetThrough(node wgraph.NodeWeighted[float64, cityName]) {
+func (self *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
 	if node == nil {
 		self.through = nil
 		return
