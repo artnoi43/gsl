@@ -34,6 +34,7 @@ func NewPriorityQueue[T constraints.Ordered](t TypePQ) *PriorityQueue[T] {
 func (self *PriorityQueue[T]) Len() int {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
+
 	return len(self.Items)
 }
 
@@ -41,18 +42,21 @@ func (self *PriorityQueue[T]) Less(i, j int) bool {
 	if self.Type == MinHeap {
 		return self.Items[i].GetValue() < self.Items[j].GetValue()
 	}
+
 	return self.Items[i].GetValue() > self.Items[j].GetValue()
 }
 
 func (self *PriorityQueue[T]) Swap(i, j int) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
+
 	self.Items[i], self.Items[j] = self.Items[j], self.Items[i]
 }
 
 func (self *PriorityQueue[T]) Push(x any) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
+
 	item, ok := x.(ItemPQ[T])
 	if !ok {
 		typeOfT := fmt.Sprintf("%T", new(T))
@@ -64,16 +68,19 @@ func (self *PriorityQueue[T]) Push(x any) {
 func (self *PriorityQueue[T]) Pop() any {
 	self.mut.Lock()
 	defer self.mut.Unlock()
+
 	old := *self
 	n := len(old.Items)
 	item := old.Items[n-1]
 	old.Items[n-1] = nil // avoid memory leak
 	self.Items = old.Items[0 : n-1]
+
 	return item
 }
 
 func (self *PriorityQueue[T]) IsEmpty() bool {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
+
 	return self.Len() == 0
 }
