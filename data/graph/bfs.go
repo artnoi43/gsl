@@ -20,7 +20,7 @@ func BFSShortestPath[T nodeValue](g Graph[T], src Node[T], dst Node[T]) ([]Node[
 
 // BFSSearch traverses the graph in BFS manner, and collecting VFS traversal information in a map `prev`. It returns the map, and a boolean value denoting if dst was reachable from src
 func BFSSearch[T nodeValue](g Graph[T], src Node[T], dst Node[T]) (map[Node[T]]Node[T], bool) {
-	q := list.NewQueue[Node[T]]()
+	q := list.NewSafeQueue[Node[T]]()
 	q.Push(src)
 
 	visited := make(map[Node[T]]bool)
