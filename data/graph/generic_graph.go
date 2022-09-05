@@ -11,7 +11,7 @@ type GenericGraph[
 	W any, // Type for graph weight
 ] interface {
 	// SetDirection sets the directionality of the graph.
-	SetDirection(bool)
+	SetDirection(value bool)
 	// HasDirection
 	HasDirection() bool
 	AddNode(node N)

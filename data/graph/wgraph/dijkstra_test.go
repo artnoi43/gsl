@@ -31,34 +31,34 @@ func TestDijkstra(t *testing.T) {
 	testDijkstra[float64](t, nameStart, nameFinish)
 }
 
-func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFinish S) map[WeightedNode[T, S]]*dijkstraTestUtils[T, S] {
+func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFinish S) map[NodeWeighted[T, S]]*dijkstraTestUtils[T, S] {
 	// TODO: infinity is way too low, because dijkstraWeight also has uint8
 	infinity := T(100)
 	nodeStart := &NodeWeightedImpl[T, S]{
-		Name: nameStart,
-		Cost: T(0),
+		Name:        nameStart,
+		ValueOrCost: T(0),
 	}
 	nodeA := &NodeWeightedImpl[T, S]{
-		Name: "A",
-		Cost: infinity,
+		Name:        "A",
+		ValueOrCost: infinity,
 	}
 	nodeB := &NodeWeightedImpl[T, S]{
-		Name: "B",
-		Cost: infinity,
+		Name:        "B",
+		ValueOrCost: infinity,
 	}
 	nodeC := &NodeWeightedImpl[T, S]{
-		Name: "C",
-		Cost: infinity,
+		Name:        "C",
+		ValueOrCost: infinity,
 	}
 	nodeD := &NodeWeightedImpl[T, S]{
-		Name: "D",
-		Cost: infinity,
+		Name:        "D",
+		ValueOrCost: infinity,
 	}
 	nodeFinish := &NodeWeightedImpl[T, S]{
-		Name: nameFinish,
-		Cost: infinity,
+		Name:        nameFinish,
+		ValueOrCost: infinity,
 	}
-	m := map[WeightedNode[T, S]]*dijkstraTestUtils[T, S]{
+	m := map[NodeWeighted[T, S]]*dijkstraTestUtils[T, S]{
 		nodeStart: {
 			inititalValue:      T(0),
 			expectedFinalValue: T(0),
@@ -177,7 +177,7 @@ func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFini
 		}
 	}
 
-	var startNode WeightedNode[T, S]
+	var startNode NodeWeighted[T, S]
 	for node := range nodesMap {
 		if node.GetKey() == nameStart {
 			startNode = node

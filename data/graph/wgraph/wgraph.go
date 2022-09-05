@@ -7,66 +7,67 @@ import (
 )
 
 type GraphWeightedImpl[T graphWeight, S ~string] struct {
-	Direction bool
-	Nodes     []WeightedNode[T, S]
-	Edges     map[WeightedNode[T, S]][]WeightedEdge[T, S] // Edges is a map of a WeightedNodeImpl's edges
+	direction bool
+	Nodes     []NodeWeighted[T, S]
+	Edges     map[NodeWeighted[T, S]][]EdgeWeighted[T, S] // Edges is a map of a NodeWeightedImpl's edges
 }
 
+// GraphWeightedImplSafe[T] wraps GraphWeightedImpl[T] methods with locking and unlocking mutex.
 type GraphWeightedImplSafe[T graphWeight, S ~string] struct {
-	graph *GraphWeightedImpl[T, S]
+	Graph GraphWeighted[T, S]
 
 	// TODO: should we make mut public/exported?
 	mut *sync.RWMutex
 }
 
-func NewWeightedGraph[T graphWeight, S ~string](hasDirection bool) WeightedGraph[T, S] {
+func NewGraphWeighted[T graphWeight, S ~string](hasDirection bool) GraphWeighted[T, S] {
 	return &GraphWeightedImplSafe[T, S]{
-		graph: &GraphWeightedImpl[T, S]{
-			Direction: hasDirection,
-			Nodes:     []WeightedNode[T, S]{},
-			Edges:     make(map[WeightedNode[T, S]][]WeightedEdge[T, S]),
+		Graph: &GraphWeightedImpl[T, S]{
+			direction: hasDirection,
+			Nodes:     []NodeWeighted[T, S]{},
+			Edges:     make(map[NodeWeighted[T, S]][]EdgeWeighted[T, S]),
 		},
 		mut: &sync.RWMutex{},
 	}
 }
 
 func (self *GraphWeightedImpl[T, S]) SetDirection(hasDirection bool) {
-	self.Direction = hasDirection
+	self.direction = hasDirection
 }
 
 func (self *GraphWeightedImpl[T, S]) HasDirection() bool {
-	return self.Direction
+	return self.direction
 }
 
-func (self *GraphWeightedImpl[T, S]) GetNodes() []WeightedNode[T, S] {
+func (self *GraphWeightedImpl[T, S]) GetNodes() []NodeWeighted[T, S] {
 	return self.Nodes
 }
 
-func (self *GraphWeightedImpl[T, S]) GetEdges() map[WeightedNode[T, S]][]WeightedEdge[T, S] {
+func (self *GraphWeightedImpl[T, S]) GetEdges() map[NodeWeighted[T, S]][]EdgeWeighted[T, S] {
 	return self.Edges
 }
 
-func (self *GraphWeightedImpl[T, S]) GetNodeEdges(node WeightedNode[T, S]) []WeightedEdge[T, S] {
+func (self *GraphWeightedImpl[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
 	return self.Edges[node]
 }
 
-func (self *GraphWeightedImpl[T, S]) AddNode(node WeightedNode[T, S]) {
+func (self *GraphWeightedImpl[T, S]) AddNode(node NodeWeighted[T, S]) {
 	self.Nodes = append(self.Nodes, node)
 }
 
-func (self *GraphWeightedImplSafe[T, S]) AddNode(node WeightedNode[T, S]) {
+func (self *GraphWeightedImplSafe[T, S]) AddNode(node NodeWeighted[T, S]) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 
-	self.graph.AddNode(node)
+	self.Graph.AddNode(node)
 }
 
 // AddEdge adds edge from n1 to n2. This particular method does not return error in any case.
-func (self *GraphWeightedImpl[T, S]) AddEdge(n1, n2 WeightedNode[T, S], weight T) error {
+func (self *GraphWeightedImpl[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
 	// Add and edge from n1 leading to n2
 	self.Edges[n1] = append(self.Edges[n1], &EdgeWeightedImpl[T, S]{node: n2, weight: weight})
 
-	if self.Direction {
+	if self.direction {
 		return nil
 	}
 
@@ -79,41 +80,41 @@ func (self *GraphWeightedImplSafe[T, S]) SetDirection(hasDirection bool) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 
-	self.graph.SetDirection(hasDirection)
+	self.Graph.SetDirection(hasDirection)
 }
 
 func (self *GraphWeightedImplSafe[T, S]) HasDirection() bool {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
 
-	return self.graph.HasDirection()
+	return self.Graph.HasDirection()
 }
 
-func (self *GraphWeightedImplSafe[T, S]) GetNodes() []WeightedNode[T, S] {
+func (self *GraphWeightedImplSafe[T, S]) GetNodes() []NodeWeighted[T, S] {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
 
-	return self.graph.GetNodes()
+	return self.Graph.GetNodes()
 }
 
-func (self *GraphWeightedImplSafe[T, S]) GetEdges() map[WeightedNode[T, S]][]WeightedEdge[T, S] {
+func (self *GraphWeightedImplSafe[T, S]) GetEdges() map[NodeWeighted[T, S]][]EdgeWeighted[T, S] {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
 
-	return self.graph.GetEdges()
+	return self.Graph.GetEdges()
 }
 
-func (self *GraphWeightedImplSafe[T, S]) GetNodeEdges(node WeightedNode[T, S]) []WeightedEdge[T, S] {
+func (self *GraphWeightedImplSafe[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
 	self.mut.RLock()
 	defer self.mut.RUnlock()
 
-	return self.graph.GetNodeEdges(node)
+	return self.Graph.GetNodeEdges(node)
 }
 
 // AddEdge adds edge from n1 to n2. This particular method does not return error in any case.
-func (self *GraphWeightedImplSafe[T, S]) AddEdge(n1, n2 WeightedNode[T, S], weight T) error {
+func (self *GraphWeightedImplSafe[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 
-	return self.graph.AddEdge(n1, n2, weight)
+	return self.Graph.AddEdge(n1, n2, weight)
 }

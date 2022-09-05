@@ -11,33 +11,33 @@ type graphWeight interface {
 	constraints.Ordered
 }
 
-// WeightedGraph is a graph.GenericGraph
-type WeightedGraph[
+// GraphWeighted is a graph.GenericGraph
+type GraphWeighted[
 	T graphWeight,
 	S ~string,
 ] graph.GenericGraph[
 	// The graph's node type
-	WeightedNode[T, S],
+	NodeWeighted[T, S],
 	// The graph's edge type
-	WeightedEdge[T, S],
+	EdgeWeighted[T, S],
 	// The graph represents the edges as map of node to edges
-	map[WeightedNode[T, S]][]WeightedEdge[T, S],
+	map[NodeWeighted[T, S]][]EdgeWeighted[T, S],
 	// The edge weight can be of any types that implements graphWeight
 	T,
 ]
 
-// WeightedNode should be able to put in a priority queue, just in case topological sort is needed.
-type WeightedNode[T graphWeight, S ~string] interface {
-	data.Valuer[T] // For priority queue
-	SetCost(T)     // Set accumulated cost to the node
+// NodeWeighted should be able to put in a priority queue, just in case topological sort is needed.
+type NodeWeighted[T graphWeight, S ~string] interface {
+	data.Valuer[T]    // For priority queue
+	SetValueOrCost(T) // Set accumulated cost to the node
 
 	GetKey() S
-	GetThrough() WeightedNode[T, S]
-	SetThrough(WeightedNode[T, S])
+	GetThrough() NodeWeighted[T, S]
+	SetThrough(NodeWeighted[T, S])
 }
 
-// WeightedEdge represents what a weighted edge should be able to do.
-type WeightedEdge[T graphWeight, S ~string] interface {
-	GetNode() WeightedNode[T, S]
+// EdgeWeighted represents what a weighted edge should be able to do.
+type EdgeWeighted[T graphWeight, S ~string] interface {
+	GetNode() NodeWeighted[T, S]
 	GetWeight() T
 }

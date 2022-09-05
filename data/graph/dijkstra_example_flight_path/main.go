@@ -20,24 +20,24 @@ type cityName string
 
 // *city implements wgraph.UndirectedNode
 type city struct {
-	name    cityName
-	cost    float64
-	through *city
+	name        cityName
+	flightHours float64
+	through     *city
 }
 
 func main() {
 	infinity := math.MaxFloat64
 
-	tokyo := &city{name: cityName("Tokyo"), cost: 0, through: nil}
-	bangkok := &city{name: cityName("Bangkok"), cost: infinity, through: nil}
-	hongkong := &city{name: cityName("Hongkong"), cost: infinity, through: nil}
-	dubai := &city{name: cityName("Dubai"), cost: infinity, through: nil}
-	helsinki := &city{name: cityName("Helsinki"), cost: infinity, through: nil}
-	budapest := &city{name: cityName("Budapest"), cost: infinity, through: nil}
+	tokyo := &city{name: cityName("Tokyo"), flightHours: 0, through: nil}
+	bangkok := &city{name: cityName("Bangkok"), flightHours: infinity, through: nil}
+	hongkong := &city{name: cityName("Hongkong"), flightHours: infinity, through: nil}
+	dubai := &city{name: cityName("Dubai"), flightHours: infinity, through: nil}
+	helsinki := &city{name: cityName("Helsinki"), flightHours: infinity, through: nil}
+	budapest := &city{name: cityName("Budapest"), flightHours: infinity, through: nil}
 
 	// See file flight_graph.png
-	graphEdges := map[wgraph.WeightedNode[float64, cityName]][]struct {
-		to       wgraph.WeightedNode[float64, cityName]
+	graphEdges := map[wgraph.NodeWeighted[float64, cityName]][]struct {
+		to       wgraph.NodeWeighted[float64, cityName]
 		flighDur float64
 	}{
 		tokyo: {
@@ -117,7 +117,7 @@ func main() {
 		pathToNode := wgraph.DijkstraShortestPathReconstruct(shortestPathsFromTokyo.Paths, shortestPathsFromTokyo.From, dst)
 		gslutils.ReverseInPlace(pathToNode)
 
-		fmt.Println("> from", fromNode.GetKey(), "to", dst.GetKey(), "min cost", dst.GetValue())
+		fmt.Println("> from", fromNode.GetKey(), "to", dst.GetKey(), "min flightHours", dst.GetValue())
 		for _, via := range pathToNode {
 			fmt.Printf("%s (%v) ", via.GetKey(), via.GetValue())
 		}
@@ -136,11 +136,11 @@ func main() {
 	}
 
 	takeUnweightedGraph(unweightedGraph, fromNode)
-	takeWeightedGraph(dijkGraph, fromNode)
-	// Compile error: wgraph.WeightedGraph are not compatible with graph.Graph.
+	takeGraphWeighted(dijkGraph, fromNode)
+	// Compile error: wgraph.GraphWeighted are not compatible with graph.Graph.
 	// But the node types are pretty much interchangable.
 	// takeUnweightedGraph(dijkGraph, fromNode)
-	// takeWeightedGraph(unweightedGraph, fromNode)
+	// takeGraphWeighted(unweightedGraph, fromNode)
 
 	// Compile error: graph.GenericGraph is too primitive to be used easily. Use graph.Graph or wgraph.GraphWeighted instead
 	// takeGenericGraph(unweightedGraph, fromNode)
@@ -148,39 +148,40 @@ func main() {
 
 }
 
-// graph.GenericGraph is impractical
+// graph.GenericGraph is impractical, as you can see from the type parameters..
 func takeGenericGraph(g graph.GenericGraph[*city, *city, float64, map[*city]*city], from graph.Node[float64]) {
 
 }
 
+// Instead of GenericGraph, use Graph or GraphWeighted
 func takeUnweightedGraph(g graph.Graph[float64], from graph.Node[float64]) {
 
 }
 
-func takeWeightedGraph(g wgraph.WeightedGraph[float64, cityName], from wgraph.WeightedNode[float64, cityName]) {
+func takeGraphWeighted(g wgraph.GraphWeighted[float64, cityName], from wgraph.NodeWeighted[float64, cityName]) {
 
 }
 
 func (self *city) GetValue() float64 {
-	return self.cost
+	return self.flightHours
+}
+
+func (self *city) SetValueOrCost(newCost float64) {
+	self.flightHours = newCost
 }
 
 func (self *city) GetKey() cityName {
 	return self.name
 }
 
-func (self *city) GetThrough() wgraph.WeightedNode[float64, cityName] {
+func (self *city) GetThrough() wgraph.NodeWeighted[float64, cityName] {
 	if self.through == nil {
 		return nil
 	}
 	return self.through
 }
 
-func (self *city) SetCost(newCost float64) {
-	self.cost = newCost
-}
-
-func (self *city) SetThrough(node wgraph.WeightedNode[float64, cityName]) {
+func (self *city) SetThrough(node wgraph.NodeWeighted[float64, cityName]) {
 	if node == nil {
 		self.through = nil
 		return
