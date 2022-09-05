@@ -8,7 +8,7 @@ import (
 
 	"golang.org/x/exp/constraints"
 
-	"github.com/artnoi43/mgl/data"
+	"github.com/artnoi43/gsl/data"
 )
 
 type foo[T constraints.Ordered] struct {

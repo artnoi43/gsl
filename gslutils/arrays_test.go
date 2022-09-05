@@ -1,4 +1,4 @@
-package mglutils
+package gslutils
 
 import (
 	"testing"

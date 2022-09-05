@@ -3,7 +3,7 @@ package wgraph
 import (
 	"testing"
 
-	"github.com/artnoi43/mgl/mglutils"
+	"github.com/artnoi43/gsl/gslutils"
 )
 
 type dijkstraTestUtils[T dijkstraWeight, S ~string] struct {
@@ -203,7 +203,7 @@ func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFini
 		// t.Logf("dst node: %v\n", nodeKey)
 		// Test paths
 		pathToNode := DijkstraShortestPathReconstruct(dijkShortestPaths.Paths, startNode, node)
-		mglutils.ReverseInPlace(pathToNode)
+		gslutils.ReverseInPlace(pathToNode)
 		if hops := len(pathToNode); hops != util.expectedPathHops {
 			t.Fatalf(fatalMsgPathLen, nameStart, nodeKey, hops, util.expectedPathHops)
 		}

@@ -1,4 +1,4 @@
-module github.com/artnoi43/mgl
+module github.com/artnoi43/gsl
 
 go 1.19
 

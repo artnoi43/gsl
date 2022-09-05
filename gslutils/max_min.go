@@ -1,4 +1,4 @@
-package mglutils
+package gslutils
 
 import "golang.org/x/exp/constraints"
 

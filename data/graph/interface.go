@@ -6,7 +6,7 @@ package graph
 import (
 	"errors"
 
-	"github.com/artnoi43/mgl/data"
+	"github.com/artnoi43/gsl/data"
 )
 
 var ErrEdgeWeightNotNull = errors.New("found edge weight in unweighted graph")

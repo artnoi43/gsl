@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/exp/constraints"
 
-	"github.com/artnoi43/mgl/data/list"
+	"github.com/artnoi43/gsl/data/list"
 )
 
 var ErrDijkstraNegativeWeightEdge = errors.New("Dijkstra edge must not be negative")

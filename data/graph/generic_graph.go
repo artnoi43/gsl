@@ -1,7 +1,7 @@
 package graph
 
-// GenericGraph represents what an mgl graph should look like.
-// It is not intended to be used by production code, but more like an internal building block for mgl graphs.
+// GenericGraph represents what an gsl graph should look like.
+// It is not intended to be used by production code, but more like an internal building block for gsl graphs.
 // It's not minimal, and was designed around flexibility and coverage.
 // This interface can be used for both unweighted and weighted graph (see wgraph package).
 type GenericGraph[
@@ -24,7 +24,7 @@ type GenericGraph[
 	// slice of the actual edges.
 	GetNodeEdges(node N) []E
 	// GetEdges returns all the edges in the graph.
-	// In the actual implementations provided by mgl, the type M differs between unweighted and weighted graphs.
+	// In the actual implementations provided by gsl, the type M differs between unweighted and weighted graphs.
 	// If the graph is weighted, then the returned type M is usually a map of node to its edges,
 	// otherwise if the graph has unweighted edges, It returns a slice of nodes accessible by Node.
 	GetEdges() M

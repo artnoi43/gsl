@@ -3,8 +3,8 @@ package wgraph
 import (
 	"golang.org/x/exp/constraints"
 
-	"github.com/artnoi43/mgl/data"
-	"github.com/artnoi43/mgl/data/graph"
+	"github.com/artnoi43/gsl/data"
+	"github.com/artnoi43/gsl/data/graph"
 )
 
 type graphWeight interface {

@@ -5,14 +5,16 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/artnoi43/mgl/data/graph"
-	"github.com/artnoi43/mgl/data/graph/wgraph"
-	"github.com/artnoi43/mgl/mglutils"
+	"github.com/artnoi43/gsl/data/graph"
+	"github.com/artnoi43/gsl/data/graph/wgraph"
+	"github.com/artnoi43/gsl/gslutils"
 )
 
-// This code purpose is to show an example of how to use the graph and wgraph packages.
+// This code purpose is to show an example of how to use the graph and wgraph packages
+// With your own data structures, that is, without using the *Impl types.
+
 // The code provides an example of solving the best flight path between major cities.
-// It uses a weight graph to do Dijkstra sort, and an unweighted graph for BFS.
+// In this case, type *city is used as nodes for both BFS and Dijkstra sort.
 
 type cityName string
 
@@ -113,7 +115,7 @@ func main() {
 			continue
 		}
 		pathToNode := wgraph.DijkstraShortestPathReconstruct(shortestPathsFromTokyo.Paths, shortestPathsFromTokyo.From, dst)
-		mglutils.ReverseInPlace(pathToNode)
+		gslutils.ReverseInPlace(pathToNode)
 
 		fmt.Println("> from", fromNode.GetKey(), "to", dst.GetKey(), "min cost", dst.GetValue())
 		for _, via := range pathToNode {
@@ -127,7 +129,7 @@ func main() {
 	for _, dst := range unweightedGraph.GetNodes() {
 		shortestHopsFromTokyo, hops, found := graph.BFSShortestPath[float64](unweightedGraph, fromNode, dst)
 		fmt.Println("path to", dst.(*city).GetKey(), "found", found, "shortestHops", hops)
-		mglutils.ReverseInPlace(shortestHopsFromTokyo)
+		gslutils.ReverseInPlace(shortestHopsFromTokyo)
 		for i, hop := range shortestHopsFromTokyo {
 			fmt.Println("hop", i, hop.(*city).GetKey())
 		}
