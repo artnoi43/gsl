@@ -2,6 +2,11 @@ package list
 
 type Stack[T any] []T
 
+func NewSafeStack[T any]() *SafeList[T] {
+	q := new(Stack[T])
+	return WrapSafeList[T](q)
+}
+
 func (self *Stack[T]) Push(x T) {
 	*self = append(*self, x)
 }

@@ -1,8 +1,8 @@
 package list
 
 type BasicList[T any] interface {
-	Pop() *T
 	Push(T)
+	Pop() *T
 	Len() int
 	IsEmpty() bool
 }

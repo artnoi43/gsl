@@ -2,6 +2,11 @@ package list
 
 type Queue[T any] []T
 
+func NewSafeQueue[T any]() *SafeList[T] {
+	q := new(Queue[T])
+	return WrapSafeList[T](q)
+}
+
 func (self *Queue[T]) Push(x T) {
 	*self = append(*self, x)
 }
