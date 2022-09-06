@@ -1,5 +1,9 @@
 # Graph data structures
-This package currently provides a `Graph` interface for unweighted graph, and an example type that implements this interface (`GraphImpl`). It also provides other topological sorting methods for `Graph`, such as breadth-first-search.
+`graph` is a Go package providing building blocks for working with graphs in Go. Most of the types and interfaces are built around `GenericGraph` which is an interface that represents a minimal and practical graph. `GenericGraph` can fit any graphs.
+
+All graphs in gsl implements `GenericGraph`, so, for functions that must work with all graphs, use GenericGraph as input parameter. Otherwise, if your code needs to work with weighted graphs only, then use `GraphWeighted[T, S]`.
+
+For example, for unweighted graphs, I wrote a new interface `GraphWeighted[T, S]` that sits on top of `GenericGraph`. Then I declare a new concrete type `GraphWeightedImpl[T, S]` that implements `GraphWeighted[T, S]`. And if I want to use this `GraphWeightedImpl` for Dijkstra search, I can wrap it with `DijkstraGraph[T, S]`. And finally, if I want to use this graph concurrently, I can wrap `DijkstraGraph[T, S]` with `SafeGraph` again.
 
 In addition to the readily usable `Graph`, `graph` also provides `GenericGraph`, which is very generic and is used by both `Graph` and `wgraph.GraphWeighted`.
 

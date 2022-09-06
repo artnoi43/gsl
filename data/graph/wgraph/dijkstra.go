@@ -20,9 +20,6 @@ type dijkstraWeight interface {
 }
 
 // DijkstraGraph[T] wraps GraphWeightedImpl[T], where T is generic type numeric types and S is ~string.
-// Only constraints.Unsigned T is being tested.
-// To prevent bugs, so if the weight data source is of non-T type (i.e. a float), users will need to perform
-// multiplications on the data, e.g. 0.1 -> 1000, 0.01 -> 100.
 type DijkstraGraph[T dijkstraWeight, S ~string] struct {
 	graph GraphWeighted[T, S]
 }
@@ -36,8 +33,16 @@ type DijstraShortestPath[T dijkstraWeight, S ~string] struct {
 	Paths map[NodeWeighted[T, S]]NodeWeighted[T, S]
 }
 
-// NewDikstraGraph calls NewGraphWeighted[T, S], and return the graph.
-// Alternatively, you can create your own implementation of GraphWeighted
+// NewDikstraGraph calls NewGraphWeightedUnsafe[T, S], and return the wrapped graph.
+// Alternatively, you can create your own implementation of GraphWeighted[T, S].
+func NewDijkstraGraphUnsafe[T dijkstraWeight, S ~string](hasDirection bool) *DijkstraGraph[T, S] {
+	return &DijkstraGraph[T, S]{
+		graph: NewGraphWeightedUnsafe[T, S](hasDirection),
+	}
+}
+
+// NewDikstraGraph calls NewGraphWeighted[T, S], and return the wrapped graph.
+// Alternatively, you can create your own implementation of GraphWeighted[T, S].
 func NewDijkstraGraph[T dijkstraWeight, S ~string](hasDirection bool) *DijkstraGraph[T, S] {
 	return &DijkstraGraph[T, S]{
 		graph: NewGraphWeighted[T, S](hasDirection),

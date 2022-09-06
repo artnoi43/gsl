@@ -7,6 +7,8 @@ type SafeGraph[N any, E any, M any, W any] struct {
 	mut   *sync.RWMutex
 }
 
+// WrapSafeGenericGraph[N, E, M, W] wraps BasicGraph[N, E, M, W]
+// with *SafeGraph[N, E, M, W] to use mutex to avoid data races
 func WrapSafeGenericGraph[
 	N any,
 	E any,
@@ -41,8 +43,8 @@ func (g *SafeGraph[N, E, M, W]) AddNode(node N) {
 }
 
 func (g *SafeGraph[N, E, M, W]) GetNodes() []N {
-	g.mut.Lock()
-	defer g.mut.Unlock()
+	g.mut.RLock()
+	defer g.mut.RUnlock()
 
 	return g.Graph.GetNodes()
 }

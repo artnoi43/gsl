@@ -8,7 +8,7 @@ type GenericGraph[
 	N any, // Type for graph node
 	E any, // Type for graph edge
 	M any, // Type representing the edge implementation of the graph, typically map[N]E.
-	W any, // Type for graph weight
+	W any, // Type for graph edge weight or node values
 ] interface {
 	// SetDirection sets the directionality of the graph.
 	SetDirection(value bool)
