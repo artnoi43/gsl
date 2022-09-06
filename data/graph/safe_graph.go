@@ -1,10 +1,13 @@
 package graph
 
-import "sync"
+import (
+	"sync"
+)
 
+// SafeGraph[N, E, M, W] wraps any BasicGraph[N, E, M, W] graphs.
 type SafeGraph[N any, E any, M any, W any] struct {
-	Graph GenericGraph[N, E, M, W]
 	mut   *sync.RWMutex
+	Graph GenericGraph[N, E, M, W]
 }
 
 // WrapSafeGenericGraph[N, E, M, W] wraps BasicGraph[N, E, M, W]
