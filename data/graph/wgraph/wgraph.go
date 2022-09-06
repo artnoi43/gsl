@@ -24,15 +24,23 @@ func NewGraphWeightedUnsafe[T graphWeight, S ~string](hasDirection bool) GraphWe
 	}
 }
 
-// NewGraphWeighted[T, S] returns the default implementation of GraphWeighted[T, S] with the concurrency wrapper.
-// If your code is not concurrent, use NewGraphWeightedUnsafe[T, S] instead
-func NewGraphWeighted[T graphWeight, S ~string](hasDirection bool) GraphWeighted[T, S] {
-	return graph.WrapSafeGraph[
+// WrapSafeGraphWeighted wraps any graph g that implements GraphWeighted[T, S] with graph.SafeGraph[N, E, M, W].
+func WrapSafeGraphWeighted[T graphWeight, S ~string](g GraphWeighted[T, S]) GraphWeighted[T, S] {
+	// The type parameters mirror how GraphWeighted[T, S] implements BasicGraph[N, E, M, W]
+	return graph.WrapSafeGenericGraph[
 		NodeWeighted[T, S],
 		EdgeWeighted[T, S],
 		map[NodeWeighted[T, S]][]EdgeWeighted[T, S],
 		T,
 	](
+		g,
+	)
+}
+
+// NewGraphWeighted[T, S] returns the default implementation of GraphWeighted[T, S] with the concurrency wrapper.
+// If your code is not concurrent, use NewGraphWeightedUnsafe[T, S] instead
+func NewGraphWeighted[T graphWeight, S ~string](hasDirection bool) GraphWeighted[T, S] {
+	return WrapSafeGraphWeighted(
 		NewGraphWeightedUnsafe[T, S](hasDirection),
 	)
 }

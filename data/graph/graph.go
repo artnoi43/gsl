@@ -17,15 +17,23 @@ func NewGraphUnsafe[T any](hasDirection bool) Graph[T] {
 	}
 }
 
-// NewGraph[T] returns the default implementation of unweighted graph (*GraphImpl[T])
-// wrapped inside a of SafeGraph[N any, E any, M any, W any]
-func NewGraph[T any](hasDirection bool) Graph[T] {
-	return WrapSafeGraph[
+// WrapSafeGraph wraps any graph g that implements Graph[T] with SafeGraph.[N, E, M, W]
+func WrapSafeGraph[T any](g Graph[T]) Graph[T] {
+	// The type parameters mirror how Graph[T] implements BasicGraph[N, E, M, W]
+	return WrapSafeGenericGraph[
 		Node[T],
 		Node[T],
 		map[Node[T]][]Node[T],
 		any,
 	](
+		g,
+	)
+}
+
+// NewGraph[T] returns the default implementation of unweighted graph (*GraphImpl[T])
+// wrapped inside a of SafeGraph[N any, E any, M any, W any]
+func NewGraph[T any](hasDirection bool) Graph[T] {
+	return WrapSafeGraph(
 		NewGraphUnsafe[T](hasDirection),
 	)
 }

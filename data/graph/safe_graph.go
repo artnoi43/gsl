@@ -7,7 +7,12 @@ type SafeGraph[N any, E any, M any, W any] struct {
 	mut   *sync.RWMutex
 }
 
-func WrapSafeGraph[N any, E any, M any, W any](g GenericGraph[N, E, M, W]) *SafeGraph[N, E, M, W] {
+func WrapSafeGenericGraph[
+	N any,
+	E any,
+	M any,
+	W any,
+](g GenericGraph[N, E, M, W]) *SafeGraph[N, E, M, W] {
 	return &SafeGraph[N, E, M, W]{
 		Graph: g,
 		mut:   &sync.RWMutex{},
