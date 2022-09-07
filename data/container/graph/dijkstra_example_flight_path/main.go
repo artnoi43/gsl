@@ -5,8 +5,8 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/artnoi43/gsl/data/graph"
-	"github.com/artnoi43/gsl/data/graph/wgraph"
+	"github.com/artnoi43/gsl/data/container/graph"
+	"github.com/artnoi43/gsl/data/container/graph/wgraph"
 	"github.com/artnoi43/gsl/gslutils"
 )
 

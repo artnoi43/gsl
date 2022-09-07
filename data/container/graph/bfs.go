@@ -1,7 +1,7 @@
 package graph
 
 import (
-	"github.com/artnoi43/gsl/data/list"
+	"github.com/artnoi43/gsl/data/container/list"
 )
 
 // BFSShortestPath calls BFSSearch and uses its output to call BFSShortestPathReconstruct.

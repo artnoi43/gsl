@@ -3,7 +3,7 @@ package wgraph
 // TODO: more relaxed generic types
 
 import (
-	"github.com/artnoi43/gsl/data/graph"
+	"github.com/artnoi43/gsl/data/container/graph"
 )
 
 // GraphWeightedImpl[T] is the default implementation of GraphWeighted[T].
