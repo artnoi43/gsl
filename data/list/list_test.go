@@ -4,15 +4,20 @@ import (
 	"testing"
 )
 
-func TestSafeList(t *testing.T) {
+func TestWrappedList(t *testing.T) {
 	valuesComposite := []interface{}{make(chan int), []byte("test"), &struct{ n int }{n: 69}}
 	ints := []int{1, 2, 3, 4}
 	floats := []float32{1, 2, 3, 4}
 	strings := []string{"kuy", "hee", "tad"}
-	testSafeList(t, valuesComposite)
-	testSafeList(t, ints)
-	testSafeList(t, floats)
-	testSafeList(t, strings)
+
+	t.Run("SafeList", func(t *testing.T) {
+		testSafeList(t, valuesComposite)
+		testSafeList(t, ints)
+		testSafeList(t, floats)
+		testSafeList(t, strings)
+	})
+
+	t.Run("SetList", testSetList)
 }
 
 func testSafeList[T any](t *testing.T, values []T) {

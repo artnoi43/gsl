@@ -92,7 +92,7 @@ func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted
 	startNode.SetPrevious(nil)
 
 	visited := make(map[NodeWeighted[T, S]]bool)
-	prev := make(map[NodeWeighted[T, S]]NodeWeighted[T, S])
+	parents := make(map[NodeWeighted[T, S]]NodeWeighted[T, S])
 
 	pq := list.NewPriorityQueue[T](list.MinHeap)
 	heap.Push(pq, startNode)
@@ -126,15 +126,15 @@ func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted
 			if newCost := current.GetValue() + edge.GetWeight(); newCost < edgeNode.GetValue() {
 				edgeNode.SetValueOrCost(newCost)
 				edgeNode.SetPrevious(current)
-				// Save path answer to prev
-				prev[edgeNode] = current
+				// Save (best) path answer to parents
+				parents[edgeNode] = current
 			}
 		}
 	}
 
 	return &DijstraShortestPath[T, S]{
 		From:  startNode,
-		Paths: prev,
+		Paths: parents,
 	}
 }
 
