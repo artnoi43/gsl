@@ -2,7 +2,7 @@ package list
 
 import "testing"
 
-func testSetList(t *testing.T) {
+func testSetListWrapper(t *testing.T) {
 	testSetListQueue(t, []float64{1, 2, 4, 2, 4, 1, 3, 5})
 	testSetListQueue(t, []string{"foo", "bar", "baz", "bar", "foom"})
 	testSetListStack(t, []float64{1, 2, 4, 2, 4, 1, 3, 5})
