@@ -1,18 +1,28 @@
 package list
 
-type Stack[T any] []T
+type StackImpl[T any] []T
 
-func NewSafeStack[T any]() SafeList[T, *Stack[T]] {
-	return WrapSafeList[T](new(Stack[T]))
+func NewStack[T any]() SafeList[T, *StackImpl[T]] {
+	return WrapSafeList[T](new(StackImpl[T]))
 }
 
-func (self *Stack[T]) Push(x T) {
+func NewStackUnsafe[T any]() *StackImpl[T] {
+	return new(StackImpl[T])
+}
+
+func (self *StackImpl[T]) Push(x T) {
 	*self = append(*self, x)
+}
+
+func (self *StackImpl[T]) PushSlice(slice []T) {
+	for _, elem := range slice {
+		self.Push(elem)
+	}
 }
 
 // Pop pops and returns the right-most element of self,
 // returning nil if self is empty
-func (self *Stack[T]) Pop() *T {
+func (self *StackImpl[T]) Pop() *T {
 	state := *self
 	l := len(state)
 	if l == 0 {
@@ -25,16 +35,12 @@ func (self *Stack[T]) Pop() *T {
 	return &elem
 }
 
-func (self *Stack[T]) Len() int {
+func (self *StackImpl[T]) Len() int {
 	state := *self
 	return len(state)
 }
 
-func (self *Stack[T]) IsEmpty() bool {
+func (self *StackImpl[T]) IsEmpty() bool {
 	state := *self
 	return len(state) == 0
-}
-
-func NewStack[T any]() *Stack[T] {
-	return &Stack[T]{}
 }

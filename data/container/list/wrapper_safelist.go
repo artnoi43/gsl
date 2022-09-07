@@ -31,6 +31,13 @@ func (self *SafeListWrapper[T, L]) Push(x T) {
 	self.basicList.Push(x)
 }
 
+func (self *SafeListWrapper[T, L]) PushSlice(x []T) {
+	self.mut.Lock()
+	defer self.mut.Unlock()
+
+	self.basicList.PushSlice(x)
+}
+
 func (self *SafeListWrapper[T, L]) Pop() *T {
 	self.mut.Lock()
 	defer self.mut.Unlock()

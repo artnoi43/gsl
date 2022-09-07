@@ -20,7 +20,7 @@ func TestQueue(t *testing.T) {
 	valuesComposite := []interface{}{1, 2, "last"}
 	qComposite := NewQueue[interface{}]()
 	// Test Push for composite queue
-	qComposite.PushSlice(valuesComposite...)
+	qComposite.PushSlice(valuesComposite)
 	// Test Pop for composite queue
 	for i, qLen := 0, qComposite.Len(); i < qLen; i++ {
 		expected := valuesComposite[i]
@@ -39,7 +39,7 @@ func TestQueue(t *testing.T) {
 	}
 }
 
-func testQueue[T comparable](t *testing.T, values []T, q *Queue[T]) {
+func testQueue[T comparable](t *testing.T, values []T, q *QueueImpl[T]) {
 	// Test Push
 	for _, expected := range values {
 		q.Push(expected)

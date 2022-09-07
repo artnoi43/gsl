@@ -5,7 +5,7 @@ import "testing"
 func TestStack(t *testing.T) {
 	values0 := []uint8{0, 1, 2, 3}
 	stack0 := NewStack[uint8]()
-	sstack0 := NewSafeStack[uint8]()
+	sstack0 := NewStack[uint8]()
 	uintStacks := []BasicList[uint8]{stack0, sstack0}
 	for _, s := range uintStacks {
 		testStack(t, values0, s)
@@ -13,7 +13,7 @@ func TestStack(t *testing.T) {
 
 	values1 := []string{"one"}
 	stack1 := NewStack[string]()
-	sstack1 := NewSafeStack[string]()
+	sstack1 := NewStack[string]()
 	stringStacks := []BasicList[string]{stack1, sstack1}
 	for _, s := range stringStacks {
 		testStack(t, values1, s)

@@ -41,6 +41,12 @@ func (s *SetImpl[T]) Push(x T) {
 	}
 }
 
+func (self *SetImpl[T]) PushSlice(slice []T) {
+	for _, elem := range slice {
+		self.Push(elem)
+	}
+}
+
 func (s *SetImpl[T]) Pop() *T {
 	toPop := s.haystack[s.length-1]
 	s.length--

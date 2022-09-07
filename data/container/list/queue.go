@@ -1,16 +1,16 @@
 package list
 
-type Queue[T any] []T
+type QueueImpl[T any] []T
 
-func NewSafeQueue[T any]() SafeList[T, *Queue[T]] {
-	return WrapSafeList[T](new(Queue[T]))
+func NewSafeQueue[T any]() SafeList[T, *QueueImpl[T]] {
+	return WrapSafeList[T](new(QueueImpl[T]))
 }
 
-func (self *Queue[T]) Push(x T) {
+func (self *QueueImpl[T]) Push(x T) {
 	*self = append(*self, x)
 }
 
-func (self *Queue[T]) PushSlice(slice ...T) {
+func (self *QueueImpl[T]) PushSlice(slice []T) {
 	for _, elem := range slice {
 		self.Push(elem)
 	}
@@ -18,7 +18,7 @@ func (self *Queue[T]) PushSlice(slice ...T) {
 
 // Pop pops and returns the left-most element of self,
 // returning nil if self is empty
-func (self *Queue[T]) Pop() *T {
+func (self *QueueImpl[T]) Pop() *T {
 	state := *self
 	l := len(state)
 	if l == 0 {
@@ -31,16 +31,16 @@ func (self *Queue[T]) Pop() *T {
 	return &elem
 }
 
-func (self *Queue[T]) Len() int {
+func (self *QueueImpl[T]) Len() int {
 	state := *self
 	return len(state)
 }
 
-func (self *Queue[T]) IsEmpty() bool {
+func (self *QueueImpl[T]) IsEmpty() bool {
 	state := *self
 	return len(state) == 0
 }
 
-func NewQueue[T any]() *Queue[T] {
-	return &Queue[T]{}
+func NewQueue[T any]() *QueueImpl[T] {
+	return &QueueImpl[T]{}
 }

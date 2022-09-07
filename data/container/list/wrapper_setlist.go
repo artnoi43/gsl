@@ -23,6 +23,12 @@ func (s *SetListWrapper[T, L]) Push(x T) {
 	}
 }
 
+func (s *SetListWrapper[T, L]) PushSlice(values []T) {
+	for _, elem := range values {
+		s.Push(elem)
+	}
+}
+
 func (s *SetListWrapper[T, L]) Pop() *T {
 	toPop := s.basicList.Pop()
 	s.length--
