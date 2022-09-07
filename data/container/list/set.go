@@ -1,45 +1,56 @@
 package list
 
-// SetList wraps BasicList[T] field `basicList`,
-// and maintains a hash map of seen items and the basicList length
-// so that determining duplicates and getting the length take O(1) time.
-type SetList[T comparable, L BasicList[T]] struct {
-	basicList  L
+type SetImpl[T comparable] struct {
+	haystack   []T
 	duplicates map[T]struct{}
 	length     int
 }
 
+// NewSet[T] returns a new Set[T]. The values in src is iterated over and pushed in to the Set[T]
+// according to the set rules.
+func NewSet[T comparable](src []T) Set[T] {
+	var haystack []T
+	duplicates := make(map[T]struct{})
+	var length int
+	for _, item := range src {
+		if _, found := duplicates[item]; !found {
+			haystack = append(haystack, item)
+			duplicates[item] = struct{}{}
+			length++
+		}
+	}
+
+	return &SetImpl[T]{
+		haystack:   haystack,
+		duplicates: duplicates,
+		length:     length,
+	}
+}
+
 // O(1)
-func (s *SetList[T, L]) HasDuplicate(x T) bool {
+func (s *SetImpl[T]) HasDuplicate(x T) bool {
 	_, found := s.duplicates[x]
 	return found
 }
 
-func (s *SetList[T, L]) Push(x T) {
+func (s *SetImpl[T]) Push(x T) {
 	if !s.HasDuplicate(x) {
-		s.basicList.Push(x)
+		s.haystack = append(s.haystack, x)
 		s.duplicates[x] = struct{}{}
 		s.length++
 	}
 }
 
-func (s *SetList[T, L]) Pop() *T {
-	toPop := s.basicList.Pop()
+func (s *SetImpl[T]) Pop() *T {
+	toPop := s.haystack[s.length-1]
 	s.length--
-	return toPop
+	return &toPop
 }
 
-func (s *SetList[T, L]) Len() int {
+func (s *SetImpl[T]) Len() int {
 	return s.length
 }
 
-func (s *SetList[T, L]) IsEmpty() bool {
+func (s *SetImpl[T]) IsEmpty() bool {
 	return s.length == 0
-}
-
-func WrapSetList[T comparable](underlyingList BasicList[T]) *SetList[T, BasicList[T]] {
-	return &SetList[T, BasicList[T]]{
-		basicList:  underlyingList,
-		duplicates: make(map[T]struct{}),
-	}
 }

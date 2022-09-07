@@ -6,3 +6,8 @@ type BasicList[T any] interface {
 	Len() int
 	IsEmpty() bool
 }
+
+type Set[T comparable] interface {
+	BasicList[T]
+	HasDuplicate(x T) bool
+}
