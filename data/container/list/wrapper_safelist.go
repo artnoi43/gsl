@@ -17,7 +17,7 @@ type SafeListWrapper[T any, L BasicList[T]] struct {
 // where T is the underlying entity (item) type and L is the underlying BasicList[T] type.
 // If you're wrapping a variable `foo“ of type `*Stack[uint8]`, then call this function with:
 // WrapSafeList[uint8, *Stack[uint8]](foo)
-func WrapSafeList[T any, L BasicList[T]](basicList L) SafeList[T, L] {
+func WrapSafeList[T any, L BasicList[T]](basicList L) *SafeListWrapper[T, L] {
 	return &SafeListWrapper[T, L]{
 		basicList: basicList,
 		mut:       &sync.RWMutex{},
@@ -57,4 +57,8 @@ func (self *SafeListWrapper[T, L]) IsEmpty() bool {
 	defer self.mut.RUnlock()
 
 	return self.basicList.IsEmpty()
+}
+
+func (self *SafeListWrapper[T, L]) IsSafe() bool {
+	return true
 }

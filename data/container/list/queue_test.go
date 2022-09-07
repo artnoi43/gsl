@@ -9,11 +9,11 @@ import (
 
 func TestQueue(t *testing.T) {
 	values0 := []uint8{0, 1, 200, 20}
-	q0 := NewQueue[uint8]()
+	q0 := NewQueueUnsafe[uint8]()
 	testQueue(t, values0, q0)
 
 	values1 := []string{"foo", "bar", "baz"}
-	q1 := NewQueue[string]()
+	q1 := NewQueueUnsafe[string]()
 	testQueue(t, values1, q1)
 
 	// Composite type queue - any comparable types should be ok in tests

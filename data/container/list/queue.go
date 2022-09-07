@@ -41,6 +41,10 @@ func (self *QueueImpl[T]) IsEmpty() bool {
 	return len(state) == 0
 }
 
-func NewQueue[T any]() *QueueImpl[T] {
-	return &QueueImpl[T]{}
+func NewQueue[T any]() SafeList[T, *QueueImpl[T]] {
+	return WrapSafeList[T](new(QueueImpl[T]))
+}
+
+func NewQueueUnsafe[T any]() *QueueImpl[T] {
+	return new(QueueImpl[T])
 }

@@ -4,7 +4,7 @@ import "testing"
 
 func TestSet(t *testing.T) {
 	data := []uint16{1, 2, 1, 2, 3, 4, 2, 1}
-	set := NewSet(data)
+	set := NewSetList(data)
 
 	counts := make(map[uint16]int)
 	for !set.IsEmpty() {
@@ -20,5 +20,13 @@ func TestSet(t *testing.T) {
 		if counts[item] != 1 {
 			t.Fatal("set failed")
 		}
+	}
+
+	var item uint16 = 69
+	for i := 0; i < 10; i++ {
+		set.Push(item)
+	}
+	if set.Len() != 1 {
+		t.Fatal("set failed")
 	}
 }

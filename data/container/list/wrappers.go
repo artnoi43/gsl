@@ -1,5 +1,19 @@
 package list
 
-type SafeList[T any, L BasicList[T]] BasicList[T]
+import "github.com/artnoi43/gsl/data"
 
-type SetList[T comparable, L BasicList[T]] BasicList[T]
+type WrappedList[T any, L BasicList[T]] BasicList[T]
+
+// Use SafeList as parameter in function where concurrency is used.
+type SafeList[T any, L BasicList[T]] interface {
+	WrappedList[T, L]
+}
+
+// Use SetList as parameter in function where you'll need characteristics of a set.
+type SetList[T comparable, L BasicList[T]] interface {
+	WrappedList[T, L]
+	data.Set[T]
+}
+
+// TODO: WTF?
+type SafeSetList[T comparable, L BasicList[T]] SafeList[T, SetList[T, L]]

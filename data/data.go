@@ -10,3 +10,7 @@ const (
 type Valuer[T any] interface {
 	GetValue() T
 }
+
+type Set[T comparable] interface {
+	HasDuplicate(x T) bool
+}

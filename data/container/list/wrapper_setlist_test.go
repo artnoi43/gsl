@@ -2,7 +2,32 @@ package list
 
 import "testing"
 
+// This function will take in any BasicList[T]
+func takeAnyList[T any](l BasicList[T]) {}
+
+// If you want your parameter to be a safe stack
+func takeSafeStack[T comparable](ss SafeList[T, *StackImpl[T]]) {}
+
+// If you want your parameter to be a safe queue
+func takeSafeQueue[T comparable](sl SafeList[T, *QueueImpl[T]]) {}
+
+// If you want your parameter to be any set list
+func takeSetList[T comparable](sl SetList[T, BasicList[T]]) {}
+
+// If you want your parameter to be SafeList[T, *SetListImpl[T]] (a *SetListImpl[T] wrapped in a SafeList[T, L])
+// TODO: 1 problem with SafeList[T, *SetListImpl[T]] - it cannot call HasDuplicate!
+// func takeSafeSetList[T comparable](SafeList[T, *SetListImpl[T]]) {}
+func takeSafeSetList[T comparable](ssl SafeSetList[T, *SetListImpl[T]]) {
+	// var zeroValue T
+	// ssl.HasDuplicate(zeroValue)
+}
+
 func testSetListWrapper(t *testing.T) {
+	setList := NewSetList([]int{1, 2, 1, 2})
+	takeSetList[int](setList)
+	safeSetList := WrapSafeList[int](setList)
+	takeSafeSetList[int](safeSetList)
+
 	testSetListQueue(t, []float64{1, 2, 4, 2, 4, 1, 3, 5})
 	testSetListQueue(t, []string{"foo", "bar", "baz", "bar", "foom"})
 	testSetListStack(t, []float64{1, 2, 4, 2, 4, 1, 3, 5})
@@ -10,66 +35,96 @@ func testSetListWrapper(t *testing.T) {
 }
 
 func testSetListStack[T comparable](t *testing.T, data []T) {
-	set := NewSet(data)
+	set := NewSetList(data)
 
 	// Wrap stack with SetListWrapper and then wrap that shit with SafeListWrapper
-	stack := NewStack[T]()                    // *StackImpl[T]
-	setStack := WrapSetList[T](stack)         // *SetList[T, Stack[T]]
+	stack := NewStackUnsafe[T]()              // *StackImpl[T]
+	setStack := WrapSetList[T](stack)         // *SetList[T, *Stack[T]]
 	safeSetStack := WrapSafeList[T](setStack) // *SafeList[T, *SetListWrapper[T]]
 
 	// Wrap anotherStack with SafeListWrapper and then wrap that shit with SetListWrapper
-	anotherStack := NewStack[T]()              // *Stack[T]
-	safeStack := WrapSafeList[T](anotherStack) // *SafeList[T, Stack[T]]
+	anotherStack := NewStackUnsafe[T]()        // *Stack[T]
+	safeStack := WrapSafeList[T](anotherStack) // *SafeList[T, *Stack[T]]
 	setSafeStack := WrapSetList[T](safeStack)  // *SetList[T, *SafeList[T, Stack[T]]]
 
 	// All 6 should implement BasicList[T] and Stack[T]
-	_ = []BasicList[T]{
+	lists := []BasicList[T]{
 		set,
 		stack, setStack, safeSetStack,
 		anotherStack, safeStack, setSafeStack,
 	}
+	for _, l := range lists {
+		takeAnyList(l)
+	}
 
 	// If wrapped lastly be SafeList[T, BasicList[T]] (like safeSetStack), then it's obviously NOT Set[T].
-	_ = []Set[T]{
+	sets := []SetList[T, BasicList[T]]{
 		set,
 		setStack,
 		// safeSetStack, // Compile error!
 		setSafeStack,
 	}
+	for _, x := range sets {
+		takeSetList(x)
+	}
 
-	testSets := []Set[T]{set, setStack, setSafeStack}
+	safes := []SafeList[T, *StackImpl[T]]{
+		safeSetStack,
+		safeStack,
+		// setSafeStack, // Compile error!
+	}
+	for _, x := range safes {
+		takeSafeStack(x)
+	}
+
+	testSets := []SetList[T, BasicList[T]]{set, setStack, setSafeStack}
 	for _, set := range testSets {
 		testSetPushAndPop[T](t, set, data)
 	}
 }
 
 func testSetListQueue[T comparable](t *testing.T, data []T) {
-	set := NewSet(data)
+	set := NewSetList(data)
 
-	queue := NewQueue[T]() // *QueueImpl[T]
-	setQueue := WrapSetList[T](queue)
-	safeSetQueue := WrapSafeList[T](setQueue)
+	queue := NewQueue[T]()                    // *QueueImpl[T]
+	setQueue := WrapSetList[T](queue)         // *SetListWrapper[T, *QueueImpl[T]]
+	safeSetQueue := WrapSafeList[T](setQueue) // *SafeListWrapper[T, *SetListWrapper[T, *QueueImpl]]
 
-	anotherQueue := NewQueue[T]()
-	safeQueue := WrapSafeList[T](queue)
-	setSafeQueue := WrapSetList[T](safeQueue)
+	anotherQueue := NewQueue[T]()             // *QueueImpl[T]
+	safeQueue := WrapSafeList[T](queue)       // *SafeListWrapper[T, *QueueImpl[T]]
+	setSafeQueue := WrapSetList[T](safeQueue) // *SetListWrapper[T, SafeListWrapper[T, *QueueImpl[T]]]
 
 	// All 6 should implement BasicList[T] and Queue[T]
-	_ = []BasicList[T]{
+	lists := []BasicList[T]{
 		set,
 		queue, setQueue, safeSetQueue,
 		anotherQueue, safeQueue, setSafeQueue,
 	}
+	for _, l := range lists {
+		takeAnyList(l)
+	}
 
 	// If wrapped lastly be SafeList[T, BasicList[T]] (like safeSetQueue), then it's obviously NOT Set[T].
-	_ = []Set[T]{
+	sets := []SetList[T, BasicList[T]]{
 		set,
 		setQueue,
 		// safeSetQueue, // Compile error!
 		setSafeQueue,
 	}
+	for _, x := range sets {
+		takeSetList(x)
+	}
 
-	testSets := []Set[T]{set, setQueue, setSafeQueue}
+	safes := []SafeList[T, *QueueImpl[T]]{
+		safeQueue,
+		safeSetQueue,
+		// setSafeQueue, // Compile error!
+	}
+	for _, x := range safes {
+		takeSafeQueue(x)
+	}
+
+	testSets := []SetList[T, BasicList[T]]{set, setQueue, setSafeQueue}
 	for _, set := range testSets {
 		testSetPushAndPop[T](t, set, data)
 	}
