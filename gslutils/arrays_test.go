@@ -25,3 +25,20 @@ func TestReverseSlice(t *testing.T) {
 		}
 	}
 }
+
+func TestContains(t *testing.T) {
+	i := 69
+	arr0 := []int{68, 69, 70, 71}
+	arr1 := []int{68, 70, 71, 72}
+
+	if !Contains(arr0, i) {
+		t.Log("item", i)
+		t.Log("arr", arr0)
+		t.Fatalf("unexpected Contains result -- expected true")
+	}
+	if Contains(arr1, i) {
+		t.Log("item", i)
+		t.Log("arr", arr1)
+		t.Fatalf("unexpected Contains result -- expected false")
+	}
+}
