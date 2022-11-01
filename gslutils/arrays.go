@@ -23,3 +23,26 @@ func Contains[T comparable](arr []T, item T) bool {
 
 	return false
 }
+
+func CollectPointers[T any](arr *[]T) []*T {
+	derefArr := *arr
+	out := make([]*T, len(derefArr))
+
+	for i := range derefArr {
+		out[i] = &derefArr[i]
+	}
+
+	return out
+}
+
+func CollectPointersIf[T any](arr *[]T, filterFunc func(T) bool) []*T {
+	derefArr := *arr
+	var filtered []*T
+	for i := range derefArr {
+		if filterFunc(derefArr[i]) {
+			filtered = append(filtered, &derefArr[i])
+		}
+	}
+
+	return filtered
+}
