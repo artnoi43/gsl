@@ -7,12 +7,8 @@ So this package is meant to fix that - by providing a single-source library for 
 
 1. `http` - providing wrapper for Go's `http` package
 
-2. `strutils` - utilities for `~string` types
+2. `gslutils` - basic utilities
 
-2. `mathutils` - basic math utilities
+3. `soyutils` - bloated utilities with external library use
 
-4. `data` - interesting data structures - is further divided into 2 subpackages:
-
-- `data/list` - list data structures like stacks, queues, and priority queues
-
-- `data/graph` - graph data structures
+4. `data` - frequently used data structures

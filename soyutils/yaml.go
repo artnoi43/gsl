@@ -1,35 +1,45 @@
 package soyutils
 
 import (
-	"os"
-
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	unmarshalErrorFmtYAML = "error unmarshaling YAML file %s"
+	marshalErrorFmtYAML   = "error marshaling YAML file %s"
+)
+
 // ReadFileYAML reads YAML file |filename| and parses it as T
-// and returns the result
-func ReadFileYAML[T any](filename string) (T, error) {
-	var t T
-	b, err := os.ReadFile(filename)
+// and returns the pointer to the result structure T
+func ReadFileYAMLPointer[T any](filename string) (*T, error) {
+	p, err := ReadAndUnmarshalFilePointer[T](filename, yaml.Unmarshal)
 	if err != nil {
-		return t, errors.Wrap(err, "failed to read config")
+		return nil, errors.Wrapf(err, unmarshalErrorFmtJSON, filename)
+	}
+	if p == nil {
+		return nil, errors.Wrapf(err, unmarshalErrorFmtJSON, filename)
 	}
 
-	if err := yaml.Unmarshal(b, &t); err != nil {
-		return t, errors.Wrap(err, "failed to parse config")
+	return p, nil
+}
+
+// ReadFileYAML reads YAML file |filename| and parses it as T
+// and returns the result structure T
+func ReadFileYAML[T any](filename string) (T, error) {
+	t, err := ReadAndUnmarshalFile[T](filename, yaml.Unmarshal)
+	if err != nil {
+		return t, err
 	}
 
 	return t, nil
 }
 
-// ReadFileYAML reads YAML file |filename| and parses it as T
-// and returns the pointer to the result
-func ReadFileYAMLPointer[T any](filename string) (*T, error) {
-	value, err := ReadFileYAML[T](filename)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed get value")
+// WriteFileJSON marshals |t| to YAML-encoded bytes and write the YAML string to file |filename|
+func MarshalAndWriteFileYAML[T any](t T, filename string) error {
+	if err := MarshalAndWriteToFile(t, yaml.Marshal, filename); err != nil {
+		return errors.Wrapf(err, marshalErrorFmtYAML, filename)
 	}
 
-	return &value, nil
+	return nil
 }
