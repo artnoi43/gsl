@@ -22,7 +22,7 @@ func CompareInterfaceValues[T comparable](a, b interface{}) (bool, error) {
 	if !ok {
 		assertedA, err = InterfaceTo[T](a)
 		if err != nil {
-			return false, errors.Wrapf(ErrNotConvertible, "cannot convert a to type %s", typeTarget.String())
+			return false, errors.Wrapf(err, "cannot convert a to type %s", typeTarget.String())
 		}
 	}
 
@@ -30,7 +30,7 @@ func CompareInterfaceValues[T comparable](a, b interface{}) (bool, error) {
 	if !ok {
 		assertedB, err = InterfaceTo[T](b)
 		if err != nil {
-			return false, errors.Wrapf(ErrNotConvertible, "cannot convert b to type %s", typeTarget.String())
+			return false, errors.Wrapf(err, "cannot convert b to type %s", typeTarget.String())
 		}
 	}
 
