@@ -17,21 +17,14 @@ func CompareInterfaceValues[T comparable](a, b interface{}) (bool, error) {
 	var t T
 	typeTarget := reflect.TypeOf(t)
 
-	var err error
-	assertedA, ok := a.(T)
-	if !ok {
-		assertedA, err = InterfaceTo[T](a)
-		if err != nil {
-			return false, errors.Wrapf(err, "cannot convert a to type %s", typeTarget.String())
-		}
+	assertedA, err := InterfaceTo[T](a)
+	if err != nil {
+		return false, errors.Wrapf(err, "cannot convert a to type %s", typeTarget.String())
 	}
 
-	assertedB, ok := b.(T)
-	if !ok {
-		assertedB, err = InterfaceTo[T](b)
-		if err != nil {
-			return false, errors.Wrapf(err, "cannot convert b to type %s", typeTarget.String())
-		}
+	assertedB, err := InterfaceTo[T](b)
+	if err != nil {
+		return false, errors.Wrapf(err, "cannot convert b to type %s", typeTarget.String())
 	}
 
 	return assertedA == assertedB, nil
@@ -40,7 +33,13 @@ func CompareInterfaceValues[T comparable](a, b interface{}) (bool, error) {
 // InterfaceTo converts v from interface{} to T.
 // It returns a zeroed T and an error if not convertible.
 func InterfaceTo[T any](v interface{}) (T, error) {
-	var t T
+	// If we can directly assert the type, then return the asserted value
+	t, ok := v.(T)
+	if ok {
+		return t, nil
+	}
+
+	// Otherwise use reflect package to convert v to T
 	valueType := reflect.TypeOf(v)
 	targetType := reflect.TypeOf(t)
 
