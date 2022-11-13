@@ -8,23 +8,27 @@ import (
 
 var ErrNotConvertible = errors.New("types are not convertible")
 
+func fmtError[T any](which string, val interface{}, err error) error {
+	var t T
+	typeVal, typeTarget := reflect.TypeOf(val).String(), reflect.TypeOf(t).String()
+	return errors.Wrapf(err, "cannot convert %s (of type %s) to type %s", which, typeVal, typeTarget)
+}
+
 // CompareInterfaceValues will compares |a| and |b| as type T.
 // It returns true if |a| and |b| are of type T and are equal in value,
 // or if |a| and |b| can be converted to T and are equal in value.
 // If |a| and |b| are not equal but can be converted to T, then it returns false.
 // CompareInterfaceValues *only* returns non-nil error if any of the values cannot be converted into T.
 func CompareInterfaceValues[T comparable](a, b interface{}) (bool, error) {
-	var t T
-	typeTarget := reflect.TypeOf(t)
-
+	// fmtError formats the error message and is called upon encountering an error
 	assertedA, err := InterfaceTo[T](a)
 	if err != nil {
-		return false, errors.Wrapf(err, "cannot convert a to type %s", typeTarget.String())
+		return false, fmtError[T]("a", a, err)
 	}
 
 	assertedB, err := InterfaceTo[T](b)
 	if err != nil {
-		return false, errors.Wrapf(err, "cannot convert b to type %s", typeTarget.String())
+		return false, fmtError[T]("b", b, err)
 	}
 
 	return assertedA == assertedB, nil
@@ -50,5 +54,5 @@ func InterfaceTo[T any](v interface{}) (T, error) {
 		}
 	}
 
-	return t, errors.Wrapf(ErrNotConvertible, "cannot convert %s to %s", valueType.String(), targetType.String())
+	return t, errors.Wrapf(ErrNotConvertible, "cannot convert type %s to type %s", valueType.String(), targetType.String())
 }
