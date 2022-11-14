@@ -78,7 +78,7 @@ func TestRetryDuration(t *testing.T) {
 
 	for f, conf := range tests {
 		start := time.Now()
-		err := retry(*f, Delay(conf.delay), Attempts(conf.attempts))
+		err := Retry("testRetryDuration", *f, Delay(conf.delay), Attempts(conf.attempts))
 		elapsed := time.Since(start)
 
 		var expectedDuration time.Duration
@@ -95,7 +95,7 @@ func TestRetryDuration(t *testing.T) {
 		}
 
 		rounded := elapsed.Round(time.Second)
-		t.Log(conf, rounded)
+		t.Log(conf, rounded, err)
 		if rounded > expectedDuration {
 			t.Fatalf("took to long for f - expecting %v, got %v\n", expectedDuration, rounded)
 		}
@@ -148,7 +148,7 @@ func TestRetryWithReturnDuration(t *testing.T) {
 
 	for f, conf := range tests {
 		start := time.Now()
-		_, err := RetryWithReturn("test", *f, Delay(conf.delay), Attempts(conf.attempts))
+		_, err := RetryWithReturn("testRetryWithReturnDuration", *f, Delay(conf.delay), Attempts(conf.attempts))
 		elapsed := time.Since(start)
 
 		var expectedDuration time.Duration
@@ -156,11 +156,15 @@ func TestRetryWithReturnDuration(t *testing.T) {
 			if err != nil {
 				t.Fatal("expecting nil error")
 			}
+
+			t.Log("err", err)
 			expectedDuration = conf.sleepDuration
 		} else {
 			if err == nil {
 				t.Fatal("expecting non-nil error")
 			}
+
+			t.Log("err", err)
 			expectedDuration = time.Duration(conf.attempts * (int(conf.sleepDuration) + int(conf.delay)))
 		}
 

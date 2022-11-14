@@ -16,6 +16,8 @@ type retryConfig struct {
 // RetryOption is a function that takes in (and modifies) *Config
 type RetryOption func(*retryConfig)
 
+var ErrRetry = errors.New("error when retrying")
+
 // Attempts set retry attempts
 func Attempts(attempts int) RetryOption {
 	return func(conf *retryConfig) {
@@ -37,19 +39,20 @@ func LastErrorOnly(lastErrOnly bool) RetryOption {
 	}
 }
 
+// retry does not wrap any error, but it does collect multiple errors.
 func retry(
 	f func() error,
 	opts ...RetryOption,
 ) error {
-	var err error
-	var retryErrors []error
-
 	conf := new(retryConfig)
 	for _, applyOption := range opts {
 		applyOption(conf)
 	}
 
-	var lastIndex int // Index of last error
+	var retryErrors []error // Attempt errors
+	var err error           // Current error
+	var lastIndex int       // Index of last error
+
 	for i := 0; i < conf.attempts; i++ {
 		// Overwrite err with last error
 		err = f()
@@ -76,19 +79,18 @@ func retry(
 	}
 
 	// Return all errors, concatenated.
-	errorStrings := make([]string, lastIndex)
-	for _, retryError := range retryErrors {
-		errorStrings = append(errorStrings, retryError.Error())
+	errorStrings := make([]string, lastIndex+1)
+	for i, retryErr := range retryErrors {
+		errorStrings[i] = retryErr.Error()
 	}
-	err = errors.New(strings.Join(errorStrings, ", "))
 
-	return err
+	return errors.New(strings.Join(errorStrings, ", "))
 }
 
 // Retry wraps retry with action string.
 func Retry(action string, f func() error, opts ...RetryOption) error {
 	if err := retry(f, opts...); err != nil {
-		return errors.Wrapf(err, "error when retrying %s", action)
+		return wrapErrRetry(action, err)
 	}
 
 	return nil
@@ -120,8 +122,14 @@ func RetryWithReturn[T any](
 	)
 
 	if err != nil {
-		return t, errors.Wrapf(err, "error when retrying %s", action)
+		return t, wrapErrRetry(action, err)
 	}
 
 	return t, nil
+}
+
+func wrapErrRetry(action string, err error) error {
+	retryErr := errors.Wrapf(errors.New(action), ErrRetry.Error())
+
+	return errors.Wrap(err, retryErr.Error())
 }
