@@ -11,6 +11,7 @@ type retryConfig struct {
 	attempts    int
 	delay       time.Duration
 	lastErrOnly bool
+	stopOnErr   error
 }
 
 // RetryOption is a function that takes in (and modifies) *Config
@@ -39,6 +40,15 @@ func LastErrorOnly(lastErrOnly bool) RetryOption {
 	}
 }
 
+// StopOnError sets a specific error, which, if seen when retrying, breaks the retry loop.
+// If |err| is found during retry, the loop breaks, and it is treated just like any other error,
+// i.e. the retry still fails.
+func StopOnError(err error) RetryOption {
+	return func(conf *retryConfig) {
+		conf.stopOnErr = err
+	}
+}
+
 // retry does not wrap any error, but it does collect multiple errors.
 func retry(
 	f func() error,
@@ -60,6 +70,10 @@ func retry(
 		if err != nil {
 			retryErrors = append(retryErrors, err)
 			lastIndex = i
+
+			if errors.Is(conf.stopOnErr, err) {
+				break
+			}
 
 			time.Sleep(conf.delay)
 			continue

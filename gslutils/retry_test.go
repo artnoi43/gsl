@@ -8,7 +8,9 @@ import (
 )
 
 func TestRetry(t *testing.T) {
-	var lastErr = errors.New("lastErr")
+	fooErr := errors.New("foo")
+	lastErr := errors.New("lastErr")
+
 	var i int
 	attempts := 3
 
@@ -16,7 +18,7 @@ func TestRetry(t *testing.T) {
 		i++
 
 		if i < attempts {
-			return errors.New("foo")
+			return fooErr
 		}
 		if i == attempts {
 			return lastErr
@@ -33,6 +35,31 @@ func TestRetry(t *testing.T) {
 	err = retry(f, Attempts(attempts), LastErrorOnly(false))
 	if errors.Is(err, lastErr) {
 		t.Fatal("expecting combined errors")
+	}
+
+	// Expecting non-nil err, but the retry should break at the fist run
+	var j int
+	delay := time.Second * 3
+	start := time.Now()
+	err = retry(
+		func() error {
+			j++
+			if j < 2 {
+				return fooErr
+			}
+
+			return nil
+		},
+		Delay(delay), Attempts(attempts), StopOnError(fooErr), LastErrorOnly(true),
+	)
+	if err == nil {
+		t.Fatal("expecting non-nil error")
+	}
+	if !errors.Is(fooErr, err) {
+		t.Fatal("expecing fooErr")
+	}
+	if elapsed := time.Since(start); elapsed.Round(time.Second) > delay {
+		t.Fatal("this retry should break right away")
 	}
 }
 
