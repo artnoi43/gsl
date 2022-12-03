@@ -1,8 +1,20 @@
 package gslutils
 
 import (
+	"reflect"
 	"testing"
 )
+
+func TestCopySlice(t *testing.T) {
+	arr := []int{1, 2, 3, 4, 20, 69}
+	out := CopySlice(arr)
+
+	if !reflect.DeepEqual(arr, out) {
+		t.Log("original", arr)
+		t.Log("copy", out)
+		t.Fatal("unexpected copy result")
+	}
+}
 
 func TestReverseSlice(t *testing.T) {
 	arr := []int{1, 2, 3, 4}
