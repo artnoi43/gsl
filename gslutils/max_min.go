@@ -2,9 +2,9 @@ package gslutils
 
 import "golang.org/x/exp/constraints"
 
-func Max[T constraints.Ordered](slice []T) T {
+func Max[T constraints.Ordered](items ...T) T {
 	var max T
-	for _, num := range slice {
+	for _, num := range items {
 		if num > max {
 			max = num
 		}
@@ -12,13 +12,13 @@ func Max[T constraints.Ordered](slice []T) T {
 	return max
 }
 
-func Min[N constraints.Ordered](slice []N) N {
+func Min[N constraints.Ordered](items ...N) N {
 	var zeroValue N
-	if len(slice) == 0 {
+	if len(items) == 0 {
 		return zeroValue
 	}
-	min := slice[0]
-	for _, num := range slice {
+	min := items[0]
+	for _, num := range items {
 		if num < min {
 			min = num
 		}

@@ -3,11 +3,13 @@ package gslutils
 import "testing"
 
 func TestMaxMin(t *testing.T) {
-	floats := []float64{1, 2, 3, 4, 5}
-	if Max(floats) != 5 {
+	min := float64(1)
+	max := float64(100)
+	floats := []float64{69, min, 3, 4, max}
+	if Max(floats...) != max {
 		t.Fatal("unexpected Max result")
 	}
-	if r := Min(floats); r != 1 {
+	if r := Min(floats...); r != min {
 		t.Fatalf("unexpected Min result %v", r)
 	}
 }
