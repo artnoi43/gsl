@@ -25,4 +25,4 @@ type Graph[T nodeValue] GenericGraph[
 	any,
 ]
 
-type Node[T nodeValue] data.Valuer[T]
+type Node[T nodeValue] data.GetValuer[T]

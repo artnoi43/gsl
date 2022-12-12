@@ -20,10 +20,10 @@ const (
 // and can be use with container/heap.Push, container/heap.Pop, and container/heap.Init.
 // I'm working on a new implementation that wouldn't require the heap package.
 type PriorityQueue[T any] struct {
-	Items    []data.Valuer[T]
+	Items    []data.GetValuer[T]
 	HeapType HeapType
 	// lessFunc depends on T, and the New* functions below
-	lessFunc func(items []data.Valuer[T], t HeapType, i, j int) bool
+	lessFunc func(items []data.GetValuer[T], t HeapType, i, j int) bool
 	mut      *sync.RWMutex
 }
 
@@ -59,7 +59,7 @@ func NewPriorityQueueCmp[T CmpOrdered[T]](t HeapType) *PriorityQueue[T] {
 // then you can provide your own lessFunc to determine ordering.
 func NewPriorityQueueCustom[T any](
 	t HeapType,
-	lessFunc func(items []data.Valuer[T], t HeapType, i, j int) bool,
+	lessFunc func(items []data.GetValuer[T], t HeapType, i, j int) bool,
 ) *PriorityQueue[T] {
 	return &PriorityQueue[T]{
 		HeapType: t,
@@ -69,7 +69,7 @@ func NewPriorityQueueCustom[T any](
 }
 
 // Less implementation for constraints.Ordered
-func lessOrdered[T constraints.Ordered](items []data.Valuer[T], t HeapType, i, j int) bool {
+func lessOrdered[T constraints.Ordered](items []data.GetValuer[T], t HeapType, i, j int) bool {
 	if t == MinHeap {
 		return items[i].GetValue() < items[j].GetValue()
 	}
@@ -78,7 +78,7 @@ func lessOrdered[T constraints.Ordered](items []data.Valuer[T], t HeapType, i, j
 }
 
 // Less implementation for CmpOrdered, e.g. *big.Int and *big.Float, and other lib types.
-func lessCmp[T CmpOrdered[T]](items []data.Valuer[T], t HeapType, i, j int) bool {
+func lessCmp[T CmpOrdered[T]](items []data.GetValuer[T], t HeapType, i, j int) bool {
 	var cmp int
 	switch t {
 	case MinHeap:
@@ -115,7 +115,7 @@ func (self *PriorityQueue[T]) Push(x any) {
 	self.mut.Lock()
 	defer self.mut.Unlock()
 
-	item, ok := x.(data.Valuer[T])
+	item, ok := x.(data.GetValuer[T])
 	if !ok {
 		typeOfT := fmt.Sprintf("%T", new(T))
 		panic(fmt.Sprintf("x is not of type %s", typeOfT))

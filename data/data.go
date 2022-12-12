@@ -1,14 +1,16 @@
 package data
 
-type ArraySortDirection uint8
+type SetValuer[T any] interface {
+	SetValue(T)
+}
 
-const (
-	Ascending ArraySortDirection = iota
-	Descending
-)
+type GetValuer[T any] interface {
+	GetValue() T
+}
 
 type Valuer[T any] interface {
-	GetValue() T
+	SetValuer[T]
+	GetValuer[T]
 }
 
 type Set[T comparable] interface {

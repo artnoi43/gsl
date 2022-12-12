@@ -139,7 +139,7 @@ func TestPQCmp(t *testing.T) {
 	lol(a) // Compiles and no panic
 }
 
-func lol(item data.Valuer[*big.Int]) {
+func lol(item data.GetValuer[*big.Int]) {
 
 }
 
