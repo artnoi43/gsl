@@ -5,8 +5,8 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/artnoi43/gsl/data/container/graph"
-	"github.com/artnoi43/gsl/data/container/graph/wgraph"
+	"github.com/artnoi43/gsl/data/graph"
+	"github.com/artnoi43/gsl/data/graph/wgraph"
 	"github.com/artnoi43/gsl/gslutils"
 )
 
@@ -89,9 +89,9 @@ func main() {
 		budapest: {},
 	}
 
-	hasDirection := false
-	dijkGraph := wgraph.NewDijkstraGraph[float64, cityName](hasDirection)
-	unweightedGraph := graph.NewGraph[float64](hasDirection)
+	directed := false
+	dijkGraph := wgraph.NewDijkstraGraph[float64, cityName](directed)
+	unweightedGraph := graph.NewGraph[float64](directed)
 
 	// Add edges and nodes to graphs
 	for node, nodeEdges := range graphEdges {
@@ -148,20 +148,6 @@ func main() {
 
 }
 
-// graph.GenericGraph is impractical, as you can see from the type parameters..
-func takeGenericGraph(g graph.GenericGraph[*city, *city, float64, map[*city]*city], from graph.Node[float64]) {
-
-}
-
-// Instead of GenericGraph, use Graph or GraphWeighted
-func takeUnweightedGraph(g graph.Graph[float64], from graph.Node[float64]) {
-
-}
-
-func takeGraphWeighted(g wgraph.GraphWeighted[float64, cityName], from wgraph.NodeWeighted[float64, cityName]) {
-
-}
-
 func (self *city) GetValue() float64 {
 	return self.flightHours
 }
@@ -193,4 +179,18 @@ func (self *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
 		panic(fmt.Sprintf("node not *city but %s", typeOfNode))
 	}
 	self.through = via
+}
+
+// graph.GenericGraph is impractical, as you can see from the type parameters..
+func takeGenericGraph(g graph.GenericGraph[*city, *city, float64, map[*city]*city], from graph.Node[float64]) {
+
+}
+
+// Instead of GenericGraph, use Graph or GraphWeighted
+func takeUnweightedGraph(g graph.HashMapGraph[float64], from graph.Node[float64]) {
+
+}
+
+func takeGraphWeighted(g wgraph.HashMapGraphWeighted[float64, cityName], from wgraph.NodeWeighted[float64, cityName]) {
+
 }

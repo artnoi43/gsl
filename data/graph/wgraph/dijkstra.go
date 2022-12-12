@@ -21,7 +21,7 @@ type dijkstraWeight interface {
 
 // DijkstraGraph[T] wraps GraphWeightedImpl[T], where T is generic type numeric types and S is ~string.
 type DijkstraGraph[T dijkstraWeight, S ~string] struct {
-	graph GraphWeighted[T, S]
+	graph HashMapGraphWeighted[T, S]
 }
 
 // This type is the Dijkstra shortest path answer. It has 2 fields, (1) `From` the 'from' node, and (2) `Paths`.
@@ -35,22 +35,22 @@ type DijstraShortestPath[T dijkstraWeight, S ~string] struct {
 
 // NewDikstraGraph calls NewGraphWeightedUnsafe[T, S], and return the wrapped graph.
 // Alternatively, you can create your own implementation of GraphWeighted[T, S].
-func NewDijkstraGraphUnsafe[T dijkstraWeight, S ~string](hasDirection bool) *DijkstraGraph[T, S] {
+func NewDijkstraGraphUnsafe[T dijkstraWeight, S ~string](directed bool) *DijkstraGraph[T, S] {
 	return &DijkstraGraph[T, S]{
-		graph: NewGraphWeightedUnsafe[T, S](hasDirection),
+		graph: NewGraphWeightedUnsafe[T, S](directed),
 	}
 }
 
 // NewDikstraGraph calls NewGraphWeighted[T, S], and return the wrapped graph.
 // Alternatively, you can create your own implementation of GraphWeighted[T, S].
-func NewDijkstraGraph[T dijkstraWeight, S ~string](hasDirection bool) *DijkstraGraph[T, S] {
+func NewDijkstraGraph[T dijkstraWeight, S ~string](directed bool) *DijkstraGraph[T, S] {
 	return &DijkstraGraph[T, S]{
-		graph: NewGraphWeighted[T, S](hasDirection),
+		graph: NewGraphWeighted[T, S](directed),
 	}
 }
 
-func (self *DijkstraGraph[T, S]) SetDirection(hasDirection bool) {
-	self.graph.SetDirection(hasDirection)
+func (self *DijkstraGraph[T, S]) SetDirection(directed bool) {
+	self.graph.SetDirection(directed)
 }
 
 func (self *DijkstraGraph[T, S]) HasDirection() bool {
@@ -113,7 +113,7 @@ func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted
 		edges := self.GetNodeEdges(current)
 
 		for _, edge := range edges {
-			edgeNode := edge.GetNode()
+			edgeNode := edge.ToNode()
 
 			// Skip visited
 			if visited[edgeNode] {

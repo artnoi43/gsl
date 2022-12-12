@@ -3,15 +3,15 @@ package wgraph
 import (
 	"golang.org/x/exp/constraints"
 
-	"github.com/artnoi43/gsl/data/container/graph"
+	"github.com/artnoi43/gsl/data/graph"
 )
 
 type graphWeight interface {
 	constraints.Ordered
 }
 
-// GraphWeighted is a graph.GenericGraph
-type GraphWeighted[
+// HashMapGraphWeighted is a graph.GenericGraph, using a hash map to represent node connections.
+type HashMapGraphWeighted[
 	T graphWeight,
 	S ~string,
 ] graph.GenericGraph[
@@ -29,15 +29,17 @@ type GraphWeighted[
 type NodeWeighted[T graphWeight, S ~string] interface {
 	// Inherit some from unweighted graphs
 	graph.Node[T]
+
 	// Other node with weighted edge methods
+
 	SetValueOrCost(value T)              // Save cost or value to the node
 	GetKey() S                           // Get the node's key, names, IDs
-	GetPrevious() NodeWeighted[T, S]     // When using with Dijkstra code, gets the previous (prior node) from in a Dijkstra walk.
+	GetPrevious() NodeWeighted[T, S]     // When using with Dijkstra code, gets the previous (prior node) from a Dijkstra walk.
 	SetPrevious(prev NodeWeighted[T, S]) // In Dijkstra code, set a node's previous node value
 }
 
 // EdgeWeighted represents what a weighted edge should be able to do.
 type EdgeWeighted[T graphWeight, S ~string] interface {
-	GetNode() (to NodeWeighted[T, S])
+	ToNode() (to NodeWeighted[T, S])
 	GetWeight() T
 }

@@ -1,5 +1,7 @@
 package graph
 
+// TODO: Refactor to use GenericGraph
+
 import (
 	"github.com/artnoi43/gsl/data/container/list"
 )
@@ -8,7 +10,7 @@ import (
 // It then returns the shortest path (slice of nodes), the number of hops it takes from `src` to `dst`,
 // and a true boolean value if there's a path from `src` to `dst`.
 // Otherwise, a nil slice, -1, and false is returned if there's no such path.
-func BFSShortestPath[T nodeValue](g Graph[T], src Node[T], dst Node[T]) ([]Node[T], int, bool) {
+func BFSShortestPath[T nodeValue](g HashMapGraph[T], src Node[T], dst Node[T]) ([]Node[T], int, bool) {
 	rawPath, found := BFSSearch(g, src, dst)
 	if !found {
 		return nil, -1, false
@@ -19,7 +21,7 @@ func BFSShortestPath[T nodeValue](g Graph[T], src Node[T], dst Node[T]) ([]Node[
 }
 
 // BFSSearch traverses the graph in BFS manner, and collecting VFS traversal information in a map `prev`. It returns the map, and a boolean value denoting if dst was reachable from src
-func BFSSearch[T nodeValue](g Graph[T], src Node[T], dst Node[T]) (map[Node[T]]Node[T], bool) {
+func BFSSearch[T nodeValue](g HashMapGraph[T], src Node[T], dst Node[T]) (map[Node[T]]Node[T], bool) {
 	q := list.NewSafeQueue[Node[T]]()
 	q.Push(src)
 

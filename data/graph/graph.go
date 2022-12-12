@@ -13,8 +13,8 @@ var ErrEdgeWeightNotNull = errors.New("found edge weight in unweighted graph")
 
 type nodeValue any
 
-// Graph is a GenericGraph, but with more node constraints. Type `GraphImpl` implements this interface.
-type Graph[T nodeValue] GenericGraph[
+// HashMapGraph[T] is a GenericGraph that represents node connections as a hash map `map[Node[T]][]Node[T].
+type HashMapGraph[T nodeValue] GenericGraph[
 	// The graph node is Node[T]
 	Node[T],
 	// Since there's no edge weight, this graph will use the connected nodes to represent a node's edges
@@ -25,4 +25,5 @@ type Graph[T nodeValue] GenericGraph[
 	any,
 ]
 
+// Read-only Node
 type Node[T nodeValue] data.GetValuer[T]

@@ -163,8 +163,8 @@ func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFini
 	nodesMap := constructDijkstraTestGraph[T](nameStart, nameFinish)
 
 	// Prepare graph
-	hasDirection := true
-	djikGraph := NewDijkstraGraph[T, S](hasDirection)
+	directed := true
+	djikGraph := NewDijkstraGraph[T, S](directed)
 	for node, util := range nodesMap {
 		// Add node
 		djikGraph.AddNode(node)
