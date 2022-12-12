@@ -15,10 +15,10 @@ const (
 func ReadFileYAMLPointer[T any](filename string) (*T, error) {
 	p, err := ReadAndUnmarshalFilePointer[T](filename, yaml.Unmarshal)
 	if err != nil {
-		return nil, errors.Wrapf(err, unmarshalErrorFmtJSON, filename)
+		return nil, errors.Wrapf(err, unmarshalErrorFmtYAML, filename)
 	}
 	if p == nil {
-		return nil, errors.Wrapf(err, unmarshalErrorFmtJSON, filename)
+		return nil, errors.Wrapf(errors.New("nil pointer unmarshaled"), unmarshalErrorFmtYAML, filename)
 	}
 
 	return p, nil

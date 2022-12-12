@@ -21,6 +21,9 @@ func ReadFileJSONPointer[T any](filename string) (*T, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, unmarshalErrorFmtJSON, filename)
 	}
+	if p == nil {
+		return nil, errors.Wrapf(errors.New("nil pointer unmarshaled"), unmarshalErrorFmtJSON, filename)
+	}
 
 	return p, nil
 }
