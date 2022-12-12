@@ -49,44 +49,40 @@ func NewDijkstraGraph[T dijkstraWeight, S ~string](directed bool) *DijkstraGraph
 	}
 }
 
-func (self *DijkstraGraph[T, S]) SetDirection(directed bool) {
-	self.graph.SetDirection(directed)
+func (s *DijkstraGraph[T, S]) SetDirection(directed bool) {
+	s.graph.SetDirection(directed)
 }
 
-func (self *DijkstraGraph[T, S]) HasDirection() bool {
-	return self.graph.HasDirection()
+func (s *DijkstraGraph[T, S]) IsDirected() bool {
+	return s.graph.IsDirected()
 }
 
-func (self *DijkstraGraph[T, S]) AddNode(node NodeWeighted[T, S]) {
-	self.graph.AddNode(node)
+func (s *DijkstraGraph[T, S]) AddNode(node NodeWeighted[T, S]) {
+	s.graph.AddNode(node)
 }
 
 // AddDijkstraEdge validates if weight is valid, and then calls GraphWeighted.AddEdge
-func (self *DijkstraGraph[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
+func (s *DijkstraGraph[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
 	var zeroValue T
 	if weight < zeroValue {
 		return errors.Wrapf(ErrDijkstraNegativeWeightEdge, "negative edge weight %v", weight)
 	}
 
-	self.graph.AddEdge(n1, n2, weight)
+	s.graph.AddEdge(n1, n2, weight)
 	return nil
 }
 
-func (self *DijkstraGraph[T, S]) GetNodes() []NodeWeighted[T, S] {
-	return self.graph.GetNodes()
+func (s *DijkstraGraph[T, S]) GetNodes() []NodeWeighted[T, S] {
+	return s.graph.GetNodes()
 }
 
-func (self *DijkstraGraph[T, S]) GetEdges() map[NodeWeighted[T, S]][]EdgeWeighted[T, S] {
-	return self.graph.GetEdges()
-}
-
-func (self *DijkstraGraph[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
-	return self.graph.GetNodeEdges(node)
+func (s *DijkstraGraph[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
+	return s.graph.GetNodeEdges(node)
 }
 
 // DjisktraFrom takes a *NodeImpl[T] startNode, and finds the shortest path from startNode to all other nodes.
 // This implementation uses PriorityQueue[T], so the nodes' values must satisfy constraints.Ordered.
-func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted[T, S]) *DijstraShortestPath[T, S] {
+func (s *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted[T, S]) *DijstraShortestPath[T, S] {
 	var zeroValue T
 	startNode.SetValueOrCost(zeroValue)
 	startNode.SetPrevious(nil)
@@ -110,7 +106,7 @@ func (self *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted
 		}
 
 		visited[current] = true
-		edges := self.GetNodeEdges(current)
+		edges := s.GetNodeEdges(current)
 
 		for _, edge := range edges {
 			edgeNode := edge.ToNode()

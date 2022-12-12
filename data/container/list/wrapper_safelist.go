@@ -24,41 +24,41 @@ func WrapSafeList[T any, L BasicList[T]](basicList L) *SafeListWrapper[T, L] {
 	}
 }
 
-func (self *SafeListWrapper[T, L]) Push(x T) {
-	self.mut.Lock()
-	defer self.mut.Unlock()
+func (w *SafeListWrapper[T, L]) Push(x T) {
+	w.mut.Lock()
+	defer w.mut.Unlock()
 
-	self.basicList.Push(x)
+	w.basicList.Push(x)
 }
 
-func (self *SafeListWrapper[T, L]) PushSlice(x []T) {
-	self.mut.Lock()
-	defer self.mut.Unlock()
+func (w *SafeListWrapper[T, L]) PushSlice(x []T) {
+	w.mut.Lock()
+	defer w.mut.Unlock()
 
-	self.basicList.PushSlice(x)
+	w.basicList.PushSlice(x)
 }
 
-func (self *SafeListWrapper[T, L]) Pop() *T {
-	self.mut.Lock()
-	defer self.mut.Unlock()
+func (w *SafeListWrapper[T, L]) Pop() *T {
+	w.mut.Lock()
+	defer w.mut.Unlock()
 
-	return self.basicList.Pop()
+	return w.basicList.Pop()
 }
 
-func (self *SafeListWrapper[T, L]) Len() int {
-	self.mut.RLock()
-	defer self.mut.RUnlock()
+func (w *SafeListWrapper[T, L]) Len() int {
+	w.mut.RLock()
+	defer w.mut.RUnlock()
 
-	return self.basicList.Len()
+	return w.basicList.Len()
 }
 
-func (self *SafeListWrapper[T, L]) IsEmpty() bool {
-	self.mut.RLock()
-	defer self.mut.RUnlock()
+func (w *SafeListWrapper[T, L]) IsEmpty() bool {
+	w.mut.RLock()
+	defer w.mut.RUnlock()
 
-	return self.basicList.IsEmpty()
+	return w.basicList.IsEmpty()
 }
 
-func (self *SafeListWrapper[T, L]) IsSafe() bool {
+func (w *SafeListWrapper[T, L]) IsSafe() bool {
 	return true
 }

@@ -8,19 +8,19 @@ type NodeWeightedImpl[T graphWeight, S ~string] struct {
 }
 
 // Implements data.Valuer[T]
-func (self *NodeWeightedImpl[T, S]) GetValue() T {
-	return self.ValueOrCost
+func (n *NodeWeightedImpl[T, S]) GetValue() T {
+	return n.ValueOrCost
 }
-func (self *NodeWeightedImpl[T, S]) GetKey() S {
-	return self.Name
+func (n *NodeWeightedImpl[T, S]) GetKey() S {
+	return n.Name
 }
-func (self *NodeWeightedImpl[T, S]) GetPrevious() NodeWeighted[T, S] {
-	return self.Previous
+func (n *NodeWeightedImpl[T, S]) GetPrevious() NodeWeighted[T, S] {
+	return n.Previous
 }
-func (self *NodeWeightedImpl[T, S]) SetValueOrCost(value T) {
-	self.ValueOrCost = value
+func (n *NodeWeightedImpl[T, S]) SetValueOrCost(value T) {
+	n.ValueOrCost = value
 }
 
-func (self *NodeWeightedImpl[T, S]) SetPrevious(prev NodeWeighted[T, S]) {
-	self.Previous = prev
+func (n *NodeWeightedImpl[T, S]) SetPrevious(prev NodeWeighted[T, S]) {
+	n.Previous = prev
 }

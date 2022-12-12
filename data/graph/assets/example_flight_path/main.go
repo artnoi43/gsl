@@ -16,6 +16,9 @@ import (
 // The code provides an example of solving the best flight path between major cities.
 // In this case, type *city is used as nodes for both BFS and Dijkstra sort.
 
+// Toward the end of this file, example functions are provided to get a better picture
+// of how write function params for these graphs.
+
 type cityName string
 
 // *city implements wgraph.UndirectedNode
@@ -114,6 +117,7 @@ func main() {
 		if dst == fromNode {
 			continue
 		}
+
 		pathToNode := wgraph.DijkstraShortestPathReconstruct(shortestPathsFromTokyo.Paths, shortestPathsFromTokyo.From, dst)
 		gslutils.ReverseInPlace(pathToNode)
 
@@ -127,7 +131,7 @@ func main() {
 
 	fmt.Println("BFS result")
 	for _, dst := range unweightedGraph.GetNodes() {
-		shortestHopsFromTokyo, hops, found := graph.BFSShortestPath[float64](unweightedGraph, fromNode, dst)
+		shortestHopsFromTokyo, hops, found := graph.BFS[float64](unweightedGraph, fromNode, dst)
 		fmt.Println("path to", dst.(*city).GetKey(), "found", found, "shortestHops", hops)
 		gslutils.ReverseInPlace(shortestHopsFromTokyo)
 		for i, hop := range shortestHopsFromTokyo {
@@ -137,39 +141,33 @@ func main() {
 
 	takeUnweightedGraph(unweightedGraph, fromNode)
 	takeGraphWeighted(dijkGraph, fromNode)
-	// Compile error: wgraph.GraphWeighted are not compatible with graph.Graph.
-	// But the node types are pretty much interchangable.
-	// takeUnweightedGraph(dijkGraph, fromNode)
-	// takeGraphWeighted(unweightedGraph, fromNode)
 
-	// Compile error: graph.GenericGraph is too primitive to be used easily. Use graph.Graph or wgraph.GraphWeighted instead
-	// takeGenericGraph(unweightedGraph, fromNode)
-	// takeGenericGraph(dijkGraph, fromNode)
-
+	gg := unweightedGraph.(graph.GenericGraph[graph.Node[float64], graph.Node[float64], any])
+	takeGenericGraph(gg)
 }
 
-func (self *city) GetValue() float64 {
-	return self.flightHours
+func (c *city) GetValue() float64 {
+	return c.flightHours
 }
 
-func (self *city) SetValueOrCost(newCost float64) {
-	self.flightHours = newCost
+func (c *city) SetValueOrCost(newCost float64) {
+	c.flightHours = newCost
 }
 
-func (self *city) GetKey() cityName {
-	return self.name
+func (c *city) GetKey() cityName {
+	return c.name
 }
 
-func (self *city) GetPrevious() wgraph.NodeWeighted[float64, cityName] {
-	if self.through == nil {
+func (c *city) GetPrevious() wgraph.NodeWeighted[float64, cityName] {
+	if c.through == nil {
 		return nil
 	}
-	return self.through
+	return c.through
 }
 
-func (self *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
+func (c *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
 	if node == nil {
-		self.through = nil
+		c.through = nil
 		return
 	}
 
@@ -178,12 +176,15 @@ func (self *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
 		typeOfNode := reflect.TypeOf(node)
 		panic(fmt.Sprintf("node not *city but %s", typeOfNode))
 	}
-	self.through = via
+	c.through = via
 }
 
 // graph.GenericGraph is impractical, as you can see from the type parameters..
-func takeGenericGraph(g graph.GenericGraph[*city, *city, float64, map[*city]*city], from graph.Node[float64]) {
+func takeGenericGraph(
+	gg graph.GenericGraph[graph.Node[float64], graph.Node[float64], any],
+) {
 
+	gg.AddEdge(nil, nil, 0)
 }
 
 // Instead of GenericGraph, use Graph or GraphWeighted

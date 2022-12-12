@@ -6,38 +6,38 @@ func NewSafeQueue[T any]() SafeList[T, *QueueImpl[T]] {
 	return WrapSafeList[T](new(QueueImpl[T]))
 }
 
-func (self *QueueImpl[T]) Push(x T) {
-	*self = append(*self, x)
+func (s *QueueImpl[T]) Push(x T) {
+	*s = append(*s, x)
 }
 
-func (self *QueueImpl[T]) PushSlice(slice []T) {
+func (s *QueueImpl[T]) PushSlice(slice []T) {
 	for _, elem := range slice {
-		self.Push(elem)
+		s.Push(elem)
 	}
 }
 
 // Pop pops and returns the left-most element of self,
 // returning nil if self is empty
-func (self *QueueImpl[T]) Pop() *T {
-	state := *self
+func (s *QueueImpl[T]) Pop() *T {
+	state := *s
 	l := len(state)
 	if l == 0 {
 		return nil
 	}
 
 	var elem T
-	elem, *self = state[0], state[1:l]
+	elem, *s = state[0], state[1:l]
 
 	return &elem
 }
 
-func (self *QueueImpl[T]) Len() int {
-	state := *self
+func (s *QueueImpl[T]) Len() int {
+	state := *s
 	return len(state)
 }
 
-func (self *QueueImpl[T]) IsEmpty() bool {
-	state := *self
+func (s *QueueImpl[T]) IsEmpty() bool {
+	state := *s
 	return len(state) == 0
 }
 

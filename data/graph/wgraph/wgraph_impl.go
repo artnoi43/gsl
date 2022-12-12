@@ -30,7 +30,6 @@ func WrapSafeGraphWeighted[T graphWeight, S ~string](g HashMapGraphWeighted[T, S
 	return graph.WrapSafeGenericGraph[
 		NodeWeighted[T, S],
 		EdgeWeighted[T, S],
-		map[NodeWeighted[T, S]][]EdgeWeighted[T, S],
 		T,
 	](
 		g,
@@ -45,34 +44,30 @@ func NewGraphWeighted[T graphWeight, S ~string](directed bool) HashMapGraphWeigh
 	)
 }
 
-func (self *GraphWeightedImpl[T, S]) SetDirection(directed bool) { self.Directed = directed }
+func (s *GraphWeightedImpl[T, S]) SetDirection(directed bool) { s.Directed = directed }
 
-func (self *GraphWeightedImpl[T, S]) HasDirection() bool { return self.Directed }
+func (s *GraphWeightedImpl[T, S]) IsDirected() bool { return s.Directed }
 
-func (self *GraphWeightedImpl[T, S]) GetNodes() []NodeWeighted[T, S] { return self.Nodes }
+func (s *GraphWeightedImpl[T, S]) GetNodes() []NodeWeighted[T, S] { return s.Nodes }
 
-func (self *GraphWeightedImpl[T, S]) GetEdges() map[NodeWeighted[T, S]][]EdgeWeighted[T, S] {
-	return self.Edges
+func (s *GraphWeightedImpl[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
+	return s.Edges[node]
 }
 
-func (self *GraphWeightedImpl[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
-	return self.Edges[node]
-}
-
-func (self *GraphWeightedImpl[T, S]) AddNode(node NodeWeighted[T, S]) {
-	self.Nodes = append(self.Nodes, node)
+func (s *GraphWeightedImpl[T, S]) AddNode(node NodeWeighted[T, S]) {
+	s.Nodes = append(s.Nodes, node)
 }
 
 // AddEdge adds edge from n1 to n2. This particular method does not return error in any case.
-func (self *GraphWeightedImpl[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
+func (s *GraphWeightedImpl[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
 	// Add and edge from n1 leading to n2
-	self.Edges[n1] = append(self.Edges[n1], &EdgeWeightedImpl[T, S]{toNode: n2, weight: weight})
+	s.Edges[n1] = append(s.Edges[n1], &EdgeWeightedImpl[T, S]{toNode: n2, weight: weight})
 
-	if self.Directed {
+	if s.Directed {
 		return nil
 	}
 
 	// If it's not directed, then both nodes have links from and to each other
-	self.Edges[n2] = append(self.Edges[n2], &EdgeWeightedImpl[T, S]{toNode: n1, weight: weight})
+	s.Edges[n2] = append(s.Edges[n2], &EdgeWeightedImpl[T, S]{toNode: n1, weight: weight})
 	return nil
 }

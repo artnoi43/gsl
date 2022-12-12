@@ -90,55 +90,55 @@ func lessCmp[T CmpOrdered[T]](items []data.GetValuer[T], t HeapType, i, j int) b
 	return items[i].GetValue().Cmp(items[j].GetValue()) == cmp
 }
 
-func (self *PriorityQueue[T]) Len() int {
-	self.mut.RLock()
-	defer self.mut.RUnlock()
+func (q *PriorityQueue[T]) Len() int {
+	q.mut.RLock()
+	defer q.mut.RUnlock()
 
-	return len(self.Items)
+	return len(q.Items)
 }
 
-func (self *PriorityQueue[T]) Less(i, j int) bool {
-	self.mut.RLock()
-	defer self.mut.RUnlock()
+func (q *PriorityQueue[T]) Less(i, j int) bool {
+	q.mut.RLock()
+	defer q.mut.RUnlock()
 
-	return self.lessFunc(self.Items, self.HeapType, i, j)
+	return q.lessFunc(q.Items, q.HeapType, i, j)
 }
 
-func (self *PriorityQueue[T]) Swap(i, j int) {
-	self.mut.Lock()
-	defer self.mut.Unlock()
+func (q *PriorityQueue[T]) Swap(i, j int) {
+	q.mut.Lock()
+	defer q.mut.Unlock()
 
-	self.Items[i], self.Items[j] = self.Items[j], self.Items[i]
+	q.Items[i], q.Items[j] = q.Items[j], q.Items[i]
 }
 
-func (self *PriorityQueue[T]) Push(x any) {
-	self.mut.Lock()
-	defer self.mut.Unlock()
+func (q *PriorityQueue[T]) Push(x any) {
+	q.mut.Lock()
+	defer q.mut.Unlock()
 
 	item, ok := x.(data.GetValuer[T])
 	if !ok {
 		typeOfT := fmt.Sprintf("%T", new(T))
 		panic(fmt.Sprintf("x is not of type %s", typeOfT))
 	}
-	self.Items = append(self.Items, item)
+	q.Items = append(q.Items, item)
 }
 
-func (self *PriorityQueue[T]) Pop() any {
-	self.mut.Lock()
-	defer self.mut.Unlock()
+func (q *PriorityQueue[T]) Pop() any {
+	q.mut.Lock()
+	defer q.mut.Unlock()
 
-	old := *self
+	old := *q
 	n := len(old.Items)
 	item := old.Items[n-1]
 	old.Items[n-1] = nil // avoid memory leak
-	self.Items = old.Items[0 : n-1]
+	q.Items = old.Items[0 : n-1]
 
 	return item
 }
 
-func (self *PriorityQueue[T]) IsEmpty() bool {
-	self.mut.RLock()
-	defer self.mut.RUnlock()
+func (q *PriorityQueue[T]) IsEmpty() bool {
+	q.mut.RLock()
+	defer q.mut.RUnlock()
 
-	return self.Len() == 0
+	return q.Len() == 0
 }

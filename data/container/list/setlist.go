@@ -47,9 +47,9 @@ func (s *SetListImpl[T]) Push(x T) {
 	}
 }
 
-func (self *SetListImpl[T]) PushSlice(slice []T) {
+func (s *SetListImpl[T]) PushSlice(slice []T) {
 	for _, elem := range slice {
-		self.Push(elem)
+		s.Push(elem)
 	}
 }
 

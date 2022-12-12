@@ -6,10 +6,10 @@ type EdgeWeightedImpl[T graphWeight, S ~string] struct {
 }
 
 // If E is an edge from nodes A to B, then E.GetToNode() returns B.
-func (self *EdgeWeightedImpl[T, S]) ToNode() NodeWeighted[T, S] {
-	return self.toNode
+func (s *EdgeWeightedImpl[T, S]) ToNode() NodeWeighted[T, S] {
+	return s.toNode
 }
 
-func (self *EdgeWeightedImpl[T, S]) GetWeight() T {
-	return self.weight
+func (s *EdgeWeightedImpl[T, S]) GetWeight() T {
+	return s.weight
 }

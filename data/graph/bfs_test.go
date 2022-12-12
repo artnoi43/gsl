@@ -1,8 +1,20 @@
 package graph
 
 import (
+	"reflect"
 	"testing"
 )
+
+type (
+	genericBFS[T nodeValue] func(GenericGraph[Node[T], Node[T], any], Node[T], Node[T]) ([]Node[T], int, bool)
+	hashMapBFS[T nodeValue] func(HashMapGraph[T], Node[T], Node[T]) ([]Node[T], int, bool)
+	testFunc[T nodeValue]   interface{ genericBFS[T] | hashMapBFS[T] }
+)
+
+type bfsTestResult struct {
+	found bool
+	hops  int
+}
 
 func TestBFS(t *testing.T) {
 	t.Run("Directed BFS", testBFS)
@@ -18,12 +30,7 @@ func testBFS(t *testing.T) {
 	makam := person{name: "makam", age: 5}
 	muji := person{name: "muji", age: 1}
 
-	type result struct {
-		found bool
-		hops  int
-	}
-
-	tests := map[person]map[person]result{
+	tests := map[person]map[person]bfsTestResult{
 		art: {
 			art: {
 				found: true,
@@ -82,23 +89,7 @@ func testBFS(t *testing.T) {
 	g.AddEdge(banana, beagie, nil)
 	g.AddEdge(black, makam, nil)
 
-	for fromNode, m := range tests {
-		for toNode, expected := range m {
-			// t.Logf("from %v to %v", fromNode, toNode)
-			shortestPath, hops, found := BFSShortestPath[int](g, fromNode, toNode)
-			if found != expected.found {
-				t.Log(shortestPath)
-				t.Fatalf("unexpected found: %v, expected %v\n", found, expected.found)
-			}
-			if hops != expected.hops {
-				t.Log(shortestPath)
-				t.Fatalf("unexpected hops: %v, expected %v\n", hops, expected.hops)
-			}
-			if hops != len(shortestPath)-1 {
-				t.Fatal("unexpected relationship for hops and len(shortestPath)")
-			}
-		}
-	}
+	loopTestBFS[int](t, tests, g)
 }
 
 func testUBFS(t *testing.T) {
@@ -109,12 +100,7 @@ func testUBFS(t *testing.T) {
 	makam := person{name: "makam", age: 5}   // makam only knows black
 	muji := person{name: "muji", age: 1}     // muji knows no one
 
-	type result struct {
-		found bool
-		hops  int
-	}
-
-	tests := map[person]map[person]result{
+	tests := map[person]map[person]bfsTestResult{
 		art: {
 			art: {
 				found: true,
@@ -152,20 +138,45 @@ func testUBFS(t *testing.T) {
 	g.AddEdge(black, makam, nil)
 	g.AddEdge(black, banana, nil)
 
-	for fromNode, m := range tests {
-		for toNode, expected := range m {
-			// t.Logf("from %v to %v", fromNode, toNode)
-			shortestPath, hops, found := BFSShortestPath[int](g, fromNode, toNode)
-			if found != expected.found {
-				t.Log(shortestPath)
-				t.Fatalf("unexpected found: %v, expected %v\n", found, expected.found)
-			}
-			if hops != expected.hops {
-				t.Log(shortestPath)
-				t.Fatalf("unexpected hops: %v, expected %v\n", hops, expected.hops)
-			}
-			if hops != len(shortestPath)-1 {
-				t.Fatal("unexpected relationship for hops and len(shortestPath)")
+	loopTestBFS[int](t, tests, g)
+}
+
+func loopTestBFS[T any](
+	t *testing.T,
+	tests map[person]map[person]bfsTestResult,
+	g HashMapGraph[int],
+) {
+	var gf genericBFS[int] = BFSNg[int]
+	var hf hashMapBFS[int] = BFS[int]
+	// Using BFSNg[int] and BFS[int] directly in testFuncs will fail type system
+	testFuncs := []interface{}{gf, hf}
+	for _, tf := range testFuncs {
+		for fromNode, m := range tests {
+			for toNode, expected := range m {
+				var shortestPath []Node[int]
+				var hops int
+				var found bool
+
+				switch f := tf.(type) {
+				case genericBFS[int]:
+					shortestPath, hops, found = f(g.(GenericGraph[Node[int], Node[int], any]), fromNode, toNode)
+				case hashMapBFS[int]:
+					shortestPath, hops, found = f(g, fromNode, toNode)
+				default:
+					t.Fatal("unexpected function type", reflect.TypeOf(f).String())
+				}
+
+				if found != expected.found {
+					t.Log(shortestPath)
+					t.Fatalf("unexpected found: %v, expected %v\n", found, expected.found)
+				}
+				if hops != expected.hops {
+					t.Log(shortestPath)
+					t.Fatalf("unexpected hops: %v, expected %v\n", hops, expected.hops)
+				}
+				if hops != len(shortestPath)-1 {
+					t.Fatal("unexpected relationship for hops and len(shortestPath)")
+				}
 			}
 		}
 	}

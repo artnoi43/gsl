@@ -7,7 +7,7 @@ type HashMapGraphImpl[T any] struct {
 	Edges    map[Node[T]][]Node[T]
 }
 
-// NewHashMapGraphUnsafe[T] returns the default implementation of unweighted graph (*GraphImpl[T])
+// NewHashMapGraphUnsafe[T] returns the default implementation of unweighted graph (*HashMapGraphImpl[T])
 // without the mutex field. If your code is not concurrent, use this type, otherwise,
 // consider calling NewGraph[T] instead.
 func NewHashMapGraphUnsafe[T any](directed bool) HashMapGraph[T] {
@@ -23,15 +23,14 @@ func WrapSafeGraph[T any](g HashMapGraph[T]) HashMapGraph[T] {
 	return WrapSafeGenericGraph[
 		Node[T],
 		Node[T],
-		map[Node[T]][]Node[T],
 		any,
 	](
 		g,
 	)
 }
 
-// NewGraph[T] returns the default implementation of unweighted graph (*GraphImpl[T])
-// wrapped inside a of SafeGraph[N any, E any, M any, W any]
+// NewGraph[T] returns the default implementation of unweighted graph (*HashMapGraphImpl[T])
+// wrapped inside a of SafeGraph[N any, E any, R any, W any]
 func NewGraph[T any](directed bool) HashMapGraph[T] {
 
 	return WrapSafeGraph(
@@ -41,11 +40,9 @@ func NewGraph[T any](directed bool) HashMapGraph[T] {
 
 func (g *HashMapGraphImpl[T]) SetDirection(directed bool) { g.Directed = directed }
 
-func (g *HashMapGraphImpl[T]) HasDirection() bool { return g.Directed }
+func (g *HashMapGraphImpl[T]) IsDirected() bool { return g.Directed }
 
 func (g *HashMapGraphImpl[T]) GetNodes() []Node[T] { return g.Nodes }
-
-func (g *HashMapGraphImpl[T]) GetEdges() map[Node[T]][]Node[T] { return g.Edges }
 
 func (g *HashMapGraphImpl[T]) GetNodeEdges(node Node[T]) []Node[T] { return g.Edges[node] }
 

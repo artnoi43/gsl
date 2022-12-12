@@ -19,8 +19,6 @@ type HashMapGraph[T nodeValue] GenericGraph[
 	Node[T],
 	// Since there's no edge weight, this graph will use the connected nodes to represent a node's edges
 	Node[T],
-	// The graph's implements edges as a map of node to other nodes
-	map[Node[T]][]Node[T],
 	// The weight can be of any types, BUT ONLY NIL IS VALID if using the default implementation of unweighted graph
 	any,
 ]

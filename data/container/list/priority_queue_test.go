@@ -17,8 +17,8 @@ type foo[T constraints.Ordered] struct {
 }
 
 // Implements data.Valuer[T]
-func (self foo[T]) GetValue() T {
-	return self.value
+func (f foo[T]) GetValue() T {
+	return f.value
 }
 
 func TestPq(t *testing.T) {

@@ -19,8 +19,6 @@ type HashMapGraphWeighted[
 	NodeWeighted[T, S],
 	// The weighted graph's edge interface
 	EdgeWeighted[T, S],
-	// The weighted graph stores the edges as map of node to edges
-	map[NodeWeighted[T, S]][]EdgeWeighted[T, S],
 	// The edge weight can be of any types that implements graphWeight
 	T,
 ]
