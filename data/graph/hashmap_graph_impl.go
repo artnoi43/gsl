@@ -10,30 +10,17 @@ type HashMapGraphImpl[T any] struct {
 // NewHashMapGraphUnsafe[T] returns the default implementation of unweighted graph (*HashMapGraphImpl[T])
 // without the mutex field. If your code is not concurrent, use this type, otherwise,
 // consider calling NewGraph[T] instead.
-func NewHashMapGraphUnsafe[T any](directed bool) HashMapGraph[T] {
+func NewHashMapGraphUnsafe[T any](directed bool) HashMapGraphV1[T] {
 	return &HashMapGraphImpl[T]{
 		Directed: directed,
 		Edges:    make(map[Node[T]][]Node[T]),
 	}
 }
 
-// WrapSafeGraph wraps any graph g that implements Graph[T] with SafeGraph.[N, E, M, W]
-func WrapSafeGraph[T any](g HashMapGraph[T]) HashMapGraph[T] {
-	// The type parameters mirror how Graph[T] implements BasicGraph[N, E, M, W]
-	return WrapSafeGenericGraph[
-		Node[T],
-		Node[T],
-		any,
-	](
-		g,
-	)
-}
-
 // NewGraph[T] returns the default implementation of unweighted graph (*HashMapGraphImpl[T])
 // wrapped inside a of SafeGraph[N any, E any, R any, W any]
-func NewGraph[T any](directed bool) HashMapGraph[T] {
-
-	return WrapSafeGraph(
+func NewHashMapGraph[T any](directed bool) HashMapGraphV1[T] {
+	return WrapSafeGenericGraph[Node[T], Node[T], any](
 		NewHashMapGraphUnsafe[T](directed),
 	)
 }
@@ -41,10 +28,6 @@ func NewGraph[T any](directed bool) HashMapGraph[T] {
 func (g *HashMapGraphImpl[T]) SetDirection(directed bool) { g.Directed = directed }
 
 func (g *HashMapGraphImpl[T]) IsDirected() bool { return g.Directed }
-
-func (g *HashMapGraphImpl[T]) GetNodes() []Node[T] { return g.Nodes }
-
-func (g *HashMapGraphImpl[T]) GetNodeEdges(node Node[T]) []Node[T] { return g.Edges[node] }
 
 func (g *HashMapGraphImpl[T]) AddNode(node Node[T]) {
 	g.Nodes = append(g.Nodes, node)
@@ -65,3 +48,19 @@ func (g *HashMapGraphImpl[T]) AddEdge(n1, n2 Node[T], weight any) error {
 	g.Edges[n2] = append(g.Edges[n2], n1)
 	return nil
 }
+
+func (g *HashMapGraphImpl[T]) GetNodes() []Node[T] { return g.Nodes }
+
+func (g *HashMapGraphImpl[T]) GetEdges() []Node[T] {
+	var edges []Node[T]
+
+	for _, nodeEdges := range g.Edges {
+		edges = append(edges, nodeEdges...)
+	}
+
+	return edges
+}
+
+func (g *HashMapGraphImpl[T]) GetNodeNeighbors(node Node[T]) []Node[T] { return g.Edges[node] }
+
+func (g *HashMapGraphImpl[T]) GetNodeEdges(node Node[T]) []Node[T] { return g.Edges[node] }

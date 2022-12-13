@@ -1,17 +1,13 @@
 package graph
 
-// TODO: Refactor to use GenericGraph
-
-import (
-	"github.com/artnoi43/gsl/data/container/list"
-)
+import "github.com/artnoi43/gsl/data/container/list"
 
 // BFS calls BFSSearch and uses its output to call BFSShortestPathReconstruct.
 // It then returns the shortest path (slice of nodes), the number of hops it takes from `src` to `dst`,
 // and a true boolean value if there's a path from `src` to `dst`.
 // Otherwise, a nil slice, -1, and false is returned if there's no such path.
-func BFS[T nodeValue](
-	g HashMapGraph[T],
+func BFS[T, E any](
+	g Graph[Node[T], E, any],
 	src Node[T],
 	dst Node[T],
 ) (
@@ -19,7 +15,7 @@ func BFS[T nodeValue](
 	int,
 	bool,
 ) {
-	rawPath, found := BFSSearch(g, src, dst)
+	rawPath, found := BFSSearchGeneric(g, src, dst)
 	if !found {
 		return nil, -1, false
 	}
@@ -28,9 +24,9 @@ func BFS[T nodeValue](
 	return shortestPath, hops, found
 }
 
-// BFSSearch traverses the graph in BFS manner, and collecting VFS traversal information in a map `prev`. It returns the map, and a boolean value denoting if dst was reachable from src
-func BFSSearch[T nodeValue](
-	g HashMapGraph[T],
+// BFSSearchGeneric traverses the graph in BFS manner, and collecting VFS traversal information in a map `prev`. It returns the map, and a boolean value denoting if dst was reachable from src
+func BFSSearchGeneric[T, E any](
+	g Graph[Node[T], E, any],
 	src Node[T],
 	dst Node[T],
 ) (
@@ -50,7 +46,7 @@ func BFSSearch[T nodeValue](
 		}
 		current := *popped
 
-		neighbors := g.GetNodeEdges(current)
+		neighbors := g.GetNodeNeighbors(current)
 		for _, neighbor := range neighbors {
 			if visited[neighbor] {
 				continue
@@ -60,6 +56,7 @@ func BFSSearch[T nodeValue](
 			if neighbor == dst {
 				found = true
 			}
+
 			q.Push(neighbor)
 			prev[neighbor] = current
 		}
@@ -102,4 +99,17 @@ func BFSShortestPathReconstruct[T nodeValue](
 	}
 
 	return shortestPath, hops
+}
+
+// BFSHashMapGraphV1 wraps BFS to make it easier for users to call BFS with HashMapGraphV1.
+func BFSHashMapGraphV1[T nodeValue](
+	g HashMapGraphV1[T],
+	src Node[T],
+	dst Node[T],
+) (
+	[]Node[T],
+	int,
+	bool,
+) {
+	return BFS(g.(Graph[Node[T], Node[T], any]), src, dst)
 }

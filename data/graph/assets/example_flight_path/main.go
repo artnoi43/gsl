@@ -94,7 +94,7 @@ func main() {
 
 	directed := false
 	dijkGraph := wgraph.NewDijkstraGraph[float64, cityName](directed)
-	unweightedGraph := graph.NewGraph[float64](directed)
+	unweightedGraph := graph.NewHashMapGraph[float64](directed)
 
 	// Add edges and nodes to graphs
 	for node, nodeEdges := range graphEdges {
@@ -131,7 +131,7 @@ func main() {
 
 	fmt.Println("BFS result")
 	for _, dst := range unweightedGraph.GetNodes() {
-		shortestHopsFromTokyo, hops, found := graph.BFS[float64](unweightedGraph, fromNode, dst)
+		shortestHopsFromTokyo, hops, found := graph.BFSHashMapGraphV1[float64](unweightedGraph, fromNode, dst)
 		fmt.Println("path to", dst.(*city).GetKey(), "found", found, "shortestHops", hops)
 		gslutils.ReverseInPlace(shortestHopsFromTokyo)
 		for i, hop := range shortestHopsFromTokyo {
@@ -142,7 +142,7 @@ func main() {
 	takeUnweightedGraph(unweightedGraph, fromNode)
 	takeGraphWeighted(dijkGraph, fromNode)
 
-	gg := unweightedGraph.(graph.GenericGraph[graph.Node[float64], graph.Node[float64], any])
+	gg := unweightedGraph.(graph.Graph[graph.Node[float64], graph.Node[float64], any])
 	takeGenericGraph(gg)
 }
 
@@ -181,17 +181,17 @@ func (c *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
 
 // graph.GenericGraph is impractical, as you can see from the type parameters..
 func takeGenericGraph(
-	gg graph.GenericGraph[graph.Node[float64], graph.Node[float64], any],
+	gg graph.Graph[graph.Node[float64], graph.Node[float64], any],
 ) {
 
 	gg.AddEdge(nil, nil, 0)
 }
 
 // Instead of GenericGraph, use Graph or GraphWeighted
-func takeUnweightedGraph(g graph.HashMapGraph[float64], from graph.Node[float64]) {
+func takeUnweightedGraph(g graph.HashMapGraphV1[float64], from graph.Node[float64]) {
 
 }
 
-func takeGraphWeighted(g wgraph.HashMapGraphWeighted[float64, cityName], from wgraph.NodeWeighted[float64, cityName]) {
+func takeGraphWeighted(g wgraph.GraphWeighted[float64, cityName], from wgraph.NodeWeighted[float64, cityName]) {
 
 }

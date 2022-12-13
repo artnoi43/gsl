@@ -1,20 +1,14 @@
 package graph
 
-// This package provides a very simple interface for graph.
-// A concurrency-ready example implementation is available as GraphImpl.
-
 import (
-	"errors"
-
 	"github.com/artnoi43/gsl/data"
 )
 
-var ErrEdgeWeightNotNull = errors.New("found edge weight in unweighted graph")
-
 type nodeValue any
 
-// HashMapGraph[T] is a GenericGraph that represents node connections as a hash map `map[Node[T]][]Node[T].
-type HashMapGraph[T nodeValue] GenericGraph[
+// HashMapGraphV1[T] is a GenericGraph that represents node connections as a hash map `map[Node[T]][]Node[T].
+// The edges in this interface is of the same type as the node `Node[T]`, since not all use cases need real edges.
+type HashMapGraphV1[T nodeValue] Graph[
 	// The graph node is Node[T]
 	Node[T],
 	// Since there's no edge weight, this graph will use the connected nodes to represent a node's edges

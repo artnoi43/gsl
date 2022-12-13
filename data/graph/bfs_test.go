@@ -6,9 +6,12 @@ import (
 )
 
 type (
-	genericBFS[T nodeValue] func(GenericGraph[Node[T], Node[T], any], Node[T], Node[T]) ([]Node[T], int, bool)
-	hashMapBFS[T nodeValue] func(HashMapGraph[T], Node[T], Node[T]) ([]Node[T], int, bool)
-	testFunc[T nodeValue]   interface{ genericBFS[T] | hashMapBFS[T] }
+	genericBFS[T nodeValue, E any] func(Graph[Node[T], E, any], Node[T], Node[T]) ([]Node[T], int, bool)
+	hashMapBFS[T nodeValue]        func(HashMapGraphV1[T], Node[T], Node[T]) ([]Node[T], int, bool)
+
+	testFunc[T nodeValue, E any] interface {
+		genericBFS[T, E] | hashMapBFS[T]
+	}
 )
 
 type bfsTestResult struct {
@@ -72,7 +75,7 @@ func testBFS(t *testing.T) {
 	}
 
 	people := []person{art, beagie, black, makam}
-	g := NewGraph[int](true)
+	g := NewHashMapGraph[int](true)
 
 	for _, friend := range people {
 		g.AddNode(friend)
@@ -124,7 +127,7 @@ func testUBFS(t *testing.T) {
 	}
 
 	people := []person{art, beagie, black, makam}
-	g := NewGraph[int](false)
+	g := NewHashMapGraph[int](false)
 
 	for _, friend := range people {
 		g.AddNode(friend)
@@ -144,10 +147,12 @@ func testUBFS(t *testing.T) {
 func loopTestBFS[T any](
 	t *testing.T,
 	tests map[person]map[person]bfsTestResult,
-	g HashMapGraph[int],
+	g HashMapGraphV1[int],
 ) {
-	var gf genericBFS[int] = BFSNg[int]
-	var hf hashMapBFS[int] = BFS[int]
+	// The undelying graph in this test is a HashMapGraphImpl, so its edge is just another Node[int]
+	var gf genericBFS[int, Node[int]] = BFS[int, Node[int]]
+	var hf hashMapBFS[int] = BFSHashMapGraphV1[int]
+
 	// Using BFSNg[int] and BFS[int] directly in testFuncs will fail type system
 	testFuncs := []interface{}{gf, hf}
 	for _, tf := range testFuncs {
@@ -158,8 +163,8 @@ func loopTestBFS[T any](
 				var found bool
 
 				switch f := tf.(type) {
-				case genericBFS[int]:
-					shortestPath, hops, found = f(g.(GenericGraph[Node[int], Node[int], any]), fromNode, toNode)
+				case genericBFS[int, Node[int]]:
+					shortestPath, hops, found = f(g.(Graph[Node[int], Node[int], any]), fromNode, toNode)
 				case hashMapBFS[int]:
 					shortestPath, hops, found = f(g, fromNode, toNode)
 				default:

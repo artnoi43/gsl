@@ -1,12 +1,10 @@
 package graph
 
-// TODO: Determine if generic type R is needed
-
-// GenericGraph represents what an gsl graph should look like.
+// Graph represents what an gsl graph should look like.
 // It is not intended to be used by production code, but more like an internal building block for gsl graphs.
 // It's not minimal, and was designed around flexibility and coverage.
 // This interface can be used for both unweighted and weighted graph (see wgraph package).
-type GenericGraph[
+type Graph[
 	N any, // Type for graph node
 	E any, // Type for graph edge
 	W any, // Type for graph edge weight or node values
@@ -20,12 +18,18 @@ type GenericGraph[
 	// Add a node to a graph
 	AddNode(node N)
 
-	// Get all nodes in the graph
-	GetNodes() []N
-
 	// AddEdge adds an edge to the graph. If the graph is directional, then AddEdge will only adds edge from n1 to n2.
 	// If the graph is undirectional, then both connections (n1 -> n2 and n2 -> n1) should be added.
 	AddEdge(n1, n2 N, weight W) error
+
+	// Get all nodes in the graph
+	GetNodes() []N
+
+	// Get all edges in the graph
+	GetEdges() []E
+
+	// GetNodeNeighbors returns a slice of N connected to node
+	GetNodeNeighbors(node N) []N
 
 	// GetNodeEdge takes in a node, and returns the connections from that node.
 	GetNodeEdges(node N) []E

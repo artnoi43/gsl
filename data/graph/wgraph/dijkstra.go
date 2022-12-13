@@ -20,8 +20,9 @@ type dijkstraWeight interface {
 }
 
 // DijkstraGraph[T] wraps GraphWeightedImpl[T], where T is generic type numeric types and S is ~string.
+// It uses HashMapGraphWeighted as the underlying data structure.
 type DijkstraGraph[T dijkstraWeight, S ~string] struct {
-	graph HashMapGraphWeighted[T, S]
+	graph GraphWeighted[T, S]
 }
 
 // This type is the Dijkstra shortest path answer. It has 2 fields, (1) `From` the 'from' node, and (2) `Paths`.
@@ -49,40 +50,48 @@ func NewDijkstraGraph[T dijkstraWeight, S ~string](directed bool) *DijkstraGraph
 	}
 }
 
-func (s *DijkstraGraph[T, S]) SetDirection(directed bool) {
-	s.graph.SetDirection(directed)
+func (g *DijkstraGraph[T, S]) SetDirection(directed bool) {
+	g.graph.SetDirection(directed)
 }
 
-func (s *DijkstraGraph[T, S]) IsDirected() bool {
-	return s.graph.IsDirected()
+func (g *DijkstraGraph[T, S]) IsDirected() bool {
+	return g.graph.IsDirected()
 }
 
-func (s *DijkstraGraph[T, S]) AddNode(node NodeWeighted[T, S]) {
-	s.graph.AddNode(node)
+func (g *DijkstraGraph[T, S]) AddNode(node NodeWeighted[T, S]) {
+	g.graph.AddNode(node)
 }
 
 // AddDijkstraEdge validates if weight is valid, and then calls GraphWeighted.AddEdge
-func (s *DijkstraGraph[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
+func (g *DijkstraGraph[T, S]) AddEdge(n1, n2 NodeWeighted[T, S], weight T) error {
 	var zeroValue T
 	if weight < zeroValue {
 		return errors.Wrapf(ErrDijkstraNegativeWeightEdge, "negative edge weight %v", weight)
 	}
 
-	s.graph.AddEdge(n1, n2, weight)
+	g.graph.AddEdge(n1, n2, weight)
 	return nil
 }
 
-func (s *DijkstraGraph[T, S]) GetNodes() []NodeWeighted[T, S] {
-	return s.graph.GetNodes()
+func (g *DijkstraGraph[T, S]) GetNodes() []NodeWeighted[T, S] {
+	return g.graph.GetNodes()
 }
 
-func (s *DijkstraGraph[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
-	return s.graph.GetNodeEdges(node)
+func (g *DijkstraGraph[T, S]) GetEdges() []EdgeWeighted[T, S] {
+	return g.graph.GetEdges()
+}
+
+func (g *DijkstraGraph[T, S]) GetNodeNeighbors(node NodeWeighted[T, S]) []NodeWeighted[T, S] {
+	return g.graph.GetNodeNeighbors(node)
+}
+
+func (g *DijkstraGraph[T, S]) GetNodeEdges(node NodeWeighted[T, S]) []EdgeWeighted[T, S] {
+	return g.graph.GetNodeEdges(node)
 }
 
 // DjisktraFrom takes a *NodeImpl[T] startNode, and finds the shortest path from startNode to all other nodes.
 // This implementation uses PriorityQueue[T], so the nodes' values must satisfy constraints.Ordered.
-func (s *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted[T, S]) *DijstraShortestPath[T, S] {
+func (g *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted[T, S]) *DijstraShortestPath[T, S] {
 	var zeroValue T
 	startNode.SetValueOrCost(zeroValue)
 	startNode.SetPrevious(nil)
@@ -106,7 +115,7 @@ func (s *DijkstraGraph[T, S]) DijkstraShortestPathFrom(startNode NodeWeighted[T,
 		}
 
 		visited[current] = true
-		edges := s.GetNodeEdges(current)
+		edges := g.GetNodeEdges(current)
 
 		for _, edge := range edges {
 			edgeNode := edge.ToNode()
