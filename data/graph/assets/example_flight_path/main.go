@@ -39,8 +39,8 @@ func main() {
 	budapest := &city{name: cityName("Budapest"), flightHours: infinity, through: nil}
 
 	// See file flight_graph.png
-	graphEdges := map[wgraph.NodeDijkstra[float64, cityName]][]struct {
-		to       wgraph.NodeDijkstra[float64, cityName]
+	graphEdges := map[wgraph.NodeDijkstra[float64]][]struct {
+		to       wgraph.NodeDijkstra[float64]
 		flighDur float64
 	}{
 		tokyo: {
@@ -93,7 +93,7 @@ func main() {
 	}
 
 	directed := false
-	dijkGraph := wgraph.NewDijkstraGraph[float64, cityName](directed)
+	dijkGraph := wgraph.NewDijkstraGraph[float64](directed)
 	unweightedGraph := graph.NewHashMapGraph[float64](directed)
 
 	// Add edges and nodes to graphs
@@ -153,18 +153,18 @@ func (c *city) SetValueOrCost(newCost float64) {
 	c.flightHours = newCost
 }
 
-func (c *city) GetKey() cityName {
-	return c.name
+func (c *city) GetKey() string {
+	return string(c.name)
 }
 
-func (c *city) GetPrevious() wgraph.NodeDijkstra[float64, cityName] {
+func (c *city) GetPrevious() wgraph.NodeDijkstra[float64] {
 	if c.through == nil {
 		return nil
 	}
 	return c.through
 }
 
-func (c *city) SetPrevious(node wgraph.NodeDijkstra[float64, cityName]) {
+func (c *city) SetPrevious(node wgraph.NodeDijkstra[float64]) {
 	if node == nil {
 		c.through = nil
 		return

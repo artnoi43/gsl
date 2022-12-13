@@ -18,5 +18,8 @@ Here are some of `Graph` implementations in this package and sub-packages:
    This type is only a mutex-enabled wrapper for `Graph[N, E, W]`. Most of the default constructor functions wraps their
    undelying graphs with `SafeGraph`, unless the constructor ends with `-Unsafe`.
 
-3. `GraphWeighted[T, S]` implements `Graph[NodeWeighted[T, S], EdgeWeighted[T, S], T]`
+3. `GraphWeighted[N NodeWeighted[W], E EdgeWeighted[W, NodeWeighted[W]], W]` implements `Graph[N, E, W]`
    This interface represents a weighted graph. It is subject to a lot of changes as of now.
+
+4. `DijkstraGraph[T]` implements `GraphWeighted[NodeDijkstra[T], EdgeWeighted[T, NodeDijkstra[T]], T]`
+   This type wraps any `GraphWeighted` and provides methods for finding Dijkstra's shortest path.
