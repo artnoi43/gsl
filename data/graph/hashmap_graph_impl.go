@@ -33,7 +33,7 @@ func (g *HashMapGraphImpl[T]) AddNode(node Node[T]) {
 	g.Nodes = append(g.Nodes, node)
 }
 
-func (g *HashMapGraphImpl[T]) AddEdge(n1, n2 Node[T], weight any) error {
+func (g *HashMapGraphImpl[T]) AddEdgeWeightOrDistance(n1, n2 Node[T], weight any) error {
 	if weight != nil {
 		return ErrEdgeWeightNotNull
 	}
@@ -47,6 +47,11 @@ func (g *HashMapGraphImpl[T]) AddEdge(n1, n2 Node[T], weight any) error {
 	// If it's not directed, then both nodes have links from and to each other
 	g.Edges[n2] = append(g.Edges[n2], n1)
 	return nil
+}
+
+// HashMapGraphImpl doesn't actually have an edge
+func (g *HashMapGraphImpl[T]) AddEdge(n1, n2 Node[T], edge Node[T]) error {
+	return g.AddEdgeWeightOrDistance(n1, n2, edge.GetValue())
 }
 
 func (g *HashMapGraphImpl[T]) GetNodes() []Node[T] { return g.Nodes }

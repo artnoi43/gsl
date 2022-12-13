@@ -39,11 +39,18 @@ func (g *SafeGraph[N, E, W]) AddNode(node N) {
 	g.Graph.AddNode(node)
 }
 
-func (g *SafeGraph[N, E, W]) AddEdge(n1, n2 N, weight W) error {
+func (g *SafeGraph[N, E, W]) AddEdgeWeightOrDistance(n1, n2 N, weight W) error {
 	g.Lock()
 	defer g.Unlock()
 
-	return g.Graph.AddEdge(n1, n2, weight)
+	return g.Graph.AddEdgeWeightOrDistance(n1, n2, weight)
+}
+
+func (g *SafeGraph[N, E, W]) AddEdge(n1, n2 N, edge E) error {
+	g.Lock()
+	defer g.Unlock()
+
+	return g.Graph.AddEdge(n1, n2, edge)
 }
 
 func (g *SafeGraph[N, E, W]) GetNodes() []N {

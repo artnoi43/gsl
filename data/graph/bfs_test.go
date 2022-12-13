@@ -81,16 +81,16 @@ func testBFS(t *testing.T) {
 		g.AddNode(friend)
 	}
 
-	g.AddEdge(art, beagie, nil)
-	g.AddEdge(art, black, nil)
-	g.AddEdge(art, banana, nil)
-	g.AddEdge(art, muji, nil)
-	g.AddEdge(beagie, art, nil)
-	g.AddEdge(beagie, banana, nil)
-	g.AddEdge(beagie, black, nil)
-	g.AddEdge(banana, art, nil)
-	g.AddEdge(banana, beagie, nil)
-	g.AddEdge(black, makam, nil)
+	g.AddEdgeWeightOnly(art, beagie, nil)
+	g.AddEdgeWeightOnly(art, black, nil)
+	g.AddEdgeWeightOnly(art, banana, nil)
+	g.AddEdgeWeightOnly(art, muji, nil)
+	g.AddEdgeWeightOnly(beagie, art, nil)
+	g.AddEdgeWeightOnly(beagie, banana, nil)
+	g.AddEdgeWeightOnly(beagie, black, nil)
+	g.AddEdgeWeightOnly(banana, art, nil)
+	g.AddEdgeWeightOnly(banana, beagie, nil)
+	g.AddEdgeWeightOnly(black, makam, nil)
 
 	loopTestBFS[int](t, tests, g)
 }
@@ -133,13 +133,13 @@ func testUBFS(t *testing.T) {
 		g.AddNode(friend)
 	}
 
-	g.AddEdge(art, beagie, nil)
-	g.AddEdge(art, black, nil)
-	g.AddEdge(art, banana, nil)
-	g.AddEdge(beagie, black, nil)
-	g.AddEdge(beagie, banana, nil)
-	g.AddEdge(black, makam, nil)
-	g.AddEdge(black, banana, nil)
+	g.AddEdgeWeightOnly(art, beagie, nil)
+	g.AddEdgeWeightOnly(art, black, nil)
+	g.AddEdgeWeightOnly(art, banana, nil)
+	g.AddEdgeWeightOnly(beagie, black, nil)
+	g.AddEdgeWeightOnly(beagie, banana, nil)
+	g.AddEdgeWeightOnly(black, makam, nil)
+	g.AddEdgeWeightOnly(black, banana, nil)
 
 	loopTestBFS[int](t, tests, g)
 }

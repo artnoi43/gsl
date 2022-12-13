@@ -102,10 +102,10 @@ func main() {
 		unweightedGraph.AddNode(node)
 		for _, nodeEdge := range nodeEdges {
 			// fmt.Println(node.GetKey()+":", "adding edge", nodeEdge.to.GetKey(), "weight", nodeEdge.flighDur)
-			if err := dijkGraph.AddEdge(node, nodeEdge.to, nodeEdge.flighDur); err != nil {
+			if err := dijkGraph.AddEdgeWeightOrDistance(node, nodeEdge.to, nodeEdge.flighDur); err != nil {
 				panic("failed to add dijkstra-compatible graph edge: " + err.Error())
 			}
-			unweightedGraph.AddEdge(node, nodeEdge.to, nil)
+			unweightedGraph.AddEdgeWeightOrDistance(node, nodeEdge.to, nil)
 		}
 	}
 

@@ -6,7 +6,7 @@ import (
 	"github.com/artnoi43/gsl/gslutils"
 )
 
-type dijkstraTestUtils[T WeightDjikstra] struct {
+type dijkstraTestUtils[T WeightDijkstra] struct {
 	inititalValue      T
 	expectedFinalValue T
 	expectedPathHops   int
@@ -31,7 +31,7 @@ func TestDijkstra(t *testing.T) {
 	testDijkstra[float64](t, nameStart, nameFinish)
 }
 
-func constructDijkstraTestGraph[T WeightDjikstra](nameStart, nameFinish string) map[NodeDijkstra[T]]*dijkstraTestUtils[T] {
+func constructDijkstraTestGraph[T WeightDijkstra](nameStart, nameFinish string) map[NodeDijkstra[T]]*dijkstraTestUtils[T] {
 	// TODO: infinity is way too low, because dijkstraWeight also has uint8
 	infinity := T(100)
 	nodeStart := &NodeDijkstraImpl[T]{
@@ -171,7 +171,7 @@ func constructDijkstraTestGraph[T WeightDjikstra](nameStart, nameFinish string) 
 }
 
 // The weighted graph used in this test can be viewed at assets/dijkstra_test_graph.png
-func testDijkstra[T WeightDjikstra](t *testing.T, nameStart, nameFinish string) {
+func testDijkstra[T WeightDijkstra](t *testing.T, nameStart, nameFinish string) {
 	nodesMap := constructDijkstraTestGraph[T](nameStart, nameFinish)
 
 	// Prepare graph
@@ -183,7 +183,7 @@ func testDijkstra[T WeightDjikstra](t *testing.T, nameStart, nameFinish string) 
 		// Add edges
 		nodeEdges := util.edges
 		for _, edge := range nodeEdges {
-			if err := djikGraph.AddEdge(node, edge.to, edge.weight); err != nil {
+			if err := djikGraph.AddEdgeWeightOnly(node, edge.to, edge.weight); err != nil {
 				t.Error(err.Error())
 			}
 		}

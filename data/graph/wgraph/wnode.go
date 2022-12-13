@@ -17,7 +17,7 @@ type NodeWeightedImpl[T Weight] struct {
 	// Previous is for Dijkstra shortest path algorithm, or other sort programs.
 }
 
-type NodeDijkstraImpl[T WeightDjikstra] struct {
+type NodeDijkstraImpl[T WeightDijkstra] struct {
 	NodeWeightedImpl[T]
 	Previous NodeDijkstra[T]
 }

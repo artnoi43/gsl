@@ -18,9 +18,11 @@ type Graph[
 	// Add a node to a graph
 	AddNode(node N)
 
-	// AddEdge adds an edge to the graph. If the graph is directional, then AddEdge will only adds edge from n1 to n2.
-	// If the graph is undirectional, then both connections (n1 -> n2 and n2 -> n1) should be added.
-	AddEdge(n1, n2 N, weight W) error
+	// AddEdge adds a real edge from n1 to n2.
+	AddEdge(n1, n2 N, edge E) error
+
+	// AddEdgeWeightOrDistance adds default weighted edge to the graph. If the graph is directional, then AddEdgeWeightOrDistance will only adds edge from n1 to n2. If the graph is undirectional, then both connections (n1 -> n2 and n2 -> n1) should be added.
+	AddEdgeWeightOrDistance(n1, n2 N, weight W) error
 
 	// Get all nodes in the graph
 	GetNodes() []N
