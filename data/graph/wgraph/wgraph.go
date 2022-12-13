@@ -14,9 +14,10 @@ type graphWeight interface {
 type GraphWeighted[
 	T graphWeight,
 	S ~string,
+	N NodeWeighted[T, S],
 ] graph.Graph[
 	// The weighted graph's node interface
-	NodeWeighted[T, S],
+	N,
 	// The weighted graph's edge interface
 	EdgeWeighted[T, S],
 	// The edge weight can be of any types that implements graphWeight

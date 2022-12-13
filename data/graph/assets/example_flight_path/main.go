@@ -39,8 +39,8 @@ func main() {
 	budapest := &city{name: cityName("Budapest"), flightHours: infinity, through: nil}
 
 	// See file flight_graph.png
-	graphEdges := map[wgraph.NodeWeighted[float64, cityName]][]struct {
-		to       wgraph.NodeWeighted[float64, cityName]
+	graphEdges := map[wgraph.NodeDijkstra[float64, cityName]][]struct {
+		to       wgraph.NodeDijkstra[float64, cityName]
 		flighDur float64
 	}{
 		tokyo: {
@@ -140,7 +140,6 @@ func main() {
 	}
 
 	takeUnweightedGraph(unweightedGraph, fromNode)
-	takeGraphWeighted(dijkGraph, fromNode)
 
 	gg := unweightedGraph.(graph.Graph[graph.Node[float64], graph.Node[float64], any])
 	takeGenericGraph(gg)
@@ -158,14 +157,14 @@ func (c *city) GetKey() cityName {
 	return c.name
 }
 
-func (c *city) GetPrevious() wgraph.NodeWeighted[float64, cityName] {
+func (c *city) GetPrevious() wgraph.NodeDijkstra[float64, cityName] {
 	if c.through == nil {
 		return nil
 	}
 	return c.through
 }
 
-func (c *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
+func (c *city) SetPrevious(node wgraph.NodeDijkstra[float64, cityName]) {
 	if node == nil {
 		c.through = nil
 		return
@@ -179,19 +178,5 @@ func (c *city) SetPrevious(node wgraph.NodeWeighted[float64, cityName]) {
 	c.through = via
 }
 
-// graph.GenericGraph is impractical, as you can see from the type parameters..
-func takeGenericGraph(
-	gg graph.Graph[graph.Node[float64], graph.Node[float64], any],
-) {
-
-	gg.AddEdge(nil, nil, 0)
-}
-
-// Instead of GenericGraph, use Graph or GraphWeighted
-func takeUnweightedGraph(g graph.HashMapGraphV1[float64], from graph.Node[float64]) {
-
-}
-
-func takeGraphWeighted(g wgraph.GraphWeighted[float64, cityName], from wgraph.NodeWeighted[float64, cityName]) {
-
-}
+func takeGenericGraph(gg graph.Graph[graph.Node[float64], graph.Node[float64], any]) {}
+func takeUnweightedGraph(g graph.HashMapGraphV1[float64], from graph.Node[float64])  {}

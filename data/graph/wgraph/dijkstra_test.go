@@ -6,14 +6,14 @@ import (
 	"github.com/artnoi43/gsl/gslutils"
 )
 
-type dijkstraTestUtils[T dijkstraWeight, S ~string] struct {
+type dijkstraTestUtils[T WeightDjikstra, S ~string] struct {
 	inititalValue      T
 	expectedFinalValue T
 	expectedPathHops   int
-	expectedPathway    []*NodeWeightedImpl[T, S]
+	expectedPathway    []*NodeDijkstraImpl[T, S]
 
 	edges []*struct {
-		to     *NodeWeightedImpl[T, S]
+		to     *NodeDijkstraImpl[T, S]
 		weight T
 	}
 }
@@ -31,41 +31,53 @@ func TestDijkstra(t *testing.T) {
 	testDijkstra[float64](t, nameStart, nameFinish)
 }
 
-func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFinish S) map[NodeWeighted[T, S]]*dijkstraTestUtils[T, S] {
+func constructDijkstraTestGraph[T WeightDjikstra, S ~string](nameStart, nameFinish S) map[NodeDijkstra[T, S]]*dijkstraTestUtils[T, S] {
 	// TODO: infinity is way too low, because dijkstraWeight also has uint8
 	infinity := T(100)
-	nodeStart := &NodeWeightedImpl[T, S]{
-		Name:        nameStart,
-		ValueOrCost: T(0),
+	nodeStart := &NodeDijkstraImpl[T, S]{
+		NodeWeightedImpl: NodeWeightedImpl[T, S]{
+			Name:        nameStart,
+			ValueOrCost: T(0),
+		},
 	}
-	nodeA := &NodeWeightedImpl[T, S]{
-		Name:        "A",
-		ValueOrCost: infinity,
+	nodeA := &NodeDijkstraImpl[T, S]{
+		NodeWeightedImpl: NodeWeightedImpl[T, S]{
+			Name:        "A",
+			ValueOrCost: infinity,
+		},
 	}
-	nodeB := &NodeWeightedImpl[T, S]{
-		Name:        "B",
-		ValueOrCost: infinity,
+	nodeB := &NodeDijkstraImpl[T, S]{
+		NodeWeightedImpl: NodeWeightedImpl[T, S]{
+			Name:        "B",
+			ValueOrCost: infinity,
+		},
 	}
-	nodeC := &NodeWeightedImpl[T, S]{
-		Name:        "C",
-		ValueOrCost: infinity,
+	nodeC := &NodeDijkstraImpl[T, S]{
+		NodeWeightedImpl: NodeWeightedImpl[T, S]{
+			Name:        "C",
+			ValueOrCost: infinity,
+		},
 	}
-	nodeD := &NodeWeightedImpl[T, S]{
-		Name:        "D",
-		ValueOrCost: infinity,
+	nodeD := &NodeDijkstraImpl[T, S]{
+		NodeWeightedImpl: NodeWeightedImpl[T, S]{
+			Name:        "D",
+			ValueOrCost: infinity,
+		},
 	}
-	nodeFinish := &NodeWeightedImpl[T, S]{
-		Name:        nameFinish,
-		ValueOrCost: infinity,
+	nodeFinish := &NodeDijkstraImpl[T, S]{
+		NodeWeightedImpl: NodeWeightedImpl[T, S]{
+			Name:        nameFinish,
+			ValueOrCost: infinity,
+		},
 	}
-	m := map[NodeWeighted[T, S]]*dijkstraTestUtils[T, S]{
+	m := map[NodeDijkstra[T, S]]*dijkstraTestUtils[T, S]{
 		nodeStart: {
 			inititalValue:      T(0),
 			expectedFinalValue: T(0),
 			expectedPathHops:   1,
-			expectedPathway:    []*NodeWeightedImpl[T, S]{},
+			expectedPathway:    []*NodeDijkstraImpl[T, S]{},
 			edges: []*struct {
-				to     *NodeWeightedImpl[T, S]
+				to     *NodeDijkstraImpl[T, S]
 				weight T
 			}{
 				{
@@ -84,9 +96,9 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 			inititalValue:      infinity,
 			expectedFinalValue: T(7),
 			expectedPathHops:   3,
-			expectedPathway:    []*NodeWeightedImpl[T, S]{nodeStart, nodeD, nodeFinish},
+			expectedPathway:    []*NodeDijkstraImpl[T, S]{nodeStart, nodeD, nodeFinish},
 			edges: []*struct {
-				to     *NodeWeightedImpl[T, S]
+				to     *NodeDijkstraImpl[T, S]
 				weight T
 			}{},
 		},
@@ -94,9 +106,9 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 			inititalValue:      infinity,
 			expectedFinalValue: T(2),
 			expectedPathHops:   2,
-			expectedPathway:    []*NodeWeightedImpl[T, S]{nodeStart, nodeA},
+			expectedPathway:    []*NodeDijkstraImpl[T, S]{nodeStart, nodeA},
 			edges: []*struct {
-				to     *NodeWeightedImpl[T, S]
+				to     *NodeDijkstraImpl[T, S]
 				weight T
 			}{
 				{
@@ -113,9 +125,9 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 			inititalValue:      infinity,
 			expectedFinalValue: T(3),
 			expectedPathHops:   3,
-			expectedPathway:    []*NodeWeightedImpl[T, S]{nodeStart, nodeA, nodeB},
+			expectedPathway:    []*NodeDijkstraImpl[T, S]{nodeStart, nodeA, nodeB},
 			edges: []*struct {
-				to     *NodeWeightedImpl[T, S]
+				to     *NodeDijkstraImpl[T, S]
 				weight T
 			}{
 				{
@@ -128,9 +140,9 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 			inititalValue:      infinity,
 			expectedFinalValue: T(4),
 			expectedPathHops:   3,
-			expectedPathway:    []*NodeWeightedImpl[T, S]{nodeStart, nodeA, nodeC},
+			expectedPathway:    []*NodeDijkstraImpl[T, S]{nodeStart, nodeA, nodeC},
 			edges: []*struct {
-				to     *NodeWeightedImpl[T, S]
+				to     *NodeDijkstraImpl[T, S]
 				weight T
 			}{
 				{
@@ -143,9 +155,9 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 			inititalValue:      infinity,
 			expectedFinalValue: T(4),
 			expectedPathHops:   2,
-			expectedPathway:    []*NodeWeightedImpl[T, S]{nodeStart, nodeD},
+			expectedPathway:    []*NodeDijkstraImpl[T, S]{nodeStart, nodeD},
 			edges: []*struct {
-				to     *NodeWeightedImpl[T, S]
+				to     *NodeDijkstraImpl[T, S]
 				weight T
 			}{
 				{
@@ -159,7 +171,7 @@ func constructDijkstraTestGraph[T dijkstraWeight, S ~string](nameStart, nameFini
 }
 
 // The weighted graph used in this test can be viewed at assets/dijkstra_test_graph.png
-func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFinish S) {
+func testDijkstra[T WeightDjikstra, S ~string](t *testing.T, nameStart, nameFinish S) {
 	nodesMap := constructDijkstraTestGraph[T](nameStart, nameFinish)
 
 	// Prepare graph
@@ -177,7 +189,7 @@ func testDijkstra[T dijkstraWeight, S ~string](t *testing.T, nameStart, nameFini
 		}
 	}
 
-	var startNode NodeWeighted[T, S]
+	var startNode NodeDijkstra[T, S]
 	for node := range nodesMap {
 		if node.GetKey() == nameStart {
 			startNode = node
