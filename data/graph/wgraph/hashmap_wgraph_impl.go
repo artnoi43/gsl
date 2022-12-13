@@ -3,71 +3,73 @@ package wgraph
 // TODO: more relaxed generic types
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/artnoi43/gsl/data/graph"
 )
 
-var ErrConnExists = errors.New("node connection already exists")
-
 // HashMapGraphWeightedImpl[W, N] is the default implementation of GraphWeighted[N, EdgeWeighted[W], W].
-type HashMapGraphWeightedImpl[T Weight, N NodeWeighted[T]] struct {
+type HashMapGraphWeightedImpl[
+	N NodeWeighted[W],
+	E EdgeWeighted[W, N],
+	W Weight,
+] struct {
 	Directed bool
 	Nodes    []N
-	Edges    map[NodeWeighted[T]]map[NodeWeighted[T]]EdgeWeighted[T, N] // Edges is a map of a NodeWeightedImpl's edges
+	Edges    map[NodeWeighted[W]]map[NodeWeighted[W]]EdgeWeighted[W, N]
 }
 
 // NewGraphWeightedUnsafe[T] returns the default implementation of GraphWeighted[T] without the concurrency wrapper.
 // If your code is concurrent, use NewGraphWeighted[T] instead
-func NewGraphWeightedUnsafe[T Weight, N NodeWeighted[T]](directed bool) GraphWeighted[N, EdgeWeighted[T, N], T] {
-	return &HashMapGraphWeightedImpl[T, N]{
+func NewGraphWeightedUnsafe[
+	N NodeWeighted[W],
+	E EdgeWeighted[W, N],
+	W Weight,
+](directed bool) GraphWeighted[N, E, W] {
+	return &HashMapGraphWeightedImpl[N, E, W]{
 		Directed: directed,
 		Nodes:    make([]N, 0),
-		Edges:    make(map[NodeWeighted[T]]map[NodeWeighted[T]]EdgeWeighted[T, N]),
+		Edges:    make(map[NodeWeighted[W]]map[NodeWeighted[W]]EdgeWeighted[W, N]),
 	}
 }
 
 // WrapSafeGraphWeighted wraps any graph g that implements GraphWeighted[T] with graph.SafeGraph[N, E, M, W].
-func WrapSafeGraphWeighted[T Weight, N NodeWeighted[T]](
-	g GraphWeighted[N, EdgeWeighted[T, N], T],
-) GraphWeighted[N, EdgeWeighted[T, N], T] {
-	// The type parameters mirror how GraphWeighted[T] implements BasicGraph[N, E, M, W]
-	return graph.WrapSafeGenericGraph[
-		N,
-		EdgeWeighted[T, N],
-		T,
-	](
-		g,
-	)
+func WrapSafeGraphWeighted[
+	N NodeWeighted[W],
+	E EdgeWeighted[W, N],
+	W Weight,
+](g GraphWeighted[N, E, W]) GraphWeighted[N, E, W] {
+	return graph.WrapSafeGenericGraph[N, E, W](g)
 }
 
-// NewGraphWeighted[T] returns the default implementation of GraphWeighted[T] with the concurrency wrapper.
-// If your code is not concurrent, use NewGraphWeightedUnsafe[T] instead
-func NewGraphWeighted[T Weight, N NodeWeighted[T]](directed bool) GraphWeighted[N, EdgeWeighted[T, N], T] {
-	return WrapSafeGraphWeighted(NewGraphWeightedUnsafe[T, N](directed))
+// NewGraphWeighted[T] returns the default implementation of GraphWeighted[T] with the concurrency safety wrapper.
+func NewGraphWeighted[
+	N NodeWeighted[W],
+	E EdgeWeighted[W, N],
+	W Weight,
+](directed bool) GraphWeighted[N, E, W] {
+	return WrapSafeGraphWeighted(NewGraphWeightedUnsafe[N, E, W](directed))
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) SetDirection(directed bool) {
+func (g *HashMapGraphWeightedImpl[N, E, W]) SetDirection(directed bool) {
 	g.Directed = directed
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) IsDirected() bool {
+func (g *HashMapGraphWeightedImpl[N, E, W]) IsDirected() bool {
 	return g.Directed
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) AddNode(node N) {
+func (g *HashMapGraphWeightedImpl[N, E, W]) AddNode(node N) {
 	g.Nodes = append(g.Nodes, node)
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) AddEdgeWeightOrDistance(n1, n2 N, weight T) error {
+func (g *HashMapGraphWeightedImpl[N, E, W]) AddEdgeWeightOrDistance(n1, n2 N, weight W) error {
 	// Overwrite existing edge from n1 to n2, if there is any
 	if m := g.Edges[n1]; m == nil {
-		g.Edges[n1] = make(map[NodeWeighted[T]]EdgeWeighted[T, N])
+		g.Edges[n1] = make(map[NodeWeighted[W]]EdgeWeighted[W, N])
 	} else if m[n2] != nil {
-		return wrapErrConnExists[T](n1, n2)
+		return wrapErrConnExists[W](n1, n2)
 	}
 
-	g.Edges[n1][n2] = &EdgeWeightedImpl[T, N]{
+	g.Edges[n1][n2] = &EdgeWeightedImpl[W, N]{
 		toNode: n2,
 		weight: weight,
 	}
@@ -77,12 +79,12 @@ func (g *HashMapGraphWeightedImpl[T, N]) AddEdgeWeightOrDistance(n1, n2 N, weigh
 	}
 
 	if m := g.Edges[n2]; m == nil {
-		g.Edges[n2] = make(map[NodeWeighted[T]]EdgeWeighted[T, N])
+		g.Edges[n2] = make(map[NodeWeighted[W]]EdgeWeighted[W, N])
 	} else if m[n1] != nil {
-		return wrapErrConnExists[T](n2, n1)
+		return wrapErrConnExists[W](n2, n1)
 	}
 
-	g.Edges[n2][n1] = &EdgeWeightedImpl[T, N]{
+	g.Edges[n2][n1] = &EdgeWeightedImpl[W, N]{
 		toNode: n1,
 		weight: weight,
 	}
@@ -91,35 +93,34 @@ func (g *HashMapGraphWeightedImpl[T, N]) AddEdgeWeightOrDistance(n1, n2 N, weigh
 }
 
 // AddEdge adds edge from n1 to n2
-func (g *HashMapGraphWeightedImpl[T, N]) AddEdge(n1, n2 N, edge EdgeWeighted[T, N]) error {
+func (g *HashMapGraphWeightedImpl[N, E, W]) AddEdge(n1, n2 N, edge E) error {
 	// Overwrite existing edge from n1 to n2, if there is any
 	if m := g.Edges[n1]; m == nil {
-		g.Edges[n1] = make(map[NodeWeighted[T]]EdgeWeighted[T, N])
+		g.Edges[n1] = make(map[NodeWeighted[W]]EdgeWeighted[W, N])
 	} else if m[n2] != nil {
-		return wrapErrConnExists[T](n1, n2)
+		return wrapErrConnExists[W](n1, n2)
 	}
 
 	g.Edges[n1][n2] = edge
-
 	return nil
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) GetNodes() []N {
+func (g *HashMapGraphWeightedImpl[N, E, W]) GetNodes() []N {
 	return g.Nodes
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) GetEdges() []EdgeWeighted[T, N] {
-	var edges []EdgeWeighted[T, N]
+func (g *HashMapGraphWeightedImpl[N, E, W]) GetEdges() []E {
+	var edges []E
 	for _, nodeEdges := range g.Edges {
 		for _, edge := range nodeEdges {
-			edges = append(edges, edge)
+			edges = append(edges, edge.(E))
 		}
 	}
 
 	return edges
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) GetNodeNeighbors(node N) []N {
+func (g *HashMapGraphWeightedImpl[N, E, W]) GetNodeNeighbors(node N) []N {
 	edges := g.Edges[node]
 	neighbors := make([]N, len(edges))
 
@@ -132,15 +133,11 @@ func (g *HashMapGraphWeightedImpl[T, N]) GetNodeNeighbors(node N) []N {
 	return neighbors
 }
 
-func (g *HashMapGraphWeightedImpl[T, N]) GetNodeEdges(node N) []EdgeWeighted[T, N] {
-	var edges []EdgeWeighted[T, N]
+func (g *HashMapGraphWeightedImpl[N, E, W]) GetNodeEdges(node N) []E {
+	var edges []E
 	for _, edge := range g.Edges[node] {
-		edges = append(edges, edge)
+		edges = append(edges, edge.(E))
 	}
 
 	return edges
-}
-
-func wrapErrConnExists[W Weight](n1, n2 NodeWeighted[W]) error {
-	return errors.Wrapf(ErrConnExists, "existing connection between node %s to %s", n1.GetKey(), n2.GetKey())
 }

@@ -1,45 +1,45 @@
 package wgraph
 
 import (
-	"github.com/pkg/errors"
 	"golang.org/x/exp/constraints"
 )
-
-var ErrDijkstraNegativeWeightEdge = errors.New("Dijkstra edge must not be negative")
 
 // WeightDijkstra represents the allowed types for edge weights and node costs.
 // TODO: integrate more comparable types, like big.Int and big.Float
 type WeightDijkstra interface {
-	Weight
 	constraints.Integer | constraints.Float
 }
 
-type NodeDijkstra[T WeightDijkstra] interface {
-	NodeWeighted[T]
+type NodeDijkstra[W WeightDijkstra] interface {
+	NodeWeighted[W]
 
-	GetPrevious() NodeDijkstra[T]     // When using with Dijkstra code, gets the previous (prior node) from a Dijkstra walk.
-	SetPrevious(prev NodeDijkstra[T]) // In Dijkstra code, set a node's previous node value
+	GetPrevious() NodeDijkstra[W]     // When using with Dijkstra code, gets the previous (prior node) from a Dijkstra walk.
+	SetPrevious(prev NodeDijkstra[W]) // In Dijkstra code, set a node's previous node value
 }
 
-type GraphDijkstra[T WeightDijkstra] interface {
-	GraphWeighted[NodeDijkstra[T], EdgeWeighted[T, NodeDijkstra[T]], T]
-	DijkstraShortestPathFrom(startNode NodeDijkstra[T]) *DijstraShortestPath[T]
+type GraphDijkstra[W WeightDijkstra] interface {
+	GraphWeighted[NodeDijkstra[W], EdgeWeighted[W, NodeDijkstra[W]], W]
+	DijkstraShortestPathFrom(startNode NodeDijkstra[W]) *DijstraShortestPath[W]
 }
 
 // This type is the Dijkstra shortest path answer. It has 2 fields, (1) `From` the 'from' node, and (2) `Paths`.
 // DijkstraShortestPath.Paths is a hash map where the key is a node, and the value is the previous node with the lowest cost to that key node.
 // Because each instance holds all best route to every reachable node from From node, you can reconstruct the shortest path from any nodes in
 // that Paths map with ReconstructPathTo
-type DijstraShortestPath[T WeightDijkstra] struct {
-	From  NodeDijkstra[T]
-	Paths map[NodeDijkstra[T]]NodeDijkstra[T]
+type DijstraShortestPath[W WeightDijkstra] struct {
+	From  NodeDijkstra[W]
+	Paths map[NodeDijkstra[W]]NodeDijkstra[W]
 }
 
 // NewDikstraGraph calls NewGraphWeightedUnsafe[T], and return the wrapped graph.
 // Alternatively, you can create your own implementation of GraphWeighted[T].
-func NewDijkstraGraphUnsafe[T WeightDijkstra](directed bool) GraphDijkstra[T] {
-	return &GraphDijkstraImpl[T]{
-		graph: &HashMapGraphWeightedImpl[T, NodeDijkstra[T]]{},
+func NewDijkstraGraphUnsafe[W WeightDijkstra](directed bool) GraphDijkstra[W] {
+	return &GraphDijkstraImpl[W]{
+		graph: new(HashMapGraphWeightedImpl[
+			NodeDijkstra[W],
+			EdgeWeighted[W, NodeDijkstra[W]],
+			W,
+		]),
 	}
 }
 
@@ -47,7 +47,11 @@ func NewDijkstraGraphUnsafe[T WeightDijkstra](directed bool) GraphDijkstra[T] {
 // Alternatively, you can create your own implementation of GraphWeighted[T].
 func NewDijkstraGraph[T WeightDijkstra](directed bool) GraphDijkstra[T] {
 	return &GraphDijkstraImpl[T]{
-		graph: NewGraphWeighted[T, NodeDijkstra[T]](directed),
+		graph: NewGraphWeighted[
+			NodeDijkstra[T],
+			EdgeWeighted[T, NodeDijkstra[T]],
+			T,
+		](directed),
 	}
 }
 

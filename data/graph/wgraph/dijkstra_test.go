@@ -183,7 +183,7 @@ func testDijkstra[T WeightDijkstra](t *testing.T, nameStart, nameFinish string) 
 		// Add edges
 		nodeEdges := util.edges
 		for _, edge := range nodeEdges {
-			if err := djikGraph.AddEdgeWeightOnly(node, edge.to, edge.weight); err != nil {
+			if err := djikGraph.AddEdgeWeightOrDistance(node, edge.to, edge.weight); err != nil {
 				t.Error(err.Error())
 			}
 		}
