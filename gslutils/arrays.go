@@ -17,10 +17,9 @@ func ReverseInPlace[T any](arr []T) {
 
 // Reverse returns a new slice, with elements being those of |arr| after being reversed.
 func Reverse[T any](arr []T) []T {
-	reversed := make([]T, len(arr))
-	copy(reversed, arr)
-
+	reversed := CopySlice(arr)
 	ReverseInPlace(reversed)
+
 	return reversed
 }
 
