@@ -83,9 +83,8 @@ func CollectPointersIf[T any](arr []T, filterFunc func(elem T) bool) []*T {
 	return filtered
 }
 
-// DerefValues iterates over |arr| and return a new slice containing dereferenced values
-// of the elements in |arr|. If an element in |arr| is nil at index `i`, the value of the
-// return slice at index `i` is a default value for type T.
+// DerefValues iterates over |arr| and return a new slice containing dereferenced values of the elements in |arr|.
+// If the pointer at `arr[i]` is nil, the returned slice will have default value of type `T` at index `i`.
 func DerefValues[T any](arr []*T) []T {
 	if arr == nil {
 		return nil
