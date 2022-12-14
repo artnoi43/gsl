@@ -4,7 +4,7 @@ import "testing"
 
 type stringAlias string
 
-func testMap[T ~string](
+func testUpperLower[T ~string](
 	t *testing.T,
 	m map[T]T,
 	f func(T) T,
@@ -23,7 +23,7 @@ func TestToUpper(t *testing.T) {
 		"k_uy": "K_UY",
 		"lA3":  "LA3",
 	}
-	testMap(t, tests, ToUpper[stringAlias])
+	testUpperLower(t, tests, ToUpper[stringAlias])
 }
 
 func TestToLower(t *testing.T) {
@@ -32,5 +32,5 @@ func TestToLower(t *testing.T) {
 		"K_uY": "k_uy",
 		"lA3%": "la3%",
 	}
-	testMap(t, tests, ToLower[stringAlias])
+	testUpperLower(t, tests, ToLower[stringAlias])
 }

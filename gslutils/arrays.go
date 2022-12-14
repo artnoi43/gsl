@@ -1,5 +1,6 @@
 package gslutils
 
+// CopySlice return a copy of |arr|.
 func CopySlice[T any](arr []T) []T {
 	ret := make([]T, len(arr))
 	copy(ret, arr)
@@ -7,12 +8,14 @@ func CopySlice[T any](arr []T) []T {
 	return ret
 }
 
+// ReverseInPlace reverses |arr| in-place.
 func ReverseInPlace[T any](arr []T) {
 	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
 		arr[i], arr[j] = arr[j], arr[i]
 	}
 }
 
+// Reverse returns a new slice, with elements being those of |arr| after being reversed.
 func Reverse[T any](arr []T) []T {
 	reversed := make([]T, len(arr))
 	copy(reversed, arr)
@@ -126,4 +129,28 @@ func DerefValuesIf[T any](arr []*T, filterFunc func(elem T) bool) []T {
 	}
 
 	return filtered
+}
+
+// Map maps |arr| to a new slice using |mapFunc|. |mapFunc| returns a tuple of generic type U and a boolean.
+// If |mapFunc|'s 2nd return value is true, its 1st return value (of type U) will be appended to the result slice.
+// Note: `T` and `U` can be of the same type.
+func Map[T any, U any](
+	arr []T,
+	mapFunc func(elem T) (U, bool),
+) []U {
+	if arr == nil {
+		return nil
+	}
+
+	var mapped []U //nolint:prealloc
+	for _, elem := range arr {
+		u, ok := mapFunc(elem)
+		if !ok {
+			continue
+		}
+
+		mapped = append(mapped, u)
+	}
+
+	return mapped
 }

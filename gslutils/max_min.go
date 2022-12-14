@@ -33,3 +33,16 @@ func Min[T constraints.Ordered](items ...T) T {
 
 	return min
 }
+
+func Sum[T constraints.Integer | constraints.Float](items ...T) T {
+	var sum T
+	for _, item := range items {
+		sum += item
+	}
+
+	return sum
+}
+
+func Avg[T constraints.Integer | constraints.Float](items ...T) T {
+	return Sum(items...) / T(len(items))
+}

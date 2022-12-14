@@ -1,6 +1,7 @@
 package gslutils
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -122,4 +123,69 @@ func TestDerefValues(t *testing.T) {
 			t.Fatalf("unexpected value -- expecting %s, got %s", expected, actual)
 		}
 	}
+}
+
+func TestMap(t *testing.T) {
+	a := []int64{2, 3, 4, 5}
+	mapFuncA := func(elem int64) (float64, bool) {
+		if elem%2 == 0 {
+			f := float64(elem)
+			f = (10.1) * f
+
+			return f, true
+		}
+
+		return -1, false
+	}
+	expectedA := []float64{20.2, 40.4}
+
+	if err := testMap(a, mapFuncA, expectedA); err != nil {
+		t.Error(err.Error())
+	}
+
+	b := []int{1, 6, 3, 4, 9}
+	mapFuncB := func(elem int) (string, bool) {
+		switch elem {
+		case 6:
+			return "six", true
+		case 9:
+			return "nine", true
+		}
+
+		return "", false
+	}
+	expectedB := []string{"six", "nine"}
+	if err := testMap(b, mapFuncB, expectedB); err != nil {
+		t.Error(err.Error())
+	}
+
+	c := []string{"one", "two", "three", "four"}
+	mapFuncC := func(elem string) (string, bool) {
+		if len(elem) >= 4 {
+			return ToUpper(elem), true
+		}
+
+		return "", false
+	}
+	expectedC := []string{"THREE", "FOUR"}
+	if err := testMap(c, mapFuncC, expectedC); err != nil {
+		t.Error(err.Error())
+	}
+}
+
+func testMap[T, U any](
+	arr []T,
+	mapFunc func(T) (U, bool),
+	expected []U,
+) error {
+	actual := Map(arr, mapFunc)
+	if l1, l2 := len(expected), len(actual); l1 != l2 {
+		return fmt.Errorf("unexpected result len, expecting %d, got %d", l1, l2)
+	}
+
+	if !reflect.DeepEqual(actual, expected) {
+		return fmt.Errorf("unexpected result, expecting %v, got %v", expected, actual)
+	}
+
+	return nil
 }

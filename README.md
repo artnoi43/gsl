@@ -1,14 +1,16 @@
 # gsl: Go Soylib - where I store my boilerplate code
-gsl was conceived simply because I found myself writing too much duplicate boilerplate code.
 
-Code like handling errors concurrently, or priority queues, are duplicated all over my projects. Even with Go generics (>=1.18), there're still duplicate code. This is bad, because I'll have to change code in many places. And I ususally change code, since I'm a beginner who only learned to code like < 2 years.
+gsl provides frequently used functionalities that I use across my projects.
 
-So this package is meant to fix that - by providing a single-source library for all my other code to import from. These are some subpackages, which may not be in sync with the current repo state:
+Since Go is focused on simplicity, some *battery-included* kind of built-ins are not included in Go (and that's a good thing).
+This led programmers to manually implement these basic solutions, and this led to a lot of duplicate code, oversighted bugs, etc.
 
-1. `http` - providing wrapper for Go's `http` package
+This is where gsl comes in - to standardize and store frequently used generic business logic for soy and non-soy devs alike.
 
-2. `gslutils` - basic utilities
+- `gslutils` - basic utilities for everyday use
 
-3. `soyutils` - bloated utilities with external library use
+- `soyutils` - utilities for soy devs
 
-4. `data` - frequently used data structures
+- `http` - providing wrapper for Go's `http` package
+
+- `data` - Basic data structure library. Highly unstable, because this is where I learn to code data structures
