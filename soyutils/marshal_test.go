@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/artnoi43/gsl/gslutils"
+	"github.com/artnoi43/gsl"
 	"gopkg.in/yaml.v3"
 )
 
@@ -53,7 +53,7 @@ func testReadAndUnmarshalFile(t *testing.T, f unmarshalFunc) {
 	}
 
 	expectedSoy, expectedMap := getSoy()
-	ok, err := gslutils.CompareInterfaceValues[soy](actualSoy, expectedSoy)
+	ok, err := gsl.CompareInterfaceValues[soy](actualSoy, expectedSoy)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -76,7 +76,7 @@ func testReadAndUnmarshalFile(t *testing.T, f unmarshalFunc) {
 		}
 		switch k {
 		case "S":
-			ok, err := gslutils.CompareInterfaceValues[string](actualValue, expectedValue)
+			ok, err := gsl.CompareInterfaceValues[string](actualValue, expectedValue)
 			if err != nil {
 				t.Error(err.Error())
 			}
@@ -84,7 +84,7 @@ func testReadAndUnmarshalFile(t *testing.T, f unmarshalFunc) {
 				t.Errorf("values not matched for key %s\n", k)
 			}
 		case "I":
-			ok, err := gslutils.CompareInterfaceValues[int](actualValue, expectedValue)
+			ok, err := gsl.CompareInterfaceValues[int](actualValue, expectedValue)
 			if err != nil {
 				t.Error(err.Error())
 			}

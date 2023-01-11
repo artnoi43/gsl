@@ -7,7 +7,7 @@ This led programmers to manually implement these basic solutions, and this led t
 
 This is where gsl comes in - to standardize and store frequently used generic business logic for soy and non-soy devs alike.
 
-- `gslutils` - basic utilities for everyday use
+- `gsl` - basic utilities for everyday use
 
 - `soyutils` - utilities for soy devs
 

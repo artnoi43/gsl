@@ -23,7 +23,8 @@ func NewGraphWeightedUnsafe[
 	N NodeWeighted[W],
 	E EdgeWeighted[W, N],
 	W Weight,
-](directed bool) GraphWeighted[N, E, W] {
+](directed bool,
+) GraphWeighted[N, E, W] {
 	return &HashMapGraphWeightedImpl[N, E, W]{
 		Directed: directed,
 		Nodes:    make([]N, 0),
@@ -36,7 +37,8 @@ func WrapSafeGraphWeighted[
 	N NodeWeighted[W],
 	E EdgeWeighted[W, N],
 	W Weight,
-](g GraphWeighted[N, E, W]) GraphWeighted[N, E, W] {
+](g GraphWeighted[N, E, W],
+) GraphWeighted[N, E, W] {
 	return graph.WrapSafeGenericGraph[N, E, W](g)
 }
 
@@ -45,7 +47,8 @@ func NewGraphWeighted[
 	N NodeWeighted[W],
 	E EdgeWeighted[W, N],
 	W Weight,
-](directed bool) GraphWeighted[N, E, W] {
+](directed bool,
+) GraphWeighted[N, E, W] {
 	return WrapSafeGraphWeighted(NewGraphWeightedUnsafe[N, E, W](directed))
 }
 

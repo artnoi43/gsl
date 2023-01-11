@@ -7,7 +7,7 @@ import (
 
 	"github.com/artnoi43/gsl/data/graph"
 	"github.com/artnoi43/gsl/data/graph/wgraph"
-	"github.com/artnoi43/gsl/gslutils"
+	"github.com/artnoi43/gsl"
 )
 
 // This code purpose is to show an example of how to use the graph and wgraph packages
@@ -119,7 +119,7 @@ func main() {
 		}
 
 		pathToNode := wgraph.DijkstraShortestPathReconstruct(shortestPathsFromTokyo.Paths, shortestPathsFromTokyo.From, dst)
-		gslutils.ReverseInPlace(pathToNode)
+		gsl.ReverseInPlace(pathToNode)
 
 		fmt.Println("> from", fromNode.GetKey(), "to", dst.GetKey(), "min flightHours", dst.GetValue())
 		for _, via := range pathToNode {
@@ -133,7 +133,7 @@ func main() {
 	for _, dst := range unweightedGraph.GetNodes() {
 		shortestHopsFromTokyo, hops, found := graph.BFSHashMapGraphV1[float64](unweightedGraph, fromNode, dst)
 		fmt.Println("path to", dst.(*city).GetKey(), "found", found, "shortestHops", hops)
-		gslutils.ReverseInPlace(shortestHopsFromTokyo)
+		gsl.ReverseInPlace(shortestHopsFromTokyo)
 		for i, hop := range shortestHopsFromTokyo {
 			fmt.Println("hop", i, hop.(*city).GetKey())
 		}

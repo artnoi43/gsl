@@ -1,4 +1,4 @@
-package gslutils
+package gsl
 
 // SliceFromMapValues collects map[K]V |m| into []V.
 // If |m| is mil, SliceFromMapValues returns nil

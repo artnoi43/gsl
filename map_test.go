@@ -1,4 +1,4 @@
-package gslutils
+package gsl
 
 import (
 	"reflect"
@@ -100,9 +100,15 @@ func TestSliceFromMapIf(t *testing.T) {
 		}
 	}
 
-	if lKeys, lVals := len(resultKeys), len(resultVals); lKeys != lVals {
-		t.Fatalf("resultKeys length %d not matched resultVals length %d", lKeys, lVals)
+	checkLens := func() {
+		if lKeys, lVals := len(resultKeys), len(resultVals); lKeys != lVals {
+			t.Fatalf("resultKeys length %d not matched resultVals length %d", lKeys, lVals)
+		}
 	}
+
+	checkLens()
+	resultKeys, resultVals = SlicesFromMapIf(m, filterEven)
+	checkLens()
 
 	for i, key := range resultKeys {
 		v, ok := m[key]
@@ -112,6 +118,7 @@ func TestSliceFromMapIf(t *testing.T) {
 		val := resultVals[i]
 
 		if v != val {
+			t.Log(resultKeys, resultVals)
 			t.Fatalf("bad value collected, expecting %v, got %v", v, val)
 		}
 	}

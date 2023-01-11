@@ -3,7 +3,7 @@ package wgraph
 import (
 	"testing"
 
-	"github.com/artnoi43/gsl/gslutils"
+	"github.com/artnoi43/gsl"
 )
 
 type dijkstraTestUtils[T WeightDijkstra] struct {
@@ -215,7 +215,7 @@ func testDijkstra[T WeightDijkstra](t *testing.T, nameStart, nameFinish string) 
 		// t.Logf("dst node: %v\n", nodeKey)
 		// Test paths
 		pathToNode := dijkShortestPaths.ReconstructPathTo(node)
-		gslutils.ReverseInPlace(pathToNode)
+		gsl.ReverseInPlace(pathToNode)
 		if hops := len(pathToNode); hops != util.expectedPathHops {
 			t.Fatalf(fatalMsgPathLen, nameStart, nodeKey, hops, util.expectedPathHops)
 		}

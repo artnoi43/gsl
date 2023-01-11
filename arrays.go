@@ -1,4 +1,4 @@
-package gslutils
+package gsl
 
 // CopySlice return a copy of |arr|.
 func CopySlice[T any](arr []T) []T {

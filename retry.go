@@ -1,4 +1,4 @@
-package gslutils
+package gsl
 
 import (
 	"strings"
