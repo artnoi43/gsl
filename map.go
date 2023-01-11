@@ -62,11 +62,8 @@ func SlicesFromMap[K comparable, V any](m map[K]V) ([]K, []V) {
 // SliceFromMapValuesIf iterates over |m| and calls |f|
 // with keys and values of |m|. For each true returned from |f|,
 // the value in |m| gets appended to the return slice.
-// If either |m| or |f| is nil, SliceFromMapKeysIf returns nil.
-func SliceFromMapValuesIf[K comparable, V any](
-	m map[K]V,
-	f func(K, V) bool,
-) []V {
+// If either |m| or |f| is nil, SliceFromMapValuesIf returns nil.
+func SliceFromMapValuesIf[K comparable, V any](m map[K]V, f func(K, V) bool) []V {
 	if m == nil || f == nil {
 		return nil
 	}
@@ -85,10 +82,7 @@ func SliceFromMapValuesIf[K comparable, V any](
 // with keys and values of |m|. For each true returned from |f|,
 // the key in |m| gets appended to the return slice.
 // If either |m| or |f| is nil, SliceFromMapKeysIf returns nil.
-func SliceFromMapKeysIf[K comparable, V any](
-	m map[K]V,
-	f func(K, V) bool,
-) []K {
+func SliceFromMapKeysIf[K comparable, V any](m map[K]V, f func(K, V) bool) []K {
 	if m == nil || f == nil {
 		return nil
 	}
@@ -103,7 +97,10 @@ func SliceFromMapKeysIf[K comparable, V any](
 	return s
 }
 
-// If either |m| or |f| is nil, SlicesFromMapIf returns nil.
+// SlicesFromMapIf iterates over |m| and calls |f|
+// with keys and values of |m|. For each true returned from |f|,
+// the key and value in |m| gets appended to both the return slices.
+// If either |m| or |f| is nil, SlicesFromMapIf returns nil, nil.
 func SlicesFromMapIf[K comparable, V any](m map[K]V, f func(K, V) bool) ([]K, []V) {
 	if m == nil || f == nil {
 		return nil, nil
