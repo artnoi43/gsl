@@ -1,8 +1,7 @@
 package gsl
 
 import (
-	"sort"
-
+	"github.com/artnoi43/gsl/data"
 	"golang.org/x/exp/constraints"
 )
 
@@ -13,11 +12,7 @@ type GoNumber interface {
 // GroupConsecutive *sorts* slice |s| in-place,
 // and calls GroupConsecutiveSorted on |s|.
 func GroupConsecutive[N GoNumber](s []N) [][2]N {
-	sort.Slice(s, func(i, j int) bool {
-		return i < j
-	})
-
-	return GroupConsecutiveSorted(s)
+	return GroupConsecutiveSorted(data.QuickSort(s, data.Ascending))
 }
 
 // GroupConsecutiveSorted groups input numbers in slice []N |s|

@@ -8,10 +8,6 @@ func QuickSortValuer[T constraints.Ordered](
 	arr []GetValuer[T],
 	ordering SortOrder,
 ) []GetValuer[T] {
-	if !ordering.IsValid() {
-		panic("invalid direction")
-	}
-
 	l := len(arr)
 	// Base case
 	if l < 2 {
@@ -21,10 +17,10 @@ func QuickSortValuer[T constraints.Ordered](
 	// Pivot here is going to be middle elem
 	mid := l / 2
 	pivot := arr[mid]
-	var left, right []GetValuer[T] //nolint:prealloc
 
 	// pivoted is the list without the pivot element/member
 	pivoted := append(arr[:mid], arr[mid+1:]...) //nolint: gocritic
+	var left, right []GetValuer[T]               //nolint:prealloc
 
 	{
 		// isLess should have lifetime of no more than the for-looop
@@ -46,14 +42,7 @@ func QuickSortValuer[T constraints.Ordered](
 	return sorted
 }
 
-func QuickSort[T constraints.Ordered](
-	arr []T,
-	ordering SortOrder,
-) []T {
-	if !ordering.IsValid() {
-		panic("invalid connection")
-	}
-
+func QuickSort[T constraints.Ordered](arr []T, ordering SortOrder) []T {
 	l := len(arr)
 	// Base case
 	if l < 2 {

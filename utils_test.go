@@ -54,4 +54,15 @@ func TestGroupConsecutive(t *testing.T) {
 			}
 		}
 	}
+
+	// See if it'll overflow
+	var s []int64 = make([]int64, 100000000)
+	for i := int64(0); i < 100000000; i++ {
+		s[i] = 7
+	}
+
+	ranges := GroupConsecutive(s)
+	if l := len(ranges); l != 1 {
+		t.Errorf("expecting length 1, got %d", l)
+	}
 }
