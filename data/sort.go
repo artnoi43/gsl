@@ -1,17 +1,44 @@
 package data
 
-type ArraySortDirection uint8
+import (
+	"fmt"
+
+	"golang.org/x/exp/constraints"
+)
+
+type SortOrder uint8
 
 const (
-	Ascending ArraySortDirection = iota
+	Ascending SortOrder = iota
 	Descending
 )
 
-func (d ArraySortDirection) IsValid() bool {
+func badOrder(ordering SortOrder) string {
+	return fmt.Sprintf("bad SortOrder %d", ordering)
+}
+
+func (d SortOrder) IsValid() bool {
 	switch d {
 	case Ascending, Descending:
 		return true
 	}
 
 	return false
+}
+
+// LessFunc selects the appropriate comparison function to check if the elements are ordered.
+// If the returned function returns true, then the elements are sorted according to its |ordering|
+func LessFunc[T constraints.Ordered](ordering SortOrder) func(T, T) bool {
+	switch ordering {
+	case Ascending:
+		return func(v1, v2 T) bool {
+			return v1 <= v2
+		}
+	case Descending:
+		return func(v1, v2 T) bool {
+			return v1 >= v2
+		}
+	}
+
+	panic(badOrder(ordering))
 }

@@ -6,10 +6,9 @@ import (
 
 func QuickSortValuer[T constraints.Ordered](
 	arr []GetValuer[T],
-	direction ArraySortDirection,
+	ordering SortOrder,
 ) []GetValuer[T] {
-
-	if !direction.IsValid() {
+	if !ordering.IsValid() {
 		panic("invalid direction")
 	}
 
@@ -22,42 +21,36 @@ func QuickSortValuer[T constraints.Ordered](
 	// Pivot here is going to be middle elem
 	mid := l / 2
 	pivot := arr[mid]
-	var left []GetValuer[T]
-	var right []GetValuer[T]
+	var left, right []GetValuer[T] //nolint:prealloc
 
-	// sansPivot is the list without the pivot element/member
-	sansPivot := append(arr[:mid], arr[mid+1:]...)
+	// pivoted is the list without the pivot element/member
+	pivoted := append(arr[:mid], arr[mid+1:]...) //nolint: gocritic
 
-	for _, elem := range sansPivot {
-		switch direction {
-		case Ascending:
-			if elem.GetValue() >= pivot.GetValue() {
-				right = append(right, elem)
+	{
+		// isLess should have lifetime of no more than the for-looop
+		// to help minimize stack size in huge recursive calls
+		isLess := LessFunc[T](ordering)
+		for _, elem := range pivoted {
+			if isLess(elem.GetValue(), pivot.GetValue()) {
+				left = append(left, elem)
 				continue
 			}
 
-		case Descending:
-			if elem.GetValue() <= pivot.GetValue() {
-				right = append(right, elem)
-				continue
-			}
+			right = append(right, elem)
 		}
-
-		left = append(left, elem)
 	}
 
-	sorted := append(QuickSortValuer(left, direction), pivot)
-	sorted = append(sorted, QuickSortValuer(right, direction)...)
+	sorted := append(QuickSortValuer(left, ordering), pivot)
+	sorted = append(sorted, QuickSortValuer(right, ordering)...)
 
 	return sorted
 }
 
 func QuickSort[T constraints.Ordered](
 	arr []T,
-	direction ArraySortDirection,
+	ordering SortOrder,
 ) []T {
-
-	if !direction.IsValid() {
+	if !ordering.IsValid() {
 		panic("invalid connection")
 	}
 
@@ -71,31 +64,26 @@ func QuickSort[T constraints.Ordered](
 	mid := l / 2
 	pivot := arr[mid]
 
-	var left []T
-	var right []T
+	// pivoted is the list without the |pivot| element/member
+	pivoted := append(arr[:mid], arr[mid+1:]...) //nolint:gocritic
+	var left, right []T                          //nolint:prealloc
 
-	// sansPivot is the list without the pivot element/member
-	sansPivot := append(arr[:mid], arr[mid+1:]...)
-
-	for _, elem := range sansPivot {
-		switch direction {
-		case Ascending:
-			if elem >= pivot {
-				right = append(right, elem)
+	{
+		// isLess should have lifetime of no more than the for-looop
+		// to help minimize stack size in huge recursive calls
+		isLess := LessFunc[T](ordering)
+		for _, elem := range pivoted {
+			if isLess(elem, pivot) {
+				left = append(left, elem)
 				continue
 			}
-		case Descending:
-			if elem <= pivot {
-				right = append(right, elem)
-				continue
-			}
+
+			right = append(right, elem)
 		}
-
-		left = append(left, elem)
 	}
 
-	sorted := append(QuickSort(left, direction), pivot)
-	sorted = append(sorted, QuickSort(right, direction)...)
+	sorted := append(QuickSort(left, ordering), pivot)
+	sorted = append(sorted, QuickSort(right, ordering)...)
 
 	return sorted
 }

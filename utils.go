@@ -65,7 +65,7 @@ func GroupConsecutiveSorted[N GoNumber](s []N) [][2]N {
 			continue
 		}
 
-		// Update "to", because prev was exactly curr-1
+		// Update "to" of the latest consec, because prev was exactly curr-1
 		consecs[len(consecs)-1][1] = curr
 	}
 

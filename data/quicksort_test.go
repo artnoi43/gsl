@@ -12,7 +12,7 @@ func TestArraySortDirection(t *testing.T) {
 		t.Error("direction Descending is invalid")
 	}
 
-	d := ArraySortDirection(69)
+	d := SortOrder(69)
 	if d.IsValid() {
 		t.Errorf("invalid direction %d is valid", d)
 	}
@@ -28,4 +28,12 @@ func TestQuickSort(t *testing.T) {
 	if out[len(out)-1] != 234 {
 		t.Fatal("unexpected result")
 	}
+
+	// See if it'll overflow
+	var s []int = make([]int, 1000000000)
+	for i := 0; i < 1000000000; i++ {
+		s[i] = i
+	}
+
+	QuickSort(arr, Descending)
 }
