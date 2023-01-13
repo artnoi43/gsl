@@ -6,79 +6,70 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// GroupConsecutive collect sorts and groups block numbers in slice []I
-// that are consecutive (difference of 1) to each other into a slice [][2]I,
-// e.g. [1, 2, 3, 5, 6, 8, 9, 10] will be mapped to [{1, 3}, {5, 6}, {8, 10}].
-// Result[0] is "from", i.e. the start of the consecutive range, while Result[1] is "to", the end of such range.
-//
-// If |s| has length of 0, it returns [][2]I{ {0, 0} }
-// If |s| has length of 1 and is []I{n}, it returns [][2]I{ {n, n} }
-func GroupConsecutive[I interface {
+type GoNumber interface {
 	constraints.Integer | constraints.Float
-}](s []I) [][2]I {
-	var zero I
+}
 
-	l := len(s)
-	switch l {
-	case 0:
-		return [][2]I{{zero, zero}}
-	case 1:
-		n := s[0]
-		return [][2]I{{n, n}}
-	}
-
+// GroupConsecutive *sorts* slice |s| in-place,
+// and calls GroupConsecutiveSorted on |s|.
+func GroupConsecutive[N GoNumber](s []N) [][2]N {
 	sort.Slice(s, func(i, j int) bool {
 		return i < j
 	})
 
-	var ranges [][2]I
+	return GroupConsecutiveSorted(s)
+}
+
+// GroupConsecutiveSorted groups input numbers in slice []N |s|
+// that are consecutive to each other (i.e. difference of 1) into a slice of [2]N.
+// The result type [2]N represents the start and end of a consecutive range,
+// that is, result[0] is "from" while result[1] is "to" of such ranges.
+//
+// If a breakpoint (non-consecutive element) is found, GroupConsecutive creates a new result.
+// e.g. [1, 2, 3, 5, 6, 8, 9, 10] will be mapped to [{1, 3}, {5, 6}, {8, 10}].
+//
+// If |s| has length of 0, it returns [][2]N{ {0, 0} }.
+// If |s| has length of 1 and is []N{n}, it returns [][2]N{ {n, n} }.
+func GroupConsecutiveSorted[N GoNumber](s []N) [][2]N {
+	l := len(s)
+
+	switch l {
+	case 0:
+		return [][2]N{{0, 0}}
+	case 1:
+		n := s[0]
+		return [][2]N{{n, n}}
+	}
+
+	var consecs [][2]N
 
 	for i := 0; i < l; i++ {
-		var curr I
-		var prev I
+		var curr N
+		var prev N
 
 		curr = s[i]
 
-		if i != 0 {
-			prev = s[i-1]
-		} else if i == 0 {
-			ranges = append(ranges, [2]I{curr, curr})
+		// First element - init new default consec range [curr, curr].
+		if i == 0 {
+			consecs = append(consecs, [2]N{curr, curr})
+			continue
 		}
+
+		prev = s[i-1]
 
 		// Skip duplicate member
 		if prev == curr {
 			continue
 		}
 
-		currRange := &ranges[len(ranges)-1]
-
-		// Not yet last element
-		if i != l-1 {
-			// Next element to |curr|
-			next := s[i+1]
-
-			if curr+1 == next {
-				// Check if previous element a break point
-				if prev != curr-1 {
-					// Found break point, add new ranges member
-					ranges = append(ranges, [2]I{curr, curr})
-					continue
-				}
-			}
-
-			// Update "to"
-			currRange[1] = curr
-
-		} else if i == l-1 {
-			if curr-1 == prev {
-				// Update "to"
-				currRange[1] = curr
-			} else {
-				// Found break point, add new ranges member
-				ranges = append(ranges, [2]I{curr, curr})
-			}
+		// If breakpoint found, add new default consec range [curr, curr].
+		if prev != curr-1 {
+			consecs = append(consecs, [2]N{curr, curr})
+			continue
 		}
+
+		consecs[len(consecs)-1][1] = curr
 	}
 
-	return ranges
+	return consecs
 }
