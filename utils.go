@@ -44,30 +44,28 @@ func GroupConsecutiveSorted[N GoNumber](s []N) [][2]N {
 	var consecs [][2]N
 
 	for i := 0; i < l; i++ {
-		var curr N
-		var prev N
+		curr := s[i]
 
-		curr = s[i]
-
-		// First element - init new default consec range [curr, curr].
+		// |curr| is element 0 - init new default consec range [curr, curr].
 		if i == 0 {
 			consecs = append(consecs, [2]N{curr, curr})
 			continue
 		}
 
-		prev = s[i-1]
+		prev := s[i-1]
 
 		// Skip duplicate member
-		if prev == curr {
+		if curr == prev {
 			continue
 		}
 
-		// If breakpoint found, add new default consec range [curr, curr].
-		if prev != curr-1 {
+		// If breakpoint found, add new default consec range [curr, curr] and continue.
+		if curr-1 != prev {
 			consecs = append(consecs, [2]N{curr, curr})
 			continue
 		}
 
+		// Update "to", because prev was exactly curr-1
 		consecs[len(consecs)-1][1] = curr
 	}
 
