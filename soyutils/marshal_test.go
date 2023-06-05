@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/artnoi43/gsl"
+	"github.com/soyart/gsl"
 	"gopkg.in/yaml.v3"
 )
 

@@ -1,6 +1,6 @@
 package container
 
-import "github.com/artnoi43/gsl/data"
+import "github.com/soyart/gsl/data"
 
 type BasicContainer[T any] interface {
 	Push(x T)

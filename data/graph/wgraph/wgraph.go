@@ -3,7 +3,7 @@ package wgraph
 import (
 	"golang.org/x/exp/constraints"
 
-	"github.com/artnoi43/gsl/data/graph"
+	"github.com/soyart/gsl/data/graph"
 )
 
 type Weight constraints.Ordered

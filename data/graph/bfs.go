@@ -1,6 +1,6 @@
 package graph
 
-import "github.com/artnoi43/gsl/data/container/list"
+import "github.com/soyart/gsl/data/container/list"
 
 // BFS calls BFSSearch and uses its output to call BFSShortestPathReconstruct.
 // It then returns the shortest path (slice of nodes), the number of hops it takes from `src` to `dst`,

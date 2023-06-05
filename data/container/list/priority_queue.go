@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/exp/constraints"
 
-	"github.com/artnoi43/gsl/data"
+	"github.com/soyart/gsl/data"
 )
 
 type HeapType uint8

@@ -1,6 +1,6 @@
 package wgraph
 
-import "github.com/artnoi43/gsl/data/graph"
+import "github.com/soyart/gsl/data/graph"
 
 // NodeWeighted should be able to put in a priority queue, just in case topological sort is needed.
 type NodeWeighted[T Weight] interface {

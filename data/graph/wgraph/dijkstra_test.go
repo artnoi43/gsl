@@ -3,7 +3,7 @@ package wgraph
 import (
 	"testing"
 
-	"github.com/artnoi43/gsl"
+	"github.com/soyart/gsl"
 )
 
 type dijkstraTestUtils[T WeightDijkstra] struct {

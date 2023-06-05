@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/artnoi43/gsl/data/container/list"
+	"github.com/soyart/gsl/data/container/list"
 )
 
 // GraphDijkstraImpl[T] wraps GraphWeightedImpl[T], where T is generic type numeric types and S is ~string.

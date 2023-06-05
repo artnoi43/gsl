@@ -1,7 +1,7 @@
 package graph
 
 import (
-	"github.com/artnoi43/gsl/data"
+	"github.com/soyart/gsl/data"
 )
 
 type nodeValue any

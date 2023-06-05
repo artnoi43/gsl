@@ -1,6 +1,6 @@
 package list
 
-import "github.com/artnoi43/gsl/data"
+import "github.com/soyart/gsl/data"
 
 type WrappedList[T any, L BasicList[T]] BasicList[T]
 

@@ -1,7 +1,7 @@
 package gsl
 
 import (
-	"github.com/artnoi43/gsl/data"
+	"github.com/soyart/gsl/data"
 	"golang.org/x/exp/constraints"
 )
 

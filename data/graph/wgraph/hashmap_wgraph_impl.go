@@ -3,7 +3,7 @@ package wgraph
 // TODO: more relaxed generic types
 
 import (
-	"github.com/artnoi43/gsl/data/graph"
+	"github.com/soyart/gsl/data/graph"
 )
 
 // HashMapGraphWeightedImpl[W, N] is the default implementation of GraphWeighted[N, EdgeWeighted[W], W].

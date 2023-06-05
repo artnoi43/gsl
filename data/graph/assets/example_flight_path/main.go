@@ -5,9 +5,9 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/artnoi43/gsl/data/graph"
-	"github.com/artnoi43/gsl/data/graph/wgraph"
-	"github.com/artnoi43/gsl"
+	"github.com/soyart/gsl/data/graph"
+	"github.com/soyart/gsl/data/graph/wgraph"
+	"github.com/soyart/gsl"
 )
 
 // This code purpose is to show an example of how to use the graph and wgraph packages
