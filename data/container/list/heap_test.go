@@ -1,7 +1,6 @@
 package list
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/soyart/gsl/data"
@@ -21,7 +20,7 @@ func TestHeapifyUp(t *testing.T) {
 
 	l := len(pq.Items)
 	for curr := range pq.Items {
-		fmt.Println("index", curr, "value", pq.Items[curr].GetValue())
+		// t.Log("index", curr, "value", pq.Items[curr].GetValue())
 
 		parent := parentNode(curr)
 		if parent >= 0 {

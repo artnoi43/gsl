@@ -54,6 +54,21 @@ func (h *Heap[T]) Pop() data.GetValuer[T] {
 	return root
 }
 
+func (h *Heap[T]) Peek() data.GetValuer[T] {
+	h.mut.RLock()
+	defer h.mut.RUnlock()
+
+	return h.Items[0]
+}
+
+func (h *Heap[T]) PopValue() T {
+	return h.Pop().GetValue()
+}
+
+func (h *Heap[T]) PeekValue() T {
+	return h.Peek().GetValue()
+}
+
 func (h *Heap[T]) heapifyUp(from int) {
 	curr := from
 	for curr != 0 {
