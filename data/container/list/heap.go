@@ -54,6 +54,20 @@ func (h *Heap[T]) Pop() data.GetValuer[T] {
 	return root
 }
 
+func (h *Heap[T]) Len() int {
+	h.mut.Lock()
+	defer h.mut.Unlock()
+
+	return len(h.Items)
+}
+
+func (h *Heap[T]) IsEmpty() bool {
+	h.mut.RLock()
+	defer h.mut.RUnlock()
+
+	return len(h.Items) == 0
+}
+
 func (h *Heap[T]) Peek() data.GetValuer[T] {
 	h.mut.RLock()
 	defer h.mut.RUnlock()
