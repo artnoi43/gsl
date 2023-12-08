@@ -26,14 +26,17 @@ func (d SortOrder) IsValid() bool {
 	return false
 }
 
-// LessFunc selects the appropriate comparison function to check if the elements are ordered.
+type LessFunc[T any] func(list []T, i, j int) bool
+
+// LessFuncOrdered selects the appropriate comparison function to check if the elements are ordered.
 // If the returned function returns true, then the elements are sorted according to its |ordering|
-func LessFunc[T constraints.Ordered](ordering SortOrder) func(T, T) bool {
+func LessFuncOrdered[T constraints.Ordered](ordering SortOrder) func(T, T) bool {
 	switch ordering {
 	case Ascending:
 		return func(v1, v2 T) bool {
 			return v1 <= v2
 		}
+
 	case Descending:
 		return func(v1, v2 T) bool {
 			return v1 >= v2

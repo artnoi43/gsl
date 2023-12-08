@@ -25,7 +25,7 @@ func QuickSortValuer[T constraints.Ordered](
 	{
 		// isLess should have lifetime of no more than the for-looop
 		// to help minimize stack size in huge recursive calls
-		isLess := LessFunc[T](ordering)
+		isLess := LessFuncOrdered[T](ordering)
 		for _, elem := range pivoted {
 			if isLess(elem.GetValue(), pivot.GetValue()) {
 				left = append(left, elem)
@@ -60,7 +60,7 @@ func QuickSort[T constraints.Ordered](arr []T, ordering SortOrder) []T {
 	{
 		// isLess should have lifetime of no more than the for-looop
 		// to help minimize stack size in huge recursive calls
-		isLess := LessFunc[T](ordering)
+		isLess := LessFuncOrdered[T](ordering)
 		for _, elem := range pivoted {
 			if isLess(elem, pivot) {
 				left = append(left, elem)

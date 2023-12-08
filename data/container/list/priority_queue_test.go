@@ -49,10 +49,10 @@ func TestPq(t *testing.T) {
 	testArbitaryUpdate(t)
 }
 
-func testPop[T constraints.Ordered](t *testing.T, pqType HeapType, items []foo[T]) []foo[T] {
-	pq := NewPriorityQueue[T](pqType)
-	pqCustom := NewPriorityQueueCustom(pqType, lessOrdered[T])
-	queues := []*PriorityQueue[T]{pq, pqCustom}
+func testPop[T constraints.Ordered](t *testing.T, pqType data.SortOrder, items []foo[T]) []foo[T] {
+	pq := NewHeapImpl[T](pqType)
+	pqCustom := NewHeapImplCustom(pqType, lessFuncOrdered[T])
+	queues := []*GoHeapImpl[T]{pq, pqCustom}
 
 	var ret []foo[T]
 	for _, q := range queues {
@@ -84,9 +84,9 @@ func testArbitaryUpdate(t *testing.T) {
 	}
 
 	// Arbitary pushes and inits
-	pq := NewPriorityQueue[float64](MaxHeap)
-	pqCustom := NewPriorityQueueCustom(MaxHeap, lessOrdered[float64])
-	queues := []*PriorityQueue[float64]{pq, pqCustom}
+	pq := NewHeapImpl[float64](MaxHeap)
+	pqCustom := NewHeapImplCustom(MaxHeap, lessFuncOrdered[float64])
+	queues := []*GoHeapImpl[float64]{pq, pqCustom}
 
 	for _, q := range queues {
 		for _, item := range foosFloat {
@@ -102,7 +102,7 @@ func testArbitaryUpdate(t *testing.T) {
 			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", hundred, popped)
 		}
 
-		q.HeapType = MinHeap
+		q.Ordering = MinHeap
 		heap.Init(q)
 		p = heap.Pop(q)
 		popped, ok = p.(foo[float64])
@@ -140,13 +140,12 @@ func TestPQCmp(t *testing.T) {
 }
 
 func lol(item data.GetValuer[*big.Int]) {
-
 }
 
 func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
-	maxPq := NewPriorityQueueCmp[*big.Int](MaxHeap)
-	maxPqCustom := NewPriorityQueueCustom(MaxHeap, lessCmp[*big.Int])
-	queues := []*PriorityQueue[*big.Int]{maxPq, maxPqCustom}
+	maxPq := NewHealImplCmp[*big.Int](MaxHeap)
+	maxPqCustom := NewHeapImplCustom(MaxHeap, lessFuncCmp[*big.Int])
+	queues := []*GoHeapImpl[*big.Int]{maxPq, maxPqCustom}
 
 	for _, q := range queues {
 		for _, item := range messy {
@@ -162,9 +161,9 @@ func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
 }
 
 func testPqCmpMin(t *testing.T, messy []*bar, min *bar) {
-	minPq := NewPriorityQueueCmp[*big.Int](MinHeap)
-	minPqCustom := NewPriorityQueueCustom(MinHeap, lessCmp[*big.Int])
-	queues := []*PriorityQueue[*big.Int]{minPq, minPqCustom}
+	minPq := NewHealImplCmp[*big.Int](MinHeap)
+	minPqCustom := NewHeapImplCustom(MinHeap, lessFuncCmp[*big.Int])
+	queues := []*GoHeapImpl[*big.Int]{minPq, minPqCustom}
 
 	for _, q := range queues {
 		for _, item := range messy {

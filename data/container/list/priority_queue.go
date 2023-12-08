@@ -9,21 +9,20 @@ import (
 	"github.com/soyart/gsl/data"
 )
 
-type HeapType uint8
-
 const (
-	MinHeap HeapType = iota
-	MaxHeap
+	MaxHeap data.SortOrder = data.Ascending
+	MinHeap data.SortOrder = data.Descending
 )
 
-// PriorityQueue implements heap.Interface,
+// GoHeapImpl implements heap.Interface,
 // and can be use with container/heap.Push, container/heap.Pop, and container/heap.Init.
 // I'm working on a new implementation that wouldn't require the heap package.
-type PriorityQueue[T any] struct {
+type GoHeapImpl[T any] struct {
 	Items    []data.GetValuer[T]
-	HeapType HeapType
+	Ordering data.SortOrder
+
 	// lessFunc depends on T, and the New* functions below
-	lessFunc func(items []data.GetValuer[T], t HeapType, i, j int) bool
+	lessFunc func(items []data.GetValuer[T], order data.SortOrder, i, j int) bool
 	mut      *sync.RWMutex
 }
 
@@ -33,44 +32,49 @@ type CmpOrdered[T any] interface {
 	Cmp(T) int
 }
 
-// NewPriorityQueue returns *PriorityQueue[constraints.Ordered], and this instance
-// uses lessOrdered as lessFunc, which means that the priority type must be able to compare ordering
+// NewHeapImpl returns *PriorityQueue[constraints.Ordered], and this instance
+// uses lessFuncOrdered as lessFunc, which means that the priority type must be able to compare ordering
 // using greater than (>) and lesser than (<) family of signs.
-func NewPriorityQueue[T constraints.Ordered](t HeapType) *PriorityQueue[T] {
-	return &PriorityQueue[T]{
-		HeapType: t,
-		lessFunc: lessOrdered[T],
-		mut:      &sync.RWMutex{},
+func NewHeapImpl[T constraints.Ordered](order data.SortOrder) *GoHeapImpl[T] {
+	return &GoHeapImpl[T]{
+		Ordering: order,
+		lessFunc: lessFuncOrdered[T],
+		mut:      new(sync.RWMutex),
 	}
 }
 
-// NewPriorityQueueCmp[T] returns *PriorityQueue[CmpOrdered[T]], and this instance
-// uses lessCmp as lessFunc, which means that the priority type must be able to compare ordering
+// NewHealImplCmp[T] returns *PriorityQueue[CmpOrdered[T]], and this instance
+// uses lessFuncCmp as lessFunc, which means that the priority type must be able to compare ordering
 // using Cmp(T) int function.
-func NewPriorityQueueCmp[T CmpOrdered[T]](t HeapType) *PriorityQueue[T] {
-	return &PriorityQueue[T]{
-		HeapType: t,
-		lessFunc: lessCmp[T],
-		mut:      &sync.RWMutex{},
+func NewHealImplCmp[T CmpOrdered[T]](order data.SortOrder) *GoHeapImpl[T] {
+	return &GoHeapImpl[T]{
+		Ordering: order,
+		lessFunc: lessFuncCmp[T],
+		mut:      new(sync.RWMutex),
 	}
 }
 
 // If the priority type for your priority queue does not implement constraints.Ordered or CmpOrdered interface,
 // then you can provide your own lessFunc to determine ordering.
-func NewPriorityQueueCustom[T any](
-	t HeapType,
-	lessFunc func(items []data.GetValuer[T], t HeapType, i, j int) bool,
-) *PriorityQueue[T] {
-	return &PriorityQueue[T]{
-		HeapType: t,
+func NewHeapImplCustom[T any](
+	order data.SortOrder,
+	lessFunc func(items []data.GetValuer[T], order data.SortOrder, i, j int) bool,
+) *GoHeapImpl[T] {
+	return &GoHeapImpl[T]{
+		Ordering: order,
 		lessFunc: lessFunc,
-		mut:      &sync.RWMutex{},
+		mut:      new(sync.RWMutex),
 	}
 }
 
 // Less implementation for constraints.Ordered
-func lessOrdered[T constraints.Ordered](items []data.GetValuer[T], t HeapType, i, j int) bool {
-	if t == MinHeap {
+func lessFuncOrdered[T constraints.Ordered](
+	items []data.GetValuer[T],
+	order data.SortOrder,
+	i int,
+	j int,
+) bool {
+	if order == MinHeap {
 		return items[i].GetValue() < items[j].GetValue()
 	}
 
@@ -78,11 +82,18 @@ func lessOrdered[T constraints.Ordered](items []data.GetValuer[T], t HeapType, i
 }
 
 // Less implementation for CmpOrdered, e.g. *big.Int and *big.Float, and other lib types.
-func lessCmp[T CmpOrdered[T]](items []data.GetValuer[T], t HeapType, i, j int) bool {
+func lessFuncCmp[T CmpOrdered[T]](
+	items []data.GetValuer[T],
+	order data.SortOrder,
+	i int,
+	j int,
+) bool {
 	var cmp int
-	switch t {
+
+	switch order {
 	case MinHeap:
 		cmp = -1
+
 	case MaxHeap:
 		cmp = 1
 	}
@@ -90,28 +101,28 @@ func lessCmp[T CmpOrdered[T]](items []data.GetValuer[T], t HeapType, i, j int) b
 	return items[i].GetValue().Cmp(items[j].GetValue()) == cmp
 }
 
-func (q *PriorityQueue[T]) Len() int {
+func (q *GoHeapImpl[T]) Len() int {
 	q.mut.RLock()
 	defer q.mut.RUnlock()
 
 	return len(q.Items)
 }
 
-func (q *PriorityQueue[T]) Less(i, j int) bool {
+func (q *GoHeapImpl[T]) Less(i, j int) bool {
 	q.mut.RLock()
 	defer q.mut.RUnlock()
 
-	return q.lessFunc(q.Items, q.HeapType, i, j)
+	return q.lessFunc(q.Items, q.Ordering, i, j)
 }
 
-func (q *PriorityQueue[T]) Swap(i, j int) {
+func (q *GoHeapImpl[T]) Swap(i, j int) {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
 	q.Items[i], q.Items[j] = q.Items[j], q.Items[i]
 }
 
-func (q *PriorityQueue[T]) Push(x any) {
+func (q *GoHeapImpl[T]) Push(x any) {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
@@ -120,10 +131,11 @@ func (q *PriorityQueue[T]) Push(x any) {
 		typeOfT := fmt.Sprintf("%T", new(T))
 		panic(fmt.Sprintf("x is not of type %s", typeOfT))
 	}
+
 	q.Items = append(q.Items, item)
 }
 
-func (q *PriorityQueue[T]) Pop() any {
+func (q *GoHeapImpl[T]) Pop() any {
 	q.mut.Lock()
 	defer q.mut.Unlock()
 
@@ -136,7 +148,7 @@ func (q *PriorityQueue[T]) Pop() any {
 	return item
 }
 
-func (q *PriorityQueue[T]) IsEmpty() bool {
+func (q *GoHeapImpl[T]) IsEmpty() bool {
 	q.mut.RLock()
 	defer q.mut.RUnlock()
 

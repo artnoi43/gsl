@@ -76,7 +76,7 @@ func (g *GraphDijkstraImpl[T]) DijkstraShortestPathFrom(startNode NodeDijkstra[T
 	visited := make(map[NodeDijkstra[T]]bool)
 	parents := make(map[NodeDijkstra[T]]NodeDijkstra[T])
 
-	pq := list.NewPriorityQueue[T](list.MinHeap)
+	pq := list.NewHeapImpl[T](list.MinHeap)
 	heap.Push(pq, startNode)
 
 	for !pq.IsEmpty() {
