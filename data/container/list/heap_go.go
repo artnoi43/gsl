@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	MaxHeap data.SortOrder = data.Ascending
-	MinHeap data.SortOrder = data.Descending
+	MaxHeap data.SortOrder = data.Descending
+	MinHeap data.SortOrder = data.Ascending
 )
 
 // GoHeapImpl implements heap.Interface,

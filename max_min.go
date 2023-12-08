@@ -1,6 +1,8 @@
 package gsl
 
-import "golang.org/x/exp/constraints"
+import (
+	"golang.org/x/exp/constraints"
+)
 
 func Max[T constraints.Ordered](items ...T) T {
 	if len(items) == 0 {
