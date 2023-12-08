@@ -95,17 +95,22 @@ func (h *Heap[T]) heapifyDown(from int) {
 
 		childRight := childLeft + 1
 
+		// Child to compare
 		child := -1
-		if childRight >= length {
-			child = childLeft
-		} else {
-			// Select child to compare
-			if h.lessFunc(h.Items, h.Ordering, childLeft, childRight) {
-				child = childLeft
-			}
-		}
 
-		if child == -1 {
+		// Choose left child if:
+		// 1) right child is null (out of range)
+		// 2) left child has higher priority (lessFunc -> true)
+		//
+		// Otherwise use right child
+		switch {
+		case
+			childRight >= length,
+			h.lessFunc(h.Items, h.Ordering, childLeft, childRight):
+
+			child = childLeft
+
+		default:
 			child = childRight
 		}
 
