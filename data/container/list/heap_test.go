@@ -87,7 +87,7 @@ func TestHeapifyDown(t *testing.T) {
 		intsHeap[i] = pq.Items[i].GetValue()
 	}
 
-	t.Log("intsHeap", intsHeap)
+	// t.Log("intsHeap", intsHeap)
 
 	var c int
 	for l := len(pq.Items); l > 0; l = len(pq.Items) {
@@ -99,7 +99,7 @@ func TestHeapifyDown(t *testing.T) {
 			items[i] = pq.Items[i].GetValue()
 		}
 
-		t.Log("l", l, "max", max, "pop", popped, "items", items)
+		// t.Log("l", l, "max", max, "pop", popped, "items", items)
 
 		if max != popped {
 			t.Logf("pop #%d expecting max %d, got %d", c+1, max, popped)

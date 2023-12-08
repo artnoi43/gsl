@@ -9,11 +9,6 @@ import (
 	"github.com/soyart/gsl/data"
 )
 
-const (
-	MaxHeap data.SortOrder = data.Descending
-	MinHeap data.SortOrder = data.Ascending
-)
-
 // GoHeapImpl implements heap.Interface,
 // and can be use with container/heap.Push, container/heap.Pop, and container/heap.Init.
 // I'm working on a new implementation that wouldn't require the heap package.
@@ -65,40 +60,6 @@ func NewHeapImplCustom[T any](
 		lessFunc: lessFunc,
 		mut:      new(sync.RWMutex),
 	}
-}
-
-// Less implementation for constraints.Ordered
-func lessFuncOrdered[T constraints.Ordered](
-	items []data.GetValuer[T],
-	order data.SortOrder,
-	i int,
-	j int,
-) bool {
-	if order == MinHeap {
-		return items[i].GetValue() < items[j].GetValue()
-	}
-
-	return items[i].GetValue() > items[j].GetValue()
-}
-
-// Less implementation for CmpOrdered, e.g. *big.Int and *big.Float, and other lib types.
-func lessFuncCmp[T CmpOrdered[T]](
-	items []data.GetValuer[T],
-	order data.SortOrder,
-	i int,
-	j int,
-) bool {
-	var cmp int
-
-	switch order {
-	case MinHeap:
-		cmp = -1
-
-	case MaxHeap:
-		cmp = 1
-	}
-
-	return items[i].GetValue().Cmp(items[j].GetValue()) == cmp
 }
 
 func (q *GoHeapImpl[T]) Len() int {

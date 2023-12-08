@@ -1,12 +1,16 @@
 package list
 
 import (
-	"fmt"
 	"sync"
 
 	"golang.org/x/exp/constraints"
 
 	"github.com/soyart/gsl/data"
+)
+
+const (
+	MaxHeap data.SortOrder = data.Descending
+	MinHeap data.SortOrder = data.Ascending
 )
 
 type Heap[T any] struct {
@@ -40,13 +44,10 @@ func (h *Heap[T]) Pop() data.GetValuer[T] {
 	defer h.mut.Unlock()
 
 	root := h.Items[0]
-	h.swap(0, len(h.Items)-1)
-	h.Items = h.Items[1:]
+	lastIdx := len(h.Items) - 1
 
-	if len(h.Items) < 2 {
-		h.Items = []data.GetValuer[T]{}
-		return root
-	}
+	h.Items[0] = h.Items[lastIdx]
+	h.Items = h.Items[:lastIdx]
 
 	h.heapifyDown(0)
 
@@ -69,27 +70,31 @@ func (h *Heap[T]) heapifyUp(from int) {
 
 func (h *Heap[T]) heapifyDown(from int) {
 	curr := from
+	length := len(h.Items)
 
-	for leftChildNode(curr) < len(h.Items) {
+	for {
 		childLeft := leftChildNode(curr)
+		if childLeft >= length {
+			break
+		}
+
 		childRight := childLeft + 1
 
-		// Select child to compare
 		child := -1
-		if h.lessFunc(h.Items, h.Ordering, childLeft, childRight) {
+		if childRight >= length {
 			child = childLeft
+		} else {
+			// Select child to compare
+			if h.lessFunc(h.Items, h.Ordering, childLeft, childRight) {
+				child = childLeft
+			}
 		}
+
 		if child == -1 {
 			child = childRight
 		}
 
-		fmt.Println("from", from, "curr", curr, "l", childLeft, "r", childRight, "child", child)
-
-		if child >= len(h.Items) {
-			break
-		}
-
-		if !h.lessFunc(h.Items, h.Ordering, curr, child) {
+		if h.lessFunc(h.Items, h.Ordering, curr, child) {
 			break
 		}
 
@@ -100,7 +105,7 @@ func (h *Heap[T]) heapifyDown(from int) {
 }
 
 func (h *Heap[T]) swap(i, j int) {
-	h.Items[j], h.Items[i] = h.Items[i], h.Items[j]
+	h.Items[i], h.Items[j] = h.Items[j], h.Items[i]
 }
 
 func leftChildNode(parent int) int {
@@ -114,4 +119,38 @@ func parentNode(child int) int {
 	}
 
 	return (child - 1) / 2
+}
+
+// Less implementation for constraints.Ordered
+func lessFuncOrdered[T constraints.Ordered](
+	items []data.GetValuer[T],
+	order data.SortOrder,
+	i int,
+	j int,
+) bool {
+	if order == MinHeap {
+		return items[i].GetValue() < items[j].GetValue()
+	}
+
+	return items[i].GetValue() > items[j].GetValue()
+}
+
+// Less implementation for CmpOrdered, e.g. *big.Int and *big.Float, and other lib types.
+func lessFuncCmp[T CmpOrdered[T]](
+	items []data.GetValuer[T],
+	order data.SortOrder,
+	i int,
+	j int,
+) bool {
+	var cmp int
+
+	switch order {
+	case MinHeap:
+		cmp = -1
+
+	case MaxHeap:
+		cmp = 1
+	}
+
+	return items[i].GetValue().Cmp(items[j].GetValue()) == cmp
 }
