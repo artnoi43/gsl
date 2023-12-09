@@ -1,11 +1,18 @@
 package gsl
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
 
 func TestGroupConsecutive(t *testing.T) {
+	targetEnv := "RUNNER_CI"
+	_, found := os.LookupEnv(targetEnv)
+	if !found {
+		t.Skipf("Skip due to missing env %s", targetEnv)
+	}
+
 	type testCase[T GoNumber] struct {
 		in  []T
 		out [][2]T

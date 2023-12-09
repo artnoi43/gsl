@@ -7,9 +7,15 @@ jobs:
   build:
     strategy:
       matrix:
-        os: ["ubuntu-latest"] # "self-hosted", "macos-latest", "windows-latest"
-        go-version: ["1.18.x", ""] # empty string means use go-version-file(go.mod)
-    name: Lint, Test and Build (${{ matrix.go-version }} ${{ matrix.os }})
+        go-version:
+          - "1.18.x"
+          - "" # empty string = read version from go.mod
+
+        os:
+          - "ubuntu-latest"
+          - "macos"
+
+    name: Test and lint (${{ matrix.go-version }} ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     env:
       pr_info: |
@@ -17,6 +23,7 @@ jobs:
         🔨 Merging commit ${{ github.sha }} on branch [${{ github.head_ref }}](${{ github.event.pull_request.head.repo.html_url }}/tree/${{ github.head_ref }})
         📝 Action Status [#${{ github.run_number }}](${{ github.event.pull_request.html_url }}/checks)
         🤔 Requested by [${{ github.actor }}](${{ github.event.pull_request.user.html_url }})
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -24,11 +31,6 @@ jobs:
 
       - name: Set up Go
         uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go-version }}
-          go-version-file: "go.mod"
-          cache: true
-      - run: echo "GOVERSION=$(go version)" >> $GITHUB_ENV
 
       - name: Update Pull Request Comment
         uses: marocchino/sticky-pull-request-comment@v2
@@ -42,6 +44,11 @@ jobs:
       - name: Install dependencies
         run: go get ./...
 
+      - name: Test
+        run: go test ./...
+        env:
+          RUNNER_CI: true
+
       # Q: Why Reviewdog ?
       # A: Because golangci-lint action has some issues, not working on self-hosted runners and can't report errors detail on review comments.
       # See: https://github.com/reviewdog/reviewdog
@@ -53,13 +60,7 @@ jobs:
           golangci_lint_flags: "--config=./.golangci.yaml --verbose --new-from-rev=${{ github.event.pull_request.base.sha }}" # show only issues from new commits
           fail_on_error: true
 
-      - name: Test
-        run: go test ./...
-
-      - name: Build
-        run: go build ./...
-
-      - name: Update Pull Request Comment for Success
+      - name: OK Pull Request Comment
         if: ${{ success() }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
@@ -70,7 +71,7 @@ jobs:
             ${{ env.pr_info }}
             _Merge this pull request if you think it's ready._
 
-      - name: Update Pull Request Comment for Failure
+      - name: Failure Pull Request Comment
         if: ${{ failure() }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
