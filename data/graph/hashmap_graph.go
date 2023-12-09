@@ -18,4 +18,4 @@ type HashMapGraphV1[T nodeValue] Graph[
 ]
 
 // Read-only Node
-type Node[T nodeValue] data.GetValuer[T]
+type Node[T nodeValue] data.Getter[T]

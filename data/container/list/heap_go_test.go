@@ -86,7 +86,10 @@ func testArbitaryUpdate(t *testing.T) {
 	// Arbitary pushes and inits
 	pq := NewHeapImpl[float64](MaxHeap)
 	pqCustom := NewHeapImplCustom(MaxHeap, lessFuncOrdered[float64])
-	queues := []*GoHeapImpl[float64]{pq, pqCustom}
+	queues := []*GoHeapImpl[float64]{
+		pq,
+		pqCustom,
+	}
 
 	for _, q := range queues {
 		for _, item := range foosFloat {
@@ -139,8 +142,7 @@ func TestPQCmp(t *testing.T) {
 	lol(a) // Compiles and no panic
 }
 
-func lol(item data.GetValuer[*big.Int]) {
-}
+func lol(item data.Getter[*big.Int]) {}
 
 func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
 	maxPq := NewHealImplCmp[*big.Int](MaxHeap)

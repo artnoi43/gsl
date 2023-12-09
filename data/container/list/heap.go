@@ -1,8 +1,6 @@
 package list
 
 import (
-	"sync"
-
 	"golang.org/x/exp/constraints"
 
 	"github.com/soyart/gsl/data"
@@ -13,12 +11,14 @@ const (
 	MinHeap data.SortOrder = data.Ascending
 )
 
-type Heap[T any] struct {
-	Items    []data.GetValuer[T]
-	Ordering data.SortOrder
+type (
+	lessFunc[T any] func(items []T, i, j int) bool
+)
 
-	lessFunc func(items []data.GetValuer[T], t data.SortOrder, i, j int) bool
-	mut      *sync.RWMutex
+type Heap[T any] struct {
+	Items    []data.Getter[T]
+	CmpFunc  lessFunc[data.Getter[T]]
+	Ordering data.SortOrder
 }
 
 func NewHeap[T constraints.Ordered](
@@ -26,8 +26,7 @@ func NewHeap[T constraints.Ordered](
 ) *Heap[T] {
 	return &Heap[T]{
 		Ordering: order,
-		lessFunc: lessFuncOrdered[T],
-		mut:      new(sync.RWMutex),
+		CmpFunc:  factoryLessFuncOrdered[T](order),
 	}
 }
 
@@ -36,23 +35,19 @@ func NewHeapCmp[T CmpOrdered[T]](
 ) *Heap[T] {
 	return &Heap[T]{
 		Ordering: order,
-		lessFunc: lessFuncCmp[T],
-		mut:      new(sync.RWMutex),
+		CmpFunc:  factoryLessFuncCmp[T](order),
 	}
 }
 
 func (h *Heap[T]) Push(item T) {
-	h.mut.Lock()
-	defer h.mut.Unlock()
-
 	h.Items = append(h.Items, data.NewGetValuer[T](item))
 	h.heapifyUp(len(h.Items) - 1)
 }
 
-func (h *Heap[T]) Pop() data.GetValuer[T] {
-	h.mut.Lock()
-	defer h.mut.Unlock()
+func (h *Heap[T]) PushGetter(getter data.Getter[T]) {
+}
 
+func (h *Heap[T]) Pop() data.Getter[T] {
 	root := h.Items[0]
 	lastIdx := len(h.Items) - 1
 
@@ -65,23 +60,14 @@ func (h *Heap[T]) Pop() data.GetValuer[T] {
 }
 
 func (h *Heap[T]) Len() int {
-	h.mut.Lock()
-	defer h.mut.Unlock()
-
 	return len(h.Items)
 }
 
 func (h *Heap[T]) IsEmpty() bool {
-	h.mut.RLock()
-	defer h.mut.RUnlock()
-
 	return len(h.Items) == 0
 }
 
-func (h *Heap[T]) Peek() data.GetValuer[T] {
-	h.mut.RLock()
-	defer h.mut.RUnlock()
-
+func (h *Heap[T]) Peek() data.Getter[T] {
 	return h.Items[0]
 }
 
@@ -98,7 +84,7 @@ func (h *Heap[T]) heapifyUp(from int) {
 	for curr != 0 {
 		parent := parentNode(curr)
 
-		if !h.lessFunc(h.Items, h.Ordering, curr, parent) {
+		if !h.CmpFunc(h.Items, curr, parent) {
 			break
 		}
 
@@ -130,7 +116,7 @@ func (h *Heap[T]) heapifyDown(from int) {
 		switch {
 		case
 			childRight >= length,
-			h.lessFunc(h.Items, h.Ordering, childLeft, childRight):
+			h.CmpFunc(h.Items, childLeft, childRight):
 
 			child = childLeft
 
@@ -138,7 +124,7 @@ func (h *Heap[T]) heapifyDown(from int) {
 			child = childRight
 		}
 
-		if h.lessFunc(h.Items, h.Ordering, curr, child) {
+		if h.CmpFunc(h.Items, curr, child) {
 			break
 		}
 
@@ -166,35 +152,30 @@ func parentNode(child int) int {
 }
 
 // Less implementation for constraints.Ordered
-func lessFuncOrdered[T constraints.Ordered](
-	items []data.GetValuer[T],
+func factoryLessFuncOrdered[T constraints.Ordered](
 	order data.SortOrder,
-	i int,
-	j int,
-) bool {
+) lessFunc[data.Getter[T]] {
 	if order == MinHeap {
-		return items[i].GetValue() < items[j].GetValue()
+		return func(items []data.Getter[T], i, j int) bool {
+			return items[i].GetValue() < items[j].GetValue()
+		}
 	}
 
-	return items[i].GetValue() > items[j].GetValue()
+	return func(items []data.Getter[T], i, j int) bool {
+		return items[i].GetValue() > items[j].GetValue()
+	}
 }
 
-// Less implementation for CmpOrdered, e.g. *big.Int and *big.Float, and other lib types.
-func lessFuncCmp[T CmpOrdered[T]](
-	items []data.GetValuer[T],
+func factoryLessFuncCmp[T CmpOrdered[T]](
 	order data.SortOrder,
-	i int,
-	j int,
-) bool {
-	var cmp int
-
-	switch order {
-	case MinHeap:
-		cmp = -1
-
-	case MaxHeap:
-		cmp = 1
+) lessFunc[data.Getter[T]] {
+	if order == MinHeap {
+		return func(items []data.Getter[T], i, j int) bool {
+			return items[i].GetValue().Cmp(items[j].GetValue()) < 0
+		}
 	}
 
-	return items[i].GetValue().Cmp(items[j].GetValue()) == cmp
+	return func(items []data.Getter[T], i, j int) bool {
+		return items[i].GetValue().Cmp(items[j].GetValue()) > 0
+	}
 }
