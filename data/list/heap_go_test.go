@@ -11,6 +11,11 @@ import (
 	"github.com/soyart/gsl/data"
 )
 
+const (
+	minHeap = data.Ascending
+	maxHeap = data.Descending
+)
+
 type foo[T constraints.Ordered] struct {
 	name  string
 	value T
@@ -49,9 +54,9 @@ func TestPq(t *testing.T) {
 	testArbitaryUpdate(t)
 }
 
-func testPop[T constraints.Ordered](t *testing.T, pqType data.SortOrder, items []foo[T]) []foo[T] {
-	pq := NewHeapImpl[T](pqType)
-	pqCustom := NewHeapImplCustom(pqType, lessFuncOrdered[T])
+func testPop[T constraints.Ordered](t *testing.T, order data.SortOrder, items []foo[T]) []foo[T] {
+	pq := NewHeapImpl[T](order)
+	pqCustom := NewHeapImplCustom(order, data.FactoryLessFuncOrdered[T](order))
 	queues := []*GoHeapImpl[T]{pq, pqCustom}
 
 	var ret []foo[T]
@@ -86,7 +91,7 @@ func testArbitaryUpdate(t *testing.T) {
 
 	// Arbitary pushes and inits
 	pq := NewHeapImpl[float64](maxHeap)
-	pqCustom := NewHeapImplCustom(maxHeap, lessFuncOrdered[float64])
+	pqCustom := NewHeapImplCustom(maxHeap, data.FactoryLessFuncOrdered[float64](maxHeap))
 	queues := []*GoHeapImpl[float64]{
 		pq,
 		pqCustom,
@@ -106,7 +111,7 @@ func testArbitaryUpdate(t *testing.T) {
 			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", hundred, popped)
 		}
 
-		q.Ordering = minHeap
+		q.ChangeOrdering(data.FactoryLessFuncOrdered[float64](minHeap))
 		heap.Init(q)
 		p = heap.Pop(q)
 		popped, ok = p.(foo[float64])
@@ -147,7 +152,7 @@ func lol(item data.Getter[*big.Int]) {}
 
 func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
 	maxPq := NewHealImplCmp[*big.Int](maxHeap)
-	maxPqCustom := NewHeapImplCustom(maxHeap, lessFuncCmp[*big.Int])
+	maxPqCustom := NewHeapImplCustom(maxHeap, data.FactoryLessFuncCmp[*big.Int](maxHeap))
 	queues := []*GoHeapImpl[*big.Int]{maxPq, maxPqCustom}
 
 	for _, q := range queues {
@@ -165,7 +170,7 @@ func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
 
 func testPqCmpMin(t *testing.T, messy []*bar, min *bar) {
 	minPq := NewHealImplCmp[*big.Int](minHeap)
-	minPqCustom := NewHeapImplCustom(minHeap, lessFuncCmp[*big.Int])
+	minPqCustom := NewHeapImplCustom(minHeap, data.FactoryLessFuncCmp[*big.Int](minHeap))
 	queues := []*GoHeapImpl[*big.Int]{minPq, minPqCustom}
 
 	for _, q := range queues {

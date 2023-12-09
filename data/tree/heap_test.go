@@ -25,7 +25,7 @@ func TestHeapifyUp(t *testing.T) {
 	for curr := range pq.Items {
 		// t.Log("index", curr, "value", pq.Items[curr].GetValue())
 
-		parent := parentNode(curr)
+		parent := ParentIdx(curr)
 		if parent >= 0 {
 			if pq.CmpFunc(pq.Items, curr, parent) {
 				valueCurr := pq.Items[curr].GetValue()
@@ -40,7 +40,7 @@ func TestHeapifyUp(t *testing.T) {
 			}
 		}
 
-		childLeft := leftChildNode(curr)
+		childLeft := LeftChildIdx(curr)
 		if childLeft >= l {
 			continue
 		}

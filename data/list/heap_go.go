@@ -1,6 +1,7 @@
 package list
 
 import (
+	"container/heap"
 	"fmt"
 	"sync"
 
@@ -9,22 +10,16 @@ import (
 	"github.com/soyart/gsl/data"
 )
 
-const (
-	minHeap = data.Ascending
-	maxHeap = data.Descending
-)
-
 // GoHeapImpl implements heap.Interface,
 // and can be use with container/heap.Push, container/heap.Pop, and container/heap.Init.
 //
 // Ordering can be changed arbitrarily, but users must explicitly calls container/heap.Init.
 type GoHeapImpl[T any] struct {
-	Items    []data.Getter[T]
-	Ordering data.SortOrder
+	Items   []data.Getter[T]
+	CmpFunc data.LessFunc[data.Getter[T]]
 
-	// CmpFunc depends on T, and the New* functions below
-	CmpFunc func(items []data.Getter[T], order data.SortOrder, i, j int) bool
-	mut     *sync.RWMutex
+	ordering data.SortOrder
+	mut      *sync.RWMutex
 }
 
 // NewHeapImpl returns *PriorityQueue[constraints.Ordered], and this instance
@@ -32,8 +27,8 @@ type GoHeapImpl[T any] struct {
 // using greater than (>) and lesser than (<) family of signs.
 func NewHeapImpl[T constraints.Ordered](order data.SortOrder) *GoHeapImpl[T] {
 	return &GoHeapImpl[T]{
-		Ordering: order,
-		CmpFunc:  lessFuncOrdered[T],
+		CmpFunc:  data.FactoryLessFuncOrdered[T](order),
+		ordering: order,
 		mut:      new(sync.RWMutex),
 	}
 }
@@ -43,8 +38,8 @@ func NewHeapImpl[T constraints.Ordered](order data.SortOrder) *GoHeapImpl[T] {
 // using Cmp(T) int function.
 func NewHealImplCmp[T data.CmpOrdered[T]](order data.SortOrder) *GoHeapImpl[T] {
 	return &GoHeapImpl[T]{
-		Ordering: order,
-		CmpFunc:  lessFuncCmp[T],
+		CmpFunc:  data.FactoryLessFuncCmp[T](order),
+		ordering: order,
 		mut:      new(sync.RWMutex),
 	}
 }
@@ -53,13 +48,18 @@ func NewHealImplCmp[T data.CmpOrdered[T]](order data.SortOrder) *GoHeapImpl[T] {
 // then you can provide your own lessFunc to determine ordering.
 func NewHeapImplCustom[T any](
 	order data.SortOrder,
-	lessFunc func(items []data.Getter[T], order data.SortOrder, i, j int) bool,
+	lessFunc data.LessFunc[data.Getter[T]],
 ) *GoHeapImpl[T] {
 	return &GoHeapImpl[T]{
-		Ordering: order,
 		CmpFunc:  lessFunc,
+		ordering: order,
 		mut:      new(sync.RWMutex),
 	}
+}
+
+func (q *GoHeapImpl[T]) ChangeOrdering(lessFunc data.LessFunc[data.Getter[T]]) {
+	q.CmpFunc = lessFunc
+	heap.Init(q)
 }
 
 func (q *GoHeapImpl[T]) Len() int {
@@ -73,7 +73,7 @@ func (q *GoHeapImpl[T]) Less(i, j int) bool {
 	q.mut.RLock()
 	defer q.mut.RUnlock()
 
-	return q.CmpFunc(q.Items, q.Ordering, i, j)
+	return q.CmpFunc(q.Items, i, j)
 }
 
 func (q *GoHeapImpl[T]) Swap(i, j int) {
@@ -114,38 +114,4 @@ func (q *GoHeapImpl[T]) IsEmpty() bool {
 	defer q.mut.RUnlock()
 
 	return q.Len() == 0
-}
-
-// Less implementation for constraints.Ordered
-func lessFuncOrdered[T constraints.Ordered](
-	items []data.Getter[T],
-	order data.SortOrder,
-	i int,
-	j int,
-) bool {
-	if order == minHeap {
-		return items[i].GetValue() < items[j].GetValue()
-	}
-
-	return items[i].GetValue() > items[j].GetValue()
-}
-
-// Less implementation for CmpOrdered, e.g. *big.Int and *big.Float, and other lib types.
-func lessFuncCmp[T data.CmpOrdered[T]](
-	items []data.Getter[T],
-	order data.SortOrder,
-	i int,
-	j int,
-) bool {
-	var cmp int
-
-	switch order {
-	case minHeap:
-		cmp = -1
-
-	case maxHeap:
-		cmp = 1
-	}
-
-	return items[i].GetValue().Cmp(items[j].GetValue()) == cmp
 }

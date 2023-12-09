@@ -77,7 +77,7 @@ func (h *Heap[T]) PeekValue() T {
 func (h *Heap[T]) heapifyUp(from int) {
 	curr := from
 	for curr != 0 {
-		parent := parentNode(curr)
+		parent := ParentIdx(curr)
 
 		if !h.CmpFunc(h.Items, curr, parent) {
 			break
@@ -93,12 +93,12 @@ func (h *Heap[T]) heapifyDown(from int) {
 	length := len(h.Items)
 
 	for {
-		childLeft := leftChildNode(curr)
+		childLeft := LeftChildIdx(curr)
 		if childLeft >= length {
 			break
 		}
 
-		childRight := childLeft + 1
+		childRight := RightChildIdx(curr)
 
 		// Child to compare
 		//nolint:ineffassign
@@ -132,17 +132,4 @@ func (h *Heap[T]) heapifyDown(from int) {
 
 func (h *Heap[T]) swap(i, j int) {
 	h.Items[i], h.Items[j] = h.Items[j], h.Items[i]
-}
-
-func leftChildNode(parent int) int {
-	return (2 * parent) + 1
-}
-
-func parentNode(child int) int {
-	rightChild := child%2 == 0
-	if rightChild {
-		return (child - 2) / 2
-	}
-
-	return (child - 1) / 2
 }
