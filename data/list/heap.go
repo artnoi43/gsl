@@ -40,23 +40,25 @@ func NewHeapCmp[T CmpOrdered[T]](
 }
 
 func (h *Heap[T]) Push(item T) {
-	h.Items = append(h.Items, data.NewGetValuer[T](item))
-	h.heapifyUp(len(h.Items) - 1)
+	getter := data.NewGetter[T](item)
+	h.PushGetter(getter)
 }
 
 func (h *Heap[T]) PushGetter(getter data.Getter[T]) {
+	h.Items = append(h.Items, getter)
+	h.heapifyUp(h.Len() - 1)
 }
 
-func (h *Heap[T]) Pop() data.Getter[T] {
-	root := h.Items[0]
-	lastIdx := len(h.Items) - 1
+func (h *Heap[T]) Pop() *T {
+	rootValue := h.Items[0].GetValue()
+	lastIdx := h.Len() - 1
 
 	h.Items[0] = h.Items[lastIdx]
 	h.Items = h.Items[:lastIdx]
 
 	h.heapifyDown(0)
 
-	return root
+	return &rootValue
 }
 
 func (h *Heap[T]) Len() int {
@@ -72,7 +74,9 @@ func (h *Heap[T]) Peek() data.Getter[T] {
 }
 
 func (h *Heap[T]) PopValue() T {
-	return h.Pop().GetValue()
+	copied := *h.Pop()
+
+	return copied
 }
 
 func (h *Heap[T]) PeekValue() T {
@@ -106,6 +110,7 @@ func (h *Heap[T]) heapifyDown(from int) {
 		childRight := childLeft + 1
 
 		// Child to compare
+		//nolint:ineffassign
 		child := -1
 
 		// Choose left child if:

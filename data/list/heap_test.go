@@ -94,7 +94,7 @@ func TestHeapifyDown(t *testing.T) {
 	var c int
 	for !pq.IsEmpty() {
 		max := data.MaxValuer(pq.Items)
-		popped := pq.Pop().GetValue()
+		popped := pq.PopValue()
 
 		items := make([]int, pq.Len())
 		for i := range pq.Items {
@@ -137,7 +137,7 @@ func TestHeapCmp(t *testing.T) {
 
 	c := 0
 	for !h.IsEmpty() {
-		popped := h.Pop().GetValue().Int64()
+		popped := h.PopValue().Int64()
 		expected := ints[c]
 
 		if popped != expected {

@@ -12,7 +12,7 @@ type Getter[T any] interface {
 	GetValue() T
 }
 
-type Valuer[T any] interface {
+type Wrapper[T any] interface {
 	Setter[T]
 	Getter[T]
 }
@@ -22,23 +22,27 @@ type Set[T comparable] interface {
 }
 
 type wrapper[T any] struct {
-	value T
+	inner T
 }
 
 func (w *wrapper[T]) SetValue(value T) {
-	w.value = value
+	w.inner = value
 }
 
 func (w *wrapper[T]) GetValue() T {
-	return w.value
+	return w.inner
 }
 
-func NewValuer[T any](t T) Setter[T] {
-	return &wrapper[T]{value: t}
+func NewSetter[T any](t T) Setter[T] {
+	return &wrapper[T]{inner: t}
 }
 
-func NewGetValuer[T any](t T) Getter[T] {
-	return &wrapper[T]{value: t}
+func NewGetter[T any](t T) Getter[T] {
+	return &wrapper[T]{inner: t}
+}
+
+func NewWrapper[T any](t T) Wrapper[T] {
+	return &wrapper[T]{inner: t}
 }
 
 func ToValues[T any](getters []Getter[T]) []T {

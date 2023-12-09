@@ -9,8 +9,8 @@ import "sync"
 // will be indifferentiable with the same type `SafeListWrapper[uint8]`.
 // SafeListWrapper[T, BasicList[T]] also implements BasicList[T]
 type SafeListWrapper[T any, L BasicList[T]] struct {
-	mut       *sync.RWMutex
-	basicList L
+	inner L
+	mut   *sync.RWMutex
 }
 
 // WrapSafeList[T] wraps a BasicList[T] into SafeListWrapper[T],
@@ -19,8 +19,8 @@ type SafeListWrapper[T any, L BasicList[T]] struct {
 // WrapSafeList[uint8, *Stack[uint8]](foo)
 func WrapSafeList[T any, L BasicList[T]](basicList L) *SafeListWrapper[T, L] {
 	return &SafeListWrapper[T, L]{
-		basicList: basicList,
-		mut:       &sync.RWMutex{},
+		inner: basicList,
+		mut:   &sync.RWMutex{},
 	}
 }
 
@@ -28,35 +28,35 @@ func (w *SafeListWrapper[T, L]) Push(x T) {
 	w.mut.Lock()
 	defer w.mut.Unlock()
 
-	w.basicList.Push(x)
+	w.inner.Push(x)
 }
 
 func (w *SafeListWrapper[T, L]) PushSlice(x []T) {
 	w.mut.Lock()
 	defer w.mut.Unlock()
 
-	w.basicList.PushSlice(x)
+	w.inner.PushSlice(x)
 }
 
 func (w *SafeListWrapper[T, L]) Pop() *T {
 	w.mut.Lock()
 	defer w.mut.Unlock()
 
-	return w.basicList.Pop()
+	return w.inner.Pop()
 }
 
 func (w *SafeListWrapper[T, L]) Len() int {
 	w.mut.RLock()
 	defer w.mut.RUnlock()
 
-	return w.basicList.Len()
+	return w.inner.Len()
 }
 
 func (w *SafeListWrapper[T, L]) IsEmpty() bool {
 	w.mut.RLock()
 	defer w.mut.RUnlock()
 
-	return w.basicList.IsEmpty()
+	return w.inner.IsEmpty()
 }
 
 func (w *SafeListWrapper[T, L]) IsSafe() bool {

@@ -12,7 +12,7 @@ import (
 // GoHeapImpl implements heap.Interface,
 // and can be use with container/heap.Push, container/heap.Pop, and container/heap.Init.
 //
-// Ordering can be changed arbitarily, but users must explicitly calls container/heap.Init.
+// Ordering can be changed arbitrarily, but users must explicitly calls container/heap.Init.
 type GoHeapImpl[T any] struct {
 	Items    []data.Getter[T]
 	Ordering data.SortOrder
