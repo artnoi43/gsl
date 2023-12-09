@@ -29,7 +29,7 @@ func (b *BinaryTreeSlice[T]) IsRoot(node int) bool {
 	return node == 0
 }
 
-func (b *BinaryTreeSlice[T]) IsLeaf(node int) bool {
+func (b *BinaryTreeSlice[T]) IsNull(node int) bool {
 	return node >= len(b.backing)
 }
 
