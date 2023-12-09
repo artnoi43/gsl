@@ -1,4 +1,4 @@
-package list
+package tree
 
 import (
 	"golang.org/x/exp/constraints"
@@ -6,18 +6,9 @@ import (
 	"github.com/soyart/gsl/data"
 )
 
-const (
-	MaxHeap data.SortOrder = data.Descending
-	MinHeap data.SortOrder = data.Ascending
-)
-
-type (
-	lessFunc[T any] func(items []T, i, j int) bool
-)
-
 type Heap[T any] struct {
 	Items    []data.Getter[T]
-	CmpFunc  lessFunc[data.Getter[T]]
+	CmpFunc  data.LessFunc[data.Getter[T]]
 	Ordering data.SortOrder
 }
 
@@ -26,16 +17,16 @@ func NewHeap[T constraints.Ordered](
 ) *Heap[T] {
 	return &Heap[T]{
 		Ordering: order,
-		CmpFunc:  factoryLessFuncOrdered[T](order),
+		CmpFunc:  data.FactoryLessFuncOrdered[T](order),
 	}
 }
 
-func NewHeapCmp[T CmpOrdered[T]](
+func NewHeapCmp[T data.CmpOrdered[T]](
 	order data.SortOrder,
 ) *Heap[T] {
 	return &Heap[T]{
 		Ordering: order,
-		CmpFunc:  factoryLessFuncCmp[T](order),
+		CmpFunc:  data.FactoryLessFuncCmp[T](order),
 	}
 }
 
@@ -154,33 +145,4 @@ func parentNode(child int) int {
 	}
 
 	return (child - 1) / 2
-}
-
-// Less implementation for constraints.Ordered
-func factoryLessFuncOrdered[T constraints.Ordered](
-	order data.SortOrder,
-) lessFunc[data.Getter[T]] {
-	if order == MinHeap {
-		return func(items []data.Getter[T], i, j int) bool {
-			return items[i].GetValue() < items[j].GetValue()
-		}
-	}
-
-	return func(items []data.Getter[T], i, j int) bool {
-		return items[i].GetValue() > items[j].GetValue()
-	}
-}
-
-func factoryLessFuncCmp[T CmpOrdered[T]](
-	order data.SortOrder,
-) lessFunc[data.Getter[T]] {
-	if order == MinHeap {
-		return func(items []data.Getter[T], i, j int) bool {
-			return items[i].GetValue().Cmp(items[j].GetValue()) < 0
-		}
-	}
-
-	return func(items []data.Getter[T], i, j int) bool {
-		return items[i].GetValue().Cmp(items[j].GetValue()) > 0
-	}
 }

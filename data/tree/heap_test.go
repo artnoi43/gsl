@@ -1,4 +1,4 @@
-package list
+package tree
 
 import (
 	"math/big"
@@ -11,7 +11,7 @@ import (
 
 func TestHeapifyUp(t *testing.T) {
 	ints := []int{6, 1, 3, 3, 2, 4, 5}
-	pq := NewHeap[int](MaxHeap)
+	pq := NewHeap[int](data.Descending)
 
 	for i := range ints {
 		pq.Push(ints[i])
@@ -78,7 +78,7 @@ func TestHeapifyUp(t *testing.T) {
 
 func TestHeapifyDown(t *testing.T) {
 	ints := []int{6, 1, 3, 3, 2, 4, 5}
-	pq := NewHeap[int](MaxHeap)
+	pq := NewHeap[int](data.Descending)
 
 	for i := range ints {
 		pq.Push(ints[i])
@@ -121,7 +121,7 @@ func TestHeapCmp(t *testing.T) {
 		intsBig[i] = big.NewInt(ints[i])
 	}
 
-	h := NewHeapCmp[*big.Int](MinHeap)
+	h := NewHeapCmp[*big.Int](data.Ascending)
 	for i := range intsBig {
 		h.Push(intsBig[i])
 	}

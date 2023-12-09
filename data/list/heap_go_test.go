@@ -32,14 +32,14 @@ func TestPq(t *testing.T) {
 		lowest,
 	}
 
-	minHeapResults := testPop(t, MinHeap, items)
+	minHeapResults := testPop(t, minHeap, items)
 	for _, minHeapResult := range minHeapResults {
 		if minHeapResult != lowest {
 			t.Fatalf("unexpected MinHeap results - expected %+v, got %+v\n", lowest, minHeapResult)
 		}
 	}
 
-	maxHeapResults := testPop(t, MaxHeap, items)
+	maxHeapResults := testPop(t, maxHeap, items)
 	for _, maxHeapResult := range maxHeapResults {
 		if maxHeapResult != highest {
 			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", highest, maxHeapResult)
@@ -67,6 +67,7 @@ func testPop[T constraints.Ordered](t *testing.T, pqType data.SortOrder, items [
 		}
 		ret = append(ret, popped)
 	}
+
 	return ret
 }
 
@@ -84,8 +85,8 @@ func testArbitaryUpdate(t *testing.T) {
 	}
 
 	// Arbitary pushes and inits
-	pq := NewHeapImpl[float64](MaxHeap)
-	pqCustom := NewHeapImplCustom(MaxHeap, lessFuncOrdered[float64])
+	pq := NewHeapImpl[float64](maxHeap)
+	pqCustom := NewHeapImplCustom(maxHeap, lessFuncOrdered[float64])
 	queues := []*GoHeapImpl[float64]{
 		pq,
 		pqCustom,
@@ -105,7 +106,7 @@ func testArbitaryUpdate(t *testing.T) {
 			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", hundred, popped)
 		}
 
-		q.Ordering = MinHeap
+		q.Ordering = minHeap
 		heap.Init(q)
 		p = heap.Pop(q)
 		popped, ok = p.(foo[float64])
@@ -145,8 +146,8 @@ func TestPQCmp(t *testing.T) {
 func lol(item data.Getter[*big.Int]) {}
 
 func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
-	maxPq := NewHealImplCmp[*big.Int](MaxHeap)
-	maxPqCustom := NewHeapImplCustom(MaxHeap, lessFuncCmp[*big.Int])
+	maxPq := NewHealImplCmp[*big.Int](maxHeap)
+	maxPqCustom := NewHeapImplCustom(maxHeap, lessFuncCmp[*big.Int])
 	queues := []*GoHeapImpl[*big.Int]{maxPq, maxPqCustom}
 
 	for _, q := range queues {
@@ -163,8 +164,8 @@ func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
 }
 
 func testPqCmpMin(t *testing.T, messy []*bar, min *bar) {
-	minPq := NewHealImplCmp[*big.Int](MinHeap)
-	minPqCustom := NewHeapImplCustom(MinHeap, lessFuncCmp[*big.Int])
+	minPq := NewHealImplCmp[*big.Int](minHeap)
+	minPqCustom := NewHeapImplCustom(minHeap, lessFuncCmp[*big.Int])
 	queues := []*GoHeapImpl[*big.Int]{minPq, minPqCustom}
 
 	for _, q := range queues {
