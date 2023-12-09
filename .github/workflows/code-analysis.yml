@@ -32,6 +32,14 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
 
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+          go-version-file: "go.mod"
+          cache: true
+      - run: echo "GOVERSION=$(go version)" >> $GITHUB_ENV
+
       - name: Update Pull Request Comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
