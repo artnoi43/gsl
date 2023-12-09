@@ -1,8 +1,11 @@
 package list
 
 import (
+	"math/big"
+	"sort"
 	"testing"
 
+	"github.com/soyart/gsl"
 	"github.com/soyart/gsl/data"
 )
 
@@ -89,11 +92,11 @@ func TestHeapifyDown(t *testing.T) {
 	// t.Log("intsHeap", intsHeap)
 
 	var c int
-	for l := len(pq.Items); l > 0; l = len(pq.Items) {
+	for !pq.IsEmpty() {
 		max := data.MaxValuer(pq.Items)
 		popped := pq.Pop().GetValue()
 
-		items := make([]int, l)
+		items := make([]int, pq.Len())
 		for i := range pq.Items {
 			items[i] = pq.Items[i].GetValue()
 		}
@@ -103,6 +106,43 @@ func TestHeapifyDown(t *testing.T) {
 		if max != popped {
 			t.Logf("pop #%d expecting max %d, got %d", c+1, max, popped)
 			t.Fatal("Unexpected popped value")
+		}
+
+		c++
+	}
+}
+
+func TestHeapCmp(t *testing.T) {
+	ints := []int64{2, 1, 4, 0, 6, 70, 1, 6}
+	min := gsl.Min[int64](ints...)
+
+	intsBig := make([]*big.Int, len(ints))
+	for i := range ints {
+		intsBig[i] = big.NewInt(ints[i])
+	}
+
+	h := NewHeapCmp[*big.Int](MinHeap)
+	for i := range intsBig {
+		h.Push(intsBig[i])
+	}
+
+	zero := h.PeekValue()
+	if v := zero.Int64(); v != min {
+		t.Fatalf("unexpected root node, expecting %d, got %d", min, v)
+	}
+
+	sort.Slice(ints, func(i, j int) bool {
+		return ints[i] < ints[j]
+	})
+
+	c := 0
+	for !h.IsEmpty() {
+		popped := h.Pop().GetValue().Int64()
+		expected := ints[c]
+
+		if popped != expected {
+			t.Logf("Pop #%d:unexpected value: expecting %d, got %d", c, expected, popped)
+			t.Fatalf("unexpected value")
 		}
 
 		c++

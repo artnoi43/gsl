@@ -31,6 +31,16 @@ func NewHeap[T constraints.Ordered](
 	}
 }
 
+func NewHeapCmp[T CmpOrdered[T]](
+	order data.SortOrder,
+) *Heap[T] {
+	return &Heap[T]{
+		Ordering: order,
+		lessFunc: lessFuncCmp[T],
+		mut:      new(sync.RWMutex),
+	}
+}
+
 func (h *Heap[T]) Push(item T) {
 	h.mut.Lock()
 	defer h.mut.Unlock()

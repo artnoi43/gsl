@@ -42,18 +42,34 @@ func NewGetValuer[T any](t T) GetValuer[T] {
 }
 
 func MaxValuer[T constraints.Ordered](values []GetValuer[T]) T {
-	valuesT := make([]T, len(values))
-	for i := range values {
-		valuesT[i] = values[i].GetValue()
+	var t T
+	if len(values) == 0 {
+		return t
 	}
 
-	max := valuesT[0]
-	for i := range valuesT {
-		v := valuesT[i]
+	max := values[0].GetValue()
+	for i := range values {
+		v := values[i].GetValue()
 		if v > max {
 			max = v
 		}
 	}
 
 	return max
+}
+
+func MinValuer[T constraints.Ordered](values []GetValuer[T]) T {
+	var t T
+	if len(values) == 0 {
+		return t
+	}
+	min := values[0].GetValue()
+	for i := range values {
+		v := values[i].GetValue()
+		if v < min {
+			min = v
+		}
+	}
+
+	return min
 }
