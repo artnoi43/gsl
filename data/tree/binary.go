@@ -2,14 +2,32 @@ package tree
 
 import "github.com/soyart/gsl/data/list"
 
+// BinaryTreeBasic is basic, minimal binary tree with node type NODE
+type BinaryTreeBasic[NODE any] interface {
+	Insert(node NODE)
+	Remove(node NODE)
+	Find(node NODE) bool
+}
+
+// BinaryTree have extra methods to work with nodes.
+// POS is any type used for indexing a node,
+// e.g. a bintree with backing arrays may use int as POS.
 type BinaryTree[POS any, NODE any] interface {
+	BinaryTreeBasic[NODE]
+
 	Parent(node POS) POS
 	LeftChild(node POS) POS
 	RightChild(node POS) POS
 	Node(pos POS) NODE
 
-	IsRoot(node POS) bool
-	IsNull(node POS) bool
+	NodeIsRoot(node POS) bool
+	NodeIsNull(node POS) bool
+}
+
+type BinaryTreeNode[T any] interface {
+	Left() BinaryTreeNode[T]
+	Right() BinaryTreeNode[T]
+	IsNull() bool
 }
 
 func Inorder[POS any, NODE any](
@@ -20,8 +38,9 @@ func Inorder[POS any, NODE any](
 	stack := list.NewStack[POS]()
 	curr := node
 
-	for !tree.IsNull(curr) || !stack.IsEmpty() {
-		for !tree.IsNull(curr) {
+	for !tree.NodeIsNull(curr) || !stack.IsEmpty() {
+
+		for !tree.NodeIsNull(curr) {
 			stack.Push(curr)
 			curr = tree.LeftChild(curr)
 		}
@@ -51,4 +70,48 @@ func InorderRecurse[POS any, NODE any](
 	}
 
 	return InorderRecurse(tree, tree.RightChild(node), f)
+}
+
+func InorderNode[T any, NODE BinaryTreeNode[T]](
+	tree BinaryTreeBasic[NODE],
+	node NODE,
+	f func(NODE) error,
+) error {
+	stack := list.NewStack[NODE]()
+	curr := node
+
+	for !curr.IsNull() || !stack.IsEmpty() {
+		for !curr.IsNull() {
+			stack.Push(curr)
+			curr = curr.Left().(NODE)
+		}
+
+		if err := f(curr); err != nil {
+			return err
+		}
+
+		curr = *stack.Pop()
+		curr = curr.Right().(NODE)
+	}
+
+	return nil
+}
+
+func InorderNodeRecurse[T any, NODE BinaryTreeNode[T]](
+	node NODE,
+	f func(NODE) error,
+) error {
+	if err := InorderNodeRecurse[T, NODE](node.Left().(NODE), f); err != nil {
+		return err
+	}
+
+	if err := f(node); err != nil {
+		return err
+	}
+
+	if err := InorderNodeRecurse[T, NODE](node.Right().(NODE), f); err != nil {
+		return err
+	}
+
+	return nil
 }
