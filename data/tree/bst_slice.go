@@ -14,16 +14,6 @@ func NewBstSlice[T constraints.Ordered]() BinaryTree[int, T] {
 	return &BstSlice[T]{}
 }
 
-func (b *BstSlice[T]) allowDups() bool {
-	return b.dups == nil
-}
-
-func (b *BstSlice[T]) isDuplicate(node T) bool {
-	_, duplicate := b.dups[node]
-
-	return duplicate
-}
-
 func (b *BstSlice[T]) Insert(node T) {
 	if b.allowDups() {
 		panic("not implemented duplicate nodes")
@@ -183,19 +173,12 @@ func (b *BstSlice[T]) find(target T) int {
 	return -1
 }
 
-func LeftChildIdx(parent int) int {
-	return (2 * parent) + 1
+func (b *BstSlice[T]) allowDups() bool {
+	return b.dups == nil
 }
 
-func RightChildIdx(parent int) int {
-	return LeftChildIdx(parent) + 1
-}
+func (b *BstSlice[T]) isDuplicate(node T) bool {
+	_, duplicate := b.dups[node]
 
-func ParentIdx(child int) int {
-	rightChild := child%2 == 0
-	if rightChild {
-		return (child - 2) / 2
-	}
-
-	return (child - 1) / 2
+	return duplicate
 }
