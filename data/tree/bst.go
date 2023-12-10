@@ -22,7 +22,28 @@ func (b *Bst[T]) Remove(node T) {
 }
 
 func (b *Bst[T]) Find(node T) bool {
-	panic("not implemented")
+	curr := &b.root
+	for {
+		if curr.IsNull() {
+			return false
+		}
+
+		v := curr.value
+
+		switch {
+		case node == v:
+			return true
+
+		case node < v:
+			curr = curr.left
+
+		case node > v:
+			curr = curr.right
+
+		default:
+			panic("unhandled case")
+		}
+	}
 }
 
 func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {

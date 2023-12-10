@@ -45,8 +45,32 @@ func (b *BstSlice[T]) Remove(node T) {
 	panic("not implemented")
 }
 
-func (b *BstSlice[T]) Find(node T) bool {
-	return b.find(node) >= 0
+func (b *BstSlice[T]) Find(target T) bool {
+	if len(b.backing) == 0 {
+		return false
+	}
+
+	curr := 0
+	for {
+		if b.NodeIsNull(curr) {
+			return false
+		}
+
+		node := b.Node(curr)
+		switch {
+		case target == node:
+			return true
+
+		case target > node:
+			curr = b.RightChild(curr)
+
+		case target < node:
+			curr = b.LeftChild(curr)
+
+		default:
+			panic("unhandled case")
+		}
+	}
 }
 
 func (b *BstSlice[T]) Parent(pos int) int {
