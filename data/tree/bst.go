@@ -17,8 +17,8 @@ func (b *Bst[T]) Insert(node T) {
 	})
 }
 
-func (b *Bst[T]) Remove(node T) {
-	panic("not implemented")
+func (b *Bst[T]) Remove(node T) bool {
+	return remove(&b.root, node)
 }
 
 func (b *Bst[T]) Find(node T) bool {
@@ -47,23 +47,25 @@ func (b *Bst[T]) Find(node T) bool {
 }
 
 func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {
-	if root.ok {
+	if !root.ok {
 		root = node
+		root.ok = true
+
 		return
 	}
 
 	left := root.left
 	right := root.right
 
-	isLeaf := left.IsNull() && right.IsNull()
-	hasBoth := !isLeaf
-	hasLeft := !left.IsNull()
-	hasRight := !right.IsNull()
+	rootIsLeaf := !left.ok && !right.ok
+	rootHasBoth := !rootIsLeaf
+	rootHasLeft := left.ok
+	rootHasRight := right.ok
 
 	var nextParent *nodeWrapper[T]
 
 	switch {
-	case isLeaf:
+	case rootIsLeaf:
 		switch {
 		case node.value < root.value:
 			root.left = node
@@ -72,7 +74,7 @@ func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {
 			root.right = node
 		}
 
-	case hasBoth:
+	case rootHasBoth:
 		switch {
 		case node.value < left.value:
 			nextParent = left
@@ -81,10 +83,10 @@ func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {
 			nextParent = right
 		}
 
-	case hasLeft:
+	case rootHasLeft:
 		nextParent = left
 
-	case hasRight:
+	case rootHasRight:
 		nextParent = right
 	}
 
@@ -93,4 +95,82 @@ func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {
 	}
 
 	insert(nextParent, node)
+}
+
+func remove[T constraints.Ordered](node *nodeWrapper[T], target T) bool {
+	if !node.ok {
+		return false
+	}
+
+	left, right := node.left, node.right
+
+	nodeIsLeaf := !left.ok && !right.ok
+	nodeHasBoth := !nodeIsLeaf
+	nodeHasLeft := left.ok
+	nodeHasRight := right.ok
+
+	var nextRoot *nodeWrapper[T]
+
+	switch {
+	case node.value == target:
+		switch {
+		case nodeIsLeaf:
+			// TODO: do hard deletes
+			node.ok = false
+
+		case nodeHasBoth:
+			replacement := findLeafRight[T](left)
+			node.value = replacement.value
+
+			nextRoot = left
+
+		case nodeHasLeft:
+			replacement := findLeafRight[T](left)
+			node.value = replacement.value
+
+			nextRoot = left
+
+		case nodeHasRight:
+			replacement := findLeafLeft[T](right)
+			node.value = replacement.value
+
+			nextRoot = right
+
+		}
+
+	case node.value < target:
+		if nodeHasBoth || nodeHasLeft {
+			nextRoot = left
+		}
+
+	case node.value < target:
+		if nodeHasBoth || nodeHasRight {
+			nextRoot = right
+		}
+
+	}
+
+	if nextRoot == nil {
+		return false
+	}
+
+	return remove(nextRoot, target)
+}
+
+func findLeafLeft[T constraints.Ordered](root *nodeWrapper[T]) *nodeWrapper[T] {
+	curr := root
+	for !curr.left.ok {
+		curr = curr.left
+	}
+
+	return curr
+}
+
+func findLeafRight[T constraints.Ordered](root *nodeWrapper[T]) *nodeWrapper[T] {
+	curr := root
+	for !curr.right.ok {
+		curr = curr.right
+	}
+
+	return curr
 }

@@ -5,7 +5,7 @@ import "github.com/soyart/gsl/data/list"
 // BinaryTreeBasic is basic, minimal binary tree with node type NODE
 type BinaryTreeBasic[NODE any] interface {
 	Insert(node NODE)
-	Remove(node NODE)
+	Remove(node NODE) bool
 	Find(node NODE) bool
 }
 

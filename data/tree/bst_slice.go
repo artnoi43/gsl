@@ -26,10 +26,10 @@ func (b *BstSlice[T]) Insert(node T) {
 	b.insert(0, node)
 }
 
-func (b *BstSlice[T]) Remove(node T) {
+func (b *BstSlice[T]) Remove(node T) bool {
 	targetPos := b.find(node)
 	if targetPos == -1 {
-		return
+		return false
 	}
 
 	panic("not implemented")
@@ -97,13 +97,13 @@ func (b *BstSlice[T]) insert(root int, node T) {
 	right := b.RightChild(root)
 	nextParent := -1
 
-	isLeaf := b.NodeIsNull(left) && b.NodeIsNull(right)
-	hasBoth := !isLeaf
-	hasLeft := !b.NodeIsNull(left)
-	hasRight := !b.NodeIsNull(right)
+	rootIsLeaf := b.NodeIsNull(left) && b.NodeIsNull(right)
+	rootHasBoth := !rootIsLeaf
+	rootHasLeft := !b.NodeIsNull(left)
+	rootHasRight := !b.NodeIsNull(right)
 
 	switch {
-	case isLeaf, hasBoth:
+	case rootIsLeaf, rootHasBoth:
 		insertIdx := -1
 
 		parentNode := b.Node(root)
@@ -122,14 +122,14 @@ func (b *BstSlice[T]) insert(root int, node T) {
 			panic("unexpected -1 insertIdx")
 		}
 
-		if hasBoth {
+		if rootHasBoth {
 			b.insert(insertIdx, node)
 			return
 		}
 
 		b.addToBacking(insertIdx, node)
 
-	case hasLeft:
+	case rootHasLeft:
 		leftNode := b.Node(left)
 		if node < leftNode {
 			b.addToBacking(left, node)
@@ -138,7 +138,7 @@ func (b *BstSlice[T]) insert(root int, node T) {
 
 		nextParent = left
 
-	case hasRight:
+	case rootHasRight:
 		rightNode := b.Node(right)
 		if node > rightNode {
 			b.addToBacking(right, node)
