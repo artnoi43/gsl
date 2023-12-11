@@ -7,17 +7,15 @@ import (
 )
 
 type Heap[T any] struct {
-	Items    []data.Getter[T]
-	CmpFunc  data.LessFunc[data.Getter[T]]
-	Ordering data.SortOrder
+	Items   []data.Getter[T]
+	CmpFunc data.LessFunc[data.Getter[T]]
 }
 
 func NewHeap[T constraints.Ordered](
 	order data.SortOrder,
 ) *Heap[T] {
 	return &Heap[T]{
-		Ordering: order,
-		CmpFunc:  data.FactoryLessFuncOrdered[T](order),
+		CmpFunc: data.FactoryLessFuncOrdered[T](order),
 	}
 }
 
@@ -25,8 +23,7 @@ func NewHeapCmp[T data.CmpOrdered[T]](
 	order data.SortOrder,
 ) *Heap[T] {
 	return &Heap[T]{
-		Ordering: order,
-		CmpFunc:  data.FactoryLessFuncCmp[T](order),
+		CmpFunc: data.FactoryLessFuncCmp[T](order),
 	}
 }
 

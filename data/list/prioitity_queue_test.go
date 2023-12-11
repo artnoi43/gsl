@@ -55,7 +55,7 @@ func TestPq(t *testing.T) {
 }
 
 func testPop[T constraints.Ordered](t *testing.T, order data.SortOrder, items []foo[T]) []foo[T] {
-	pq := NewHeapImp[T](order)
+	pq := NewPriorityQueue[T](order)
 	pqCustom := NewPriorityQueueCustom(order, data.FactoryLessFuncOrdered[T](order))
 	queues := []*PriorityQueue[T]{pq, pqCustom}
 
@@ -90,7 +90,7 @@ func testArbitaryUpdate(t *testing.T) {
 	}
 
 	// Arbitary pushes and inits
-	pq := NewHeapImp[float64](maxHeap)
+	pq := NewPriorityQueue[float64](maxHeap)
 	pqCustom := NewPriorityQueueCustom(maxHeap, data.FactoryLessFuncOrdered[float64](maxHeap))
 	queues := []*PriorityQueue[float64]{
 		pq,
