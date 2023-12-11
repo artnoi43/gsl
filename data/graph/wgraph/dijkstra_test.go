@@ -1,6 +1,7 @@
 package wgraph
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/soyart/gsl"
@@ -25,6 +26,7 @@ func TestDijkstra(t *testing.T) {
 		nameStart  = "start"
 		nameFinish = "finish"
 	)
+
 	testDijkstra[uint](t, nameStart, nameFinish)
 	testDijkstra[uint8](t, nameStart, nameFinish)
 	testDijkstra[int32](t, nameStart, nameFinish)
@@ -197,15 +199,16 @@ func testDijkstra[T WeightDijkstra](t *testing.T, nameStart, nameFinish string) 
 	}
 
 	dijkShortestPaths := djikGraph.DijkstraShortestPathFrom(startNode)
-	fatalMsgCost := "invalid answer for (%s->%s): %d, expecting %d"
-	fatalMsgPathLen := "invalid returned path length (%s->%s): %d, expecting %d"
-	fatalMsgPathVia := "invalid via path (%s->%s)[%d]: %s, expecting %s"
+	var dummyT T
+	for src, dst := range dijkShortestPaths.Paths {
+		t.Log(reflect.TypeOf(dummyT).String(), "from", dijkShortestPaths.From.GetKey(), "src", src.GetKey(), src.GetValue(), "dst", dst.GetKey(), dst.GetValue())
+	}
 
 	// The check is hard-coded
 	for node, util := range nodesMap {
 		// Test costs
 		if node.GetValue() != util.expectedFinalValue {
-			t.Fatalf(fatalMsgCost, nameStart, node.GetKey(), node.GetValue(), util.expectedFinalValue)
+			t.Fatalf("invalid answer for (%s->%s): %v, expecting %v", nameStart, node.GetKey(), node.GetValue(), util.expectedFinalValue)
 		}
 
 		if node == startNode {
@@ -217,13 +220,13 @@ func testDijkstra[T WeightDijkstra](t *testing.T, nameStart, nameFinish string) 
 		pathToNode := dijkShortestPaths.ReconstructPathTo(node)
 		gsl.ReverseInPlace(pathToNode)
 		if hops := len(pathToNode); hops != util.expectedPathHops {
-			t.Fatalf(fatalMsgPathLen, nameStart, nodeKey, hops, util.expectedPathHops)
+			t.Fatalf("invalid returned path length (%s->%s): %d, expecting %d", nameStart, nodeKey, hops, util.expectedPathHops)
 		}
 		for i, actual := range pathToNode {
 			expected := util.expectedPathway[i]
 			// t.Logf("prev[%d]: %v, expected: %v\n", i, actual.GetKey(), expected.GetKey())
 			if expected != actual {
-				t.Fatalf(fatalMsgPathVia, nameStart, nodeKey, i, actual.GetKey(), expected.GetKey())
+				t.Fatalf("invalid via path (%s->%s)[%d]: %s, expecting %s", nameStart, nodeKey, i, actual.GetKey(), expected.GetKey())
 			}
 		}
 	}

@@ -22,10 +22,10 @@ type GoHeapImpl[T any] struct {
 	mut      *sync.RWMutex
 }
 
-// NewHeapImpl returns *PriorityQueue[constraints.Ordered], and this instance
+// NewPriorityQueue returns *PriorityQueue[constraints.Ordered], and this instance
 // uses lessFuncOrdered as lessFunc, which means that the priority type must be able to compare ordering
 // using greater than (>) and lesser than (<) family of signs.
-func NewHeapImpl[T constraints.Ordered](order data.SortOrder) *GoHeapImpl[T] {
+func NewPriorityQueue[T constraints.Ordered](order data.SortOrder) *GoHeapImpl[T] {
 	return &GoHeapImpl[T]{
 		CmpFunc:  data.FactoryLessFuncOrdered[T](order),
 		ordering: order,
@@ -33,10 +33,9 @@ func NewHeapImpl[T constraints.Ordered](order data.SortOrder) *GoHeapImpl[T] {
 	}
 }
 
-// NewHealImplCmp[T] returns *PriorityQueue[CmpOrdered[T]], and this instance
-// uses lessFuncCmp as lessFunc, which means that the priority type must be able to compare ordering
-// using Cmp(T) int function.
-func NewHealImplCmp[T data.CmpOrdered[T]](order data.SortOrder) *GoHeapImpl[T] {
+// NewPrioirtyQueueCmp[T] returns *PriorityQueue[CmpOrdered[T]] with the default lessFunc
+// for type T with Cmp(T), i.e. -1 -> less, 0 -> equal, 1 -> greater.
+func NewPrioirtyQueueCmp[T data.CmpOrdered[T]](order data.SortOrder) *GoHeapImpl[T] {
 	return &GoHeapImpl[T]{
 		CmpFunc:  data.FactoryLessFuncCmp[T](order),
 		ordering: order,
@@ -44,9 +43,8 @@ func NewHealImplCmp[T data.CmpOrdered[T]](order data.SortOrder) *GoHeapImpl[T] {
 	}
 }
 
-// If the priority type for your priority queue does not implement constraints.Ordered or CmpOrdered interface,
-// then you can provide your own lessFunc to determine ordering.
-func NewHeapImplCustom[T any](
+// NewPriorityQueueCustom use the provided lessFunc for the heapify processes.
+func NewPriorityQueueCustom[T any](
 	order data.SortOrder,
 	lessFunc data.LessFunc[data.Getter[T]],
 ) *GoHeapImpl[T] {
