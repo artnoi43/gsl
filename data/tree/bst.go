@@ -119,19 +119,19 @@ func remove[T constraints.Ordered](node *binTreeNode[T], target T) bool {
 			node.ok = false
 
 		case nodeHasBoth:
-			replacement := findLeafRight[T](left)
+			replacement := leafRight[T](left)
 			node.value = replacement.value
 
 			nextRoot = left
 
 		case nodeHasLeft:
-			replacement := findLeafRight[T](left)
+			replacement := leafRight[T](left)
 			node.value = replacement.value
 
 			nextRoot = left
 
 		case nodeHasRight:
-			replacement := findLeafLeft[T](right)
+			replacement := leafLeft[T](right)
 			node.value = replacement.value
 
 			nextRoot = right
@@ -157,7 +157,8 @@ func remove[T constraints.Ordered](node *binTreeNode[T], target T) bool {
 	return remove(nextRoot, target)
 }
 
-func findLeafLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
+// Returns left leaf of a tree root
+func leafLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for !curr.left.ok {
 		curr = curr.left
@@ -166,7 +167,8 @@ func findLeafLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	return curr
 }
 
-func findLeafRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
+// Returns right leaf of a tree root
+func leafRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for !curr.right.ok {
 		curr = curr.right
