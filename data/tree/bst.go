@@ -11,7 +11,7 @@ type Bst[T constraints.Ordered] struct {
 func (b *Bst[T]) Insert(node T) {
 	insert[T](&b.root, &binTreeNode[T]{
 		value: node,
-		ok:    false,
+		ok:    true,
 		left:  nil,
 		right: nil,
 	})
