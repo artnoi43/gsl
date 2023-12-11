@@ -5,11 +5,11 @@ import "golang.org/x/exp/constraints"
 // Bst is BST implementation with nodeWrapper as node
 type Bst[T constraints.Ordered] struct {
 	count int
-	root  nodeWrapper[T]
+	root  binTreeNode[T]
 }
 
 func (b *Bst[T]) Insert(node T) {
-	insert[T](&b.root, &nodeWrapper[T]{
+	insert[T](&b.root, &binTreeNode[T]{
 		value: node,
 		ok:    false,
 		left:  nil,
@@ -46,7 +46,7 @@ func (b *Bst[T]) Find(node T) bool {
 	}
 }
 
-func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {
+func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 	if !root.ok {
 		root = node
 		root.ok = true
@@ -62,7 +62,7 @@ func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {
 	rootHasLeft := left.ok
 	rootHasRight := right.ok
 
-	var nextParent *nodeWrapper[T]
+	var nextParent *binTreeNode[T]
 
 	switch {
 	case rootIsLeaf:
@@ -97,7 +97,7 @@ func insert[T constraints.Ordered](root *nodeWrapper[T], node *nodeWrapper[T]) {
 	insert(nextParent, node)
 }
 
-func remove[T constraints.Ordered](node *nodeWrapper[T], target T) bool {
+func remove[T constraints.Ordered](node *binTreeNode[T], target T) bool {
 	if !node.ok {
 		return false
 	}
@@ -109,7 +109,7 @@ func remove[T constraints.Ordered](node *nodeWrapper[T], target T) bool {
 	nodeHasLeft := left.ok
 	nodeHasRight := right.ok
 
-	var nextRoot *nodeWrapper[T]
+	var nextRoot *binTreeNode[T]
 
 	switch {
 	case node.value == target:
@@ -157,7 +157,7 @@ func remove[T constraints.Ordered](node *nodeWrapper[T], target T) bool {
 	return remove(nextRoot, target)
 }
 
-func findLeafLeft[T constraints.Ordered](root *nodeWrapper[T]) *nodeWrapper[T] {
+func findLeafLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for !curr.left.ok {
 		curr = curr.left
@@ -166,7 +166,7 @@ func findLeafLeft[T constraints.Ordered](root *nodeWrapper[T]) *nodeWrapper[T] {
 	return curr
 }
 
-func findLeafRight[T constraints.Ordered](root *nodeWrapper[T]) *nodeWrapper[T] {
+func findLeafRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for !curr.right.ok {
 		curr = curr.right

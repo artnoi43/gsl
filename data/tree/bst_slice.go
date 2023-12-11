@@ -152,9 +152,9 @@ func (b *BstSlice[T]) insert(root int, node T) {
 }
 
 func (b *BstSlice[T]) addToBacking(insertIdx int, node T) {
-	l := len(b.backing)
+	l := len(b.backing) + 1
 	if insertIdx >= l {
-		newBacking := make([]T, l)
+		newBacking := make([]T, l+1)
 		copy(newBacking, b.backing)
 
 		b.backing = newBacking

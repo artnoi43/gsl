@@ -31,29 +31,21 @@ type BinaryTreeNode[T any] interface {
 	IsNull() bool
 }
 
-type nodeWrapper[T comparable] struct {
+type binTreeNode[T comparable] struct {
 	value T
 	ok    bool
 
-	left  *nodeWrapper[T]
-	right *nodeWrapper[T]
+	left  *binTreeNode[T]
+	right *binTreeNode[T]
 }
 
-func (w *nodeWrapper[T]) Left() BinaryTreeNode[T] {
-	return w.left
-}
+func (n *binTreeNode[T]) Left() BinaryTreeNode[T] { return n.left }
 
-func (w *nodeWrapper[T]) Right() BinaryTreeNode[T] {
-	return w.right
-}
+func (n *binTreeNode[T]) Right() BinaryTreeNode[T] { return n.right }
 
-func (w *nodeWrapper[T]) Value() T {
-	return w.value
-}
+func (n *binTreeNode[T]) Value() T { return n.value }
 
-func (w *nodeWrapper[T]) IsNull() bool {
-	return w.ok
-}
+func (n *binTreeNode[T]) IsNull() bool { return n.ok }
 
 func Inorder[POS any, NODE any](
 	tree BinaryTree[POS, NODE],
