@@ -55,32 +55,35 @@ func (b *Bst[T]) Find(target T) bool {
 }
 
 func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
-	switch {
-	case !root.ok:
-		root = node
-		root.ok = true
+	curr := root
+	for {
+		switch {
+		case curr == nil || !curr.ok:
+			curr = node
+			curr.ok = true
 
-		return
-
-	case node.value == root.value:
-		// Do nothing if duplicate nodes
-		return
-
-	case node.value < root.value:
-		if root.left == nil {
-			root.left = node
 			return
-		}
 
-		insert(root.left, node)
-
-	case node.value > root.value:
-		if root.right == nil {
-			root.right = node
+		case node.value == curr.value:
+			// Do nothing if duplicate nodes
 			return
-		}
 
-		insert(root.right, node)
+		case node.value < curr.value:
+			if curr.left == nil {
+				curr.left = node
+				return
+			}
+
+			curr = curr.left
+
+		case node.value > curr.value:
+			if curr.right == nil {
+				curr.right = node
+				return
+			}
+
+			curr = curr.right
+		}
 	}
 }
 
@@ -135,4 +138,34 @@ func digRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	}
 
 	return curr
+}
+
+func BstInsertRecurse[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
+	switch {
+	case !root.ok:
+		root = node
+		root.ok = true
+
+		return
+
+	case node.value == root.value:
+		// Do nothing if duplicate nodes
+		return
+
+	case node.value < root.value:
+		if root.left == nil {
+			root.left = node
+			return
+		}
+
+		BstInsertRecurse(root.left, node)
+
+	case node.value > root.value:
+		if root.right == nil {
+			root.right = node
+			return
+		}
+
+		BstInsertRecurse(root.right, node)
+	}
 }
