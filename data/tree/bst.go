@@ -36,16 +36,14 @@ func (b *Bst[T]) Find(target T) bool {
 			return false
 		}
 
-		v := curr.value
-
 		switch {
-		case target == v:
+		case target == curr.value:
 			return true
 
-		case target < v:
+		case target < curr.value:
 			curr = curr.left
 
-		case target > v:
+		case target > curr.value:
 			curr = curr.right
 
 		default:
