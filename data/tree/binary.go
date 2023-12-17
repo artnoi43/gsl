@@ -1,6 +1,8 @@
 package tree
 
-import "github.com/soyart/gsl/data/list"
+import (
+	"github.com/soyart/gsl/data/list"
+)
 
 // BinaryTreeBasic is basic, minimal binary tree with node type NODE
 type BinaryTreeBasic[NODE any] interface {
@@ -45,7 +47,19 @@ func (n *binTreeNode[T]) Right() BinaryTreeNode[T] { return n.right }
 
 func (n *binTreeNode[T]) Value() T { return n.value }
 
-func (n *binTreeNode[T]) IsNull() bool { return n.ok }
+func (n *binTreeNode[T]) IsNull() bool {
+	return !n.ok &&
+		n.left == nil &&
+		n.right == nil
+}
+
+func (n *binTreeNode[T]) IsLeaf() bool {
+	return n.left == nil && n.right == nil
+}
+
+func (n *binTreeNode[T]) HasBoth() bool {
+	return n.left != nil && n.right != nil
+}
 
 func Inorder[POS any, NODE any](
 	tree BinaryTree[POS, NODE],

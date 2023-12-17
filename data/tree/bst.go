@@ -1,19 +1,28 @@
 package tree
 
-import "golang.org/x/exp/constraints"
+import (
+	"golang.org/x/exp/constraints"
+)
 
 // Bst is BST implementation with nodeWrapper as node
 type Bst[T constraints.Ordered] struct {
 	root binTreeNode[T]
 }
 
-func (b *Bst[T]) Insert(node T) {
-	insert[T](&b.root, &binTreeNode[T]{
-		value: node,
+func (b *Bst[T]) Insert(item T) {
+	node := binTreeNode[T]{
+		value: item,
 		ok:    true,
 		left:  nil,
 		right: nil,
-	})
+	}
+
+	if b.root.IsNull() {
+		b.root = node
+		return
+	}
+
+	insert(&b.root, &node)
 }
 
 func (b *Bst[T]) Remove(node T) bool {
@@ -23,6 +32,11 @@ func (b *Bst[T]) Remove(node T) bool {
 func (b *Bst[T]) Find(node T) bool {
 	curr := &b.root
 	for {
+
+		if curr == nil {
+			return false
+		}
+
 		if curr.IsNull() {
 			return false
 		}
@@ -53,15 +67,10 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 		return
 	}
 
-	left := root.left
-	right := root.right
-
-	rootIsLeaf := !left.ok && !right.ok
-	rootHasBoth := !rootIsLeaf
-	rootHasLeft := left.ok
-	rootHasRight := right.ok
-
-	var nextParent *binTreeNode[T]
+	rootIsLeaf := root.IsLeaf()
+	rootHasBoth := root.HasBoth()
+	rootHasLeft := root.left != nil
+	rootHasRight := root.right != nil
 
 	switch {
 	case rootIsLeaf:
@@ -73,27 +82,23 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 			root.right = node
 		}
 
+		return
+
 	case rootHasBoth:
 		switch {
-		case node.value < left.value:
-			nextParent = left
+		case node.value < root.left.value:
+			insert(root.left, node)
 
-		case node.value > right.value:
-			nextParent = right
+		case node.value > root.right.value:
+			insert(root.right, node)
 		}
 
 	case rootHasLeft:
-		nextParent = left
+		insert(root.left, node)
 
 	case rootHasRight:
-		nextParent = right
+		insert(root.right, node)
 	}
-
-	if nextParent == nil {
-		panic("unexpected nil next parent")
-	}
-
-	insert(nextParent, node)
 }
 
 func remove[T constraints.Ordered](node *binTreeNode[T], target T) bool {
