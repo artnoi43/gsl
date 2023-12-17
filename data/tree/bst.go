@@ -26,18 +26,13 @@ func (b *Bst[T]) Insert(item T) {
 }
 
 func (b *Bst[T]) Remove(node T) bool {
-	return remove(&b.root, node)
+	return remove(&b.root, node) != nil
 }
 
 func (b *Bst[T]) Find(node T) bool {
 	curr := &b.root
 	for {
-
-		if curr == nil {
-			return false
-		}
-
-		if curr.IsNull() {
+		if curr == nil || curr.IsNull() {
 			return false
 		}
 
@@ -67,13 +62,8 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 		return
 	}
 
-	rootIsLeaf := root.IsLeaf()
-	rootHasBoth := root.HasBoth()
-	rootHasLeft := root.left != nil
-	rootHasRight := root.right != nil
-
 	switch {
-	case rootIsLeaf:
+	case root.IsLeaf():
 		switch {
 		case node.value < root.value:
 			root.left = node
@@ -84,7 +74,7 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 
 		return
 
-	case rootHasBoth:
+	case root.hasBoth():
 		switch {
 		case node.value < root.left.value:
 			insert(root.left, node)
@@ -93,78 +83,47 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 			insert(root.right, node)
 		}
 
-	case rootHasLeft:
+	case root.hasLeft():
 		insert(root.left, node)
 
-	case rootHasRight:
+	case root.hasRight():
 		insert(root.right, node)
 	}
 }
 
-func remove[T constraints.Ordered](node *binTreeNode[T], target T) bool {
-	if !node.ok {
-		return false
+func remove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[T] {
+	if root == nil || !root.ok {
+		return nil
 	}
-
-	left, right := node.left, node.right
-
-	nodeIsLeaf := !left.ok && !right.ok
-	nodeHasBoth := !nodeIsLeaf
-	nodeHasLeft := left.ok
-	nodeHasRight := right.ok
-
-	var nextRoot *binTreeNode[T]
 
 	switch {
-	case node.value == target:
+	case target == root.value:
 		switch {
-		case nodeIsLeaf:
-			// TODO: do hard deletes
-			node.ok = false
+		case root.hasBoth():
+			replacement := digRight(root.left)
+			return replacement
 
-		case nodeHasBoth:
-			replacement := digRight[T](left)
-			node.value = replacement.value
+		case root.hasLeft():
+			return root.left
 
-			nextRoot = left
-
-		case nodeHasLeft:
-			replacement := digRight[T](left)
-			node.value = replacement.value
-
-			nextRoot = left
-
-		case nodeHasRight:
-			replacement := digLeft[T](right)
-			node.value = replacement.value
-
-			nextRoot = right
-
+		case root.hasRight():
+			return root.right
 		}
 
-	case node.value < target:
-		if nodeHasBoth || nodeHasLeft {
-			nextRoot = left
-		}
+	case target < root.value:
+		root.left = remove(root.left, target)
 
-	case node.value < target:
-		if nodeHasBoth || nodeHasRight {
-			nextRoot = right
-		}
-
+	case target > root.value:
+		root.right = remove(root.right, target)
 	}
 
-	if nextRoot == nil {
-		return false
-	}
-
-	return remove(nextRoot, target)
+	return root
 }
 
 // Returns left leaf of a tree root
 func digLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
-	for !curr.left.ok {
+	for curr.left != nil && curr.left.ok {
 		curr = curr.left
 	}
 
@@ -174,7 +133,7 @@ func digLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 // Returns right leaf of a tree root
 func digRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
-	for !curr.right.ok {
+	for curr.right != nil && !curr.right.ok {
 		curr = curr.right
 	}
 

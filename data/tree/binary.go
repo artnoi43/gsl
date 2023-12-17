@@ -57,8 +57,16 @@ func (n *binTreeNode[T]) IsLeaf() bool {
 	return n.left == nil && n.right == nil
 }
 
-func (n *binTreeNode[T]) HasBoth() bool {
+func (n *binTreeNode[T]) hasBoth() bool {
 	return n.left != nil && n.right != nil
+}
+
+func (n *binTreeNode[T]) hasLeft() bool {
+	return n.left != nil
+}
+
+func (n *binTreeNode[T]) hasRight() bool {
+	return n.right != nil
 }
 
 func Inorder[POS any, NODE any](
