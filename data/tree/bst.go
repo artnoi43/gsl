@@ -55,14 +55,13 @@ func (b *Bst[T]) Find(target T) bool {
 }
 
 func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
-	if !root.ok {
+	switch {
+	case !root.ok:
 		root = node
 		root.ok = true
 
 		return
-	}
 
-	switch {
 	case node.value == root.value:
 		// Do nothing if duplicate nodes
 		return
@@ -85,12 +84,12 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 	}
 }
 
+// remove removes target from subtree tree, returning the new root of the subtree
 func remove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[T] {
-	if root == nil || !root.ok {
-		return nil
-	}
-
 	switch {
+	case root == nil, !root.ok:
+		return nil
+
 	case target < root.value:
 		root.left = remove(root.left, target)
 

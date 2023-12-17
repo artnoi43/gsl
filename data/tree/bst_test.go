@@ -24,6 +24,31 @@ func TestBstInsertFind(t *testing.T) {
 	}
 }
 
+func TestBstRemoveEmpty(t *testing.T) {
+	bst := new(Bst[int])
+
+	items := []int{3, 1, 2, 0, 5}
+
+	for i := range items {
+		bst.Insert(items[i])
+	}
+
+	for i := range items {
+		t.Log("root", bst.root)
+		bst.Remove(items[i])
+	}
+
+	t.Log("final root", bst.root)
+	if !bst.root.IsLeaf() {
+		t.Fatalf("not all children removed")
+	}
+
+	if bst.root.ok {
+		t.Log("final root", bst.root)
+		t.Fatalf("root is still ok")
+	}
+}
+
 func TestBstRemove(t *testing.T) {
 	bst := new(Bst[int])
 
