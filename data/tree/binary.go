@@ -154,3 +154,31 @@ func InorderNodeRecurse[T any, NODE BinaryTreeNode[T]](
 
 	return nil
 }
+
+// BinTreeMax digs for smallest values in the subtree, returning
+// the node as well as the height.
+func BinTreeMax[T any](node BinaryTreeNode[T]) (BinaryTreeNode[T], uint) {
+	curr := node
+	var height uint
+
+	for curr.Right() != nil && !curr.Right().IsNull() {
+		curr = curr.Right()
+		height++
+	}
+
+	return curr, height
+}
+
+// BinTreeMin digs for smallest values in the subtree, returning
+// the node as well as the height.
+func BinTreeMin[T any](root BinaryTreeNode[T]) (BinaryTreeNode[T], uint) {
+	curr := root
+	var height uint
+
+	for curr.Left() != nil && !curr.Left().IsNull() {
+		curr = curr.Left()
+		height++
+	}
+
+	return curr, height
+}

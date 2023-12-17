@@ -6,59 +6,40 @@ import (
 
 // Bst is BST implementation with nodeWrapper as node
 type Bst[T constraints.Ordered] struct {
-	root binTreeNode[T]
+	Root binTreeNode[T]
+}
+
+func NewBst[T constraints.Ordered]() *Bst[T] {
+	return new(Bst[T])
 }
 
 func (b *Bst[T]) Insert(item T) {
-	node := binTreeNode[T]{
-		value: item,
-		ok:    true,
-		left:  nil,
-		right: nil,
-	}
-
-	if b.root.IsNull() {
-		b.root = node
-		return
-	}
-
-	insert(&b.root, &node)
+	BstInsert(
+		&b.Root,
+		&binTreeNode[T]{
+			value: item,
+			ok:    true,
+			left:  nil,
+			right: nil,
+		},
+	)
 }
 
 func (b *Bst[T]) Remove(node T) bool {
-	return remove(&b.root, node) != nil
+	return BstRemove(&b.Root, node) != nil
 }
 
 func (b *Bst[T]) Find(target T) bool {
-	curr := &b.root
-	for {
-		if curr == nil || curr.IsNull() {
-			return false
-		}
-
-		switch {
-		case target == curr.value:
-			return true
-
-		case target < curr.value:
-			curr = curr.left
-
-		case target > curr.value:
-			curr = curr.right
-
-		default:
-			panic("unhandled case")
-		}
-	}
+	return BstFind(&b.Root, target)
 }
 
-func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
+func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 	curr := root
+
 	for {
 		switch {
-		case curr == nil || !curr.ok:
+		case curr == nil:
 			curr = node
-			curr.ok = true
 
 			return
 
@@ -85,17 +66,41 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 	}
 }
 
-// remove removes target from subtree tree, returning the new root of the subtree
-func remove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[T] {
+func BstFind[T constraints.Ordered](root *binTreeNode[T], target T) bool {
+	curr := root
+
+	for {
+		if curr == nil || curr.IsNull() {
+			return false
+		}
+
+		switch {
+		case target == curr.value:
+			return true
+
+		case target < curr.value:
+			curr = curr.left
+
+		case target > curr.value:
+			curr = curr.right
+
+		default:
+			panic("unhandled case")
+		}
+	}
+}
+
+// BstRemove removes target from subtree tree, returning the new root of the subtree
+func BstRemove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[T] {
 	switch {
 	case root == nil:
 		return nil
 
 	case target < root.value:
-		root.left = remove(root.left, target)
+		root.left = BstRemove(root.left, target)
 
 	case target > root.value:
-		root.right = remove(root.right, target)
+		root.right = BstRemove(root.right, target)
 
 	// Do the actual removal
 	default:
@@ -111,7 +116,7 @@ func remove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[
 
 			root.ok = false
 			root.value = replacement.value
-			root.right = remove(root.right, replacement.value)
+			root.right = BstRemove(root.right, replacement.value)
 		}
 	}
 
@@ -131,7 +136,7 @@ func digLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 // Returns right leaf of a tree root
 func digRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
-	for curr.right != nil && !curr.right.ok {
+	for curr.right != nil && curr.right.ok {
 		curr = curr.right
 	}
 

@@ -31,21 +31,21 @@ func TestBstRemoveEmpty(t *testing.T) {
 
 	for i := range items {
 		bst.Insert(items[i])
-		t.Log("root after insert", items[i], "root", bst.root)
+		t.Log("root after insert", items[i], "root", bst.Root)
 	}
 
 	for i := range items {
 		bst.Remove(items[i])
-		t.Log("root after delete", items[i], "root", bst.root)
+		t.Log("root after delete", items[i], "root", bst.Root)
 	}
 
-	t.Log("final root", bst.root)
-	if !bst.root.IsLeaf() {
+	t.Log("final root", bst.Root)
+	if !bst.Root.IsLeaf() {
 		t.Fatalf("not all children removed")
 	}
 
-	if bst.root.ok {
-		t.Log("final root", bst.root)
+	if bst.Root.ok {
+		t.Log("final root", bst.Root)
 		t.Fatalf("root is still ok")
 	}
 }
@@ -93,7 +93,7 @@ func TestBst(t *testing.T) {
 		item := items[i]
 
 		if !bst.Find(item) {
-			t.Logf("item: %d, root: %+v", item, bst.root)
+			t.Logf("item: %d, root: %+v", item, bst.Root)
 			t.Fatalf("missing item %d", item)
 		}
 	}
