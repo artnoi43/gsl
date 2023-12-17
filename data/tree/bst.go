@@ -87,7 +87,7 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 // remove removes target from subtree tree, returning the new root of the subtree
 func remove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[T] {
 	switch {
-	case root == nil, !root.ok:
+	case root == nil:
 		return nil
 
 	case target < root.value:
@@ -107,8 +107,9 @@ func remove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[
 
 		default:
 			replacement := digLeft(root.right)
-			root.value = replacement.value
 
+			root.ok = false
+			root.value = replacement.value
 			root.right = remove(root.right, replacement.value)
 		}
 	}

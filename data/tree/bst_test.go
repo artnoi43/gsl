@@ -31,11 +31,12 @@ func TestBstRemoveEmpty(t *testing.T) {
 
 	for i := range items {
 		bst.Insert(items[i])
+		t.Log("root after insert", items[i], "root", bst.root)
 	}
 
 	for i := range items {
-		t.Log("root", bst.root)
 		bst.Remove(items[i])
+		t.Log("root after delete", items[i], "root", bst.root)
 	}
 
 	t.Log("final root", bst.root)
