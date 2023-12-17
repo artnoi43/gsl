@@ -4,8 +4,7 @@ import "golang.org/x/exp/constraints"
 
 // Bst is BST implementation with nodeWrapper as node
 type Bst[T constraints.Ordered] struct {
-	count int
-	root  binTreeNode[T]
+	root binTreeNode[T]
 }
 
 func (b *Bst[T]) Insert(node T) {
@@ -119,19 +118,19 @@ func remove[T constraints.Ordered](node *binTreeNode[T], target T) bool {
 			node.ok = false
 
 		case nodeHasBoth:
-			replacement := leafRight[T](left)
+			replacement := digRight[T](left)
 			node.value = replacement.value
 
 			nextRoot = left
 
 		case nodeHasLeft:
-			replacement := leafRight[T](left)
+			replacement := digRight[T](left)
 			node.value = replacement.value
 
 			nextRoot = left
 
 		case nodeHasRight:
-			replacement := leafLeft[T](right)
+			replacement := digLeft[T](right)
 			node.value = replacement.value
 
 			nextRoot = right
@@ -158,7 +157,7 @@ func remove[T constraints.Ordered](node *binTreeNode[T], target T) bool {
 }
 
 // Returns left leaf of a tree root
-func leafLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
+func digLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for !curr.left.ok {
 		curr = curr.left
@@ -168,7 +167,7 @@ func leafLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 }
 
 // Returns right leaf of a tree root
-func leafRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
+func digRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for !curr.right.ok {
 		curr = curr.right
