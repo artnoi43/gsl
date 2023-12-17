@@ -1,6 +1,8 @@
 package tree
 
 import (
+	"fmt"
+
 	"golang.org/x/exp/constraints"
 )
 
@@ -29,7 +31,7 @@ func (b *Bst[T]) Remove(node T) bool {
 	return remove(&b.root, node) != nil
 }
 
-func (b *Bst[T]) Find(node T) bool {
+func (b *Bst[T]) Find(target T) bool {
 	curr := &b.root
 	for {
 		if curr == nil || curr.IsNull() {
@@ -39,13 +41,13 @@ func (b *Bst[T]) Find(node T) bool {
 		v := curr.value
 
 		switch {
-		case node == v:
+		case target == v:
 			return true
 
-		case node < v:
+		case target < v:
 			curr = curr.left
 
-		case node > v:
+		case target > v:
 			curr = curr.right
 
 		default:
@@ -63,30 +65,24 @@ func insert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
 	}
 
 	switch {
-	case root.IsLeaf():
-		switch {
-		case node.value < root.value:
-			root.left = node
-
-		case node.value > root.value:
-			root.right = node
-		}
-
+	case node.value == root.value:
+		// Do nothing if duplicate nodes
 		return
 
-	case root.hasBoth():
-		switch {
-		case node.value < root.left.value:
-			insert(root.left, node)
-
-		case node.value > root.right.value:
-			insert(root.right, node)
+	case node.value < root.value:
+		if root.left == nil {
+			root.left = node
+			return
 		}
 
-	case root.hasLeft():
 		insert(root.left, node)
 
-	case root.hasRight():
+	case node.value > root.value:
+		if root.right == nil {
+			root.right = node
+			return
+		}
+
 		insert(root.right, node)
 	}
 }
@@ -97,24 +93,27 @@ func remove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[
 	}
 
 	switch {
-	case target == root.value:
-		switch {
-		case root.hasBoth():
-			replacement := digRight(root.left)
-			return replacement
-
-		case root.hasLeft():
-			return root.left
-
-		case root.hasRight():
-			return root.right
-		}
-
 	case target < root.value:
 		root.left = remove(root.left, target)
 
 	case target > root.value:
 		root.right = remove(root.right, target)
+
+	// Do the actual removal
+	default:
+		switch {
+		case root.left == nil:
+			return root.right
+
+		case root.right == nil:
+			return root.left
+
+		default:
+			replacement := digLeft(root.right)
+			root.value = replacement.value
+
+			root.right = remove(root.right, replacement.value)
+		}
 	}
 
 	return root

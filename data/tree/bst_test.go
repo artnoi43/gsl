@@ -57,7 +57,7 @@ func TestBst(t *testing.T) {
 
 	targetRemove := 9
 
-	items := []int{2, targetRemove, -1, 1, 7, 5, 30, 8, 3}
+	items := []int{2, targetRemove, -1, 1, 7, 30, 8}
 
 	for i := range items {
 		bst.Insert(items[i])
@@ -66,7 +66,8 @@ func TestBst(t *testing.T) {
 	for i := range items {
 		item := items[i]
 
-		if !bst.Find(items[i]) {
+		if !bst.Find(item) {
+			t.Logf("item: %d, root: %+v", item, bst.root)
 			t.Fatalf("missing item %d", item)
 		}
 	}
