@@ -1,8 +1,6 @@
 package tree
 
 import (
-	"fmt"
-
 	"golang.org/x/exp/constraints"
 )
 
