@@ -11,6 +11,11 @@ import (
 	"github.com/soyart/gsl/data"
 )
 
+const (
+	minHeap = data.Ascending
+	maxHeap = data.Descending
+)
+
 type foo[T constraints.Ordered] struct {
 	name  string
 	value T
@@ -32,14 +37,14 @@ func TestPq(t *testing.T) {
 		lowest,
 	}
 
-	minHeapResults := testPop(t, MinHeap, items)
+	minHeapResults := testPop(t, minHeap, items)
 	for _, minHeapResult := range minHeapResults {
 		if minHeapResult != lowest {
 			t.Fatalf("unexpected MinHeap results - expected %+v, got %+v\n", lowest, minHeapResult)
 		}
 	}
 
-	maxHeapResults := testPop(t, MaxHeap, items)
+	maxHeapResults := testPop(t, maxHeap, items)
 	for _, maxHeapResult := range maxHeapResults {
 		if maxHeapResult != highest {
 			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", highest, maxHeapResult)
@@ -49,9 +54,9 @@ func TestPq(t *testing.T) {
 	testArbitaryUpdate(t)
 }
 
-func testPop[T constraints.Ordered](t *testing.T, pqType HeapType, items []foo[T]) []foo[T] {
-	pq := NewPriorityQueue[T](pqType)
-	pqCustom := NewPriorityQueueCustom(pqType, lessOrdered[T])
+func testPop[T constraints.Ordered](t *testing.T, order data.SortOrder, items []foo[T]) []foo[T] {
+	pq := NewPriorityQueue[T](order)
+	pqCustom := NewPriorityQueueCustom(order, data.FactoryLessFuncOrdered[T](order))
 	queues := []*PriorityQueue[T]{pq, pqCustom}
 
 	var ret []foo[T]
@@ -67,6 +72,7 @@ func testPop[T constraints.Ordered](t *testing.T, pqType HeapType, items []foo[T
 		}
 		ret = append(ret, popped)
 	}
+
 	return ret
 }
 
@@ -84,9 +90,12 @@ func testArbitaryUpdate(t *testing.T) {
 	}
 
 	// Arbitary pushes and inits
-	pq := NewPriorityQueue[float64](MaxHeap)
-	pqCustom := NewPriorityQueueCustom(MaxHeap, lessOrdered[float64])
-	queues := []*PriorityQueue[float64]{pq, pqCustom}
+	pq := NewPriorityQueue[float64](maxHeap)
+	pqCustom := NewPriorityQueueCustom(maxHeap, data.FactoryLessFuncOrdered[float64](maxHeap))
+	queues := []*PriorityQueue[float64]{
+		pq,
+		pqCustom,
+	}
 
 	for _, q := range queues {
 		for _, item := range foosFloat {
@@ -102,7 +111,7 @@ func testArbitaryUpdate(t *testing.T) {
 			t.Fatalf("unexpected MaxHeap results - expected %+v, got %+v\n", hundred, popped)
 		}
 
-		q.HeapType = MinHeap
+		q.ChangeOrdering(data.FactoryLessFuncOrdered[float64](minHeap))
 		heap.Init(q)
 		p = heap.Pop(q)
 		popped, ok = p.(foo[float64])
@@ -139,13 +148,11 @@ func TestPQCmp(t *testing.T) {
 	lol(a) // Compiles and no panic
 }
 
-func lol(item data.GetValuer[*big.Int]) {
-
-}
+func lol(item data.Getter[*big.Int]) {}
 
 func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
-	maxPq := NewPriorityQueueCmp[*big.Int](MaxHeap)
-	maxPqCustom := NewPriorityQueueCustom(MaxHeap, lessCmp[*big.Int])
+	maxPq := NewPrioirtyQueueCmp[*big.Int](maxHeap)
+	maxPqCustom := NewPriorityQueueCustom(maxHeap, data.FactoryLessFuncCmp[*big.Int](maxHeap))
 	queues := []*PriorityQueue[*big.Int]{maxPq, maxPqCustom}
 
 	for _, q := range queues {
@@ -162,8 +169,8 @@ func testPqCmpMax(t *testing.T, messy []*bar, max *bar) {
 }
 
 func testPqCmpMin(t *testing.T, messy []*bar, min *bar) {
-	minPq := NewPriorityQueueCmp[*big.Int](MinHeap)
-	minPqCustom := NewPriorityQueueCustom(MinHeap, lessCmp[*big.Int])
+	minPq := NewPrioirtyQueueCmp[*big.Int](minHeap)
+	minPqCustom := NewPriorityQueueCustom(minHeap, data.FactoryLessFuncCmp[*big.Int](minHeap))
 	queues := []*PriorityQueue[*big.Int]{minPq, minPqCustom}
 
 	for _, q := range queues {

@@ -5,9 +5,9 @@ import (
 )
 
 func QuickSortValuer[T constraints.Ordered](
-	arr []GetValuer[T],
+	arr []Getter[T],
 	ordering SortOrder,
-) []GetValuer[T] {
+) []Getter[T] {
 	l := len(arr)
 	// Base case
 	if l < 2 {
@@ -20,12 +20,12 @@ func QuickSortValuer[T constraints.Ordered](
 
 	// pivoted is the list without the pivot element/member
 	pivoted := append(arr[:mid], arr[mid+1:]...) //nolint: gocritic
-	var left, right []GetValuer[T]               //nolint:prealloc
+	var left, right []Getter[T]                  //nolint:prealloc
 
 	{
 		// isLess should have lifetime of no more than the for-looop
 		// to help minimize stack size in huge recursive calls
-		isLess := LessFunc[T](ordering)
+		isLess := LessFuncOrdered[T](ordering)
 		for _, elem := range pivoted {
 			if isLess(elem.GetValue(), pivot.GetValue()) {
 				left = append(left, elem)
@@ -60,7 +60,7 @@ func QuickSort[T constraints.Ordered](arr []T, ordering SortOrder) []T {
 	{
 		// isLess should have lifetime of no more than the for-looop
 		// to help minimize stack size in huge recursive calls
-		isLess := LessFunc[T](ordering)
+		isLess := LessFuncOrdered[T](ordering)
 		for _, elem := range pivoted {
 			if isLess(elem, pivot) {
 				left = append(left, elem)

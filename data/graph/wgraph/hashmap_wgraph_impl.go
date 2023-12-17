@@ -137,9 +137,13 @@ func (g *HashMapGraphWeightedImpl[N, E, W]) GetNodeNeighbors(node N) []N {
 }
 
 func (g *HashMapGraphWeightedImpl[N, E, W]) GetNodeEdges(node N) []E {
-	var edges []E
-	for _, edge := range g.Edges[node] {
-		edges = append(edges, edge.(E))
+	edgesMap := g.Edges[node]
+	edges := make([]E, len(edgesMap))
+
+	c := 0
+	for _, edge := range edgesMap {
+		edges[c] = edge.(E)
+		c++
 	}
 
 	return edges

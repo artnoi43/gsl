@@ -43,6 +43,7 @@ func (g *SafeGraph[N, E, W]) AddEdgeWeightOrDistance(n1, n2 N, weight W) error {
 	g.Lock()
 	defer g.Unlock()
 
+	//nolint:wrapcheck
 	return g.Graph.AddEdgeWeightOrDistance(n1, n2, weight)
 }
 
@@ -50,6 +51,7 @@ func (g *SafeGraph[N, E, W]) AddEdge(n1, n2 N, edge E) error {
 	g.Lock()
 	defer g.Unlock()
 
+	//nolint:wrapcheck
 	return g.Graph.AddEdge(n1, n2, edge)
 }
 

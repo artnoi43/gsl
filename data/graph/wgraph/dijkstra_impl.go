@@ -7,7 +7,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/soyart/gsl/data/container/list"
+	"github.com/soyart/gsl/data"
+	"github.com/soyart/gsl/data/list"
 )
 
 // GraphDijkstraImpl[T] wraps GraphWeightedImpl[T], where T is generic type numeric types and S is ~string.
@@ -34,8 +35,8 @@ func (g *GraphDijkstraImpl[T]) AddEdgeWeightOrDistance(n1, n2 NodeDijkstra[T], w
 		return errors.Wrapf(ErrDijkstraNegativeWeightEdge, "negative edge weight %v", weight)
 	}
 
-	g.graph.AddEdgeWeightOrDistance(n1, n2, weight)
-	return nil
+	//nolint:wrapcheck
+	return g.graph.AddEdgeWeightOrDistance(n1, n2, weight)
 }
 
 func (g *GraphDijkstraImpl[T]) AddEdge(n1, n2 NodeDijkstra[T], edge EdgeWeighted[T, NodeDijkstra[T]]) error {
@@ -45,8 +46,8 @@ func (g *GraphDijkstraImpl[T]) AddEdge(n1, n2 NodeDijkstra[T], edge EdgeWeighted
 		return errors.Wrapf(ErrDijkstraNegativeWeightEdge, "negative edge weight %v", weight)
 	}
 
-	g.graph.AddEdge(n1, n2, edge)
-	return nil
+	//nolint:wrapcheck
+	return g.graph.AddEdge(n1, n2, edge)
 }
 
 func (g *GraphDijkstraImpl[T]) GetNodes() []NodeDijkstra[T] {
@@ -76,7 +77,7 @@ func (g *GraphDijkstraImpl[T]) DijkstraShortestPathFrom(startNode NodeDijkstra[T
 	visited := make(map[NodeDijkstra[T]]bool)
 	parents := make(map[NodeDijkstra[T]]NodeDijkstra[T])
 
-	pq := list.NewPriorityQueue[T](list.MinHeap)
+	pq := list.NewPriorityQueue[T](data.Ascending)
 	heap.Push(pq, startNode)
 
 	for !pq.IsEmpty() {

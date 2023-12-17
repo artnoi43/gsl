@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,17 +13,23 @@ import (
 
 // GetAndParse fetches data from the HTTP endpoint,
 // and parses response's JSON body into the interface.
-func GetAndParse(u string, v interface{}) error {
+func GetAndParse(ctx context.Context, url string, v interface{}) error {
 	client := http.Client{
 		Timeout: time.Second * 3,
 	}
-	resp, err := client.Get(u)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return errors.Wrapf(err, "failed to build request for url %s", url)
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return errors.Wrap(
 			err,
 			fmt.Sprintf(
 				"failed to get url: %s",
-				u,
+				url,
 			),
 		)
 	}
@@ -46,5 +53,5 @@ func GetAndParse(u string, v interface{}) error {
 			),
 		)
 	}
-	return json.Unmarshal(body, &v)
+	return errors.Wrapf(json.Unmarshal(body, &v), "failed to unmarshal body from %s", url)
 }

@@ -48,7 +48,7 @@ func MarshalAndWriteToFile[T any](t T, f marshalFunc, filename string) error {
 	}
 
 	fp, err := os.Create(filename)
-	defer fp.Close()
+	defer fp.Close() //nolint:staticcheck
 
 	if err != nil {
 		return errors.Wrapf(err, "error creating file %s", filename)

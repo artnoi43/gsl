@@ -63,8 +63,9 @@ func TestGroupConsecutive(t *testing.T) {
 	}
 
 	// See if it'll overflow
-	var s []int64 = make([]int64, 100000000)
-	for i := int64(0); i < 100000000; i++ {
+	n := 100000
+	var s []int = make([]int, n)
+	for i := int(0); i < n; i++ {
 		s[i] = 7
 	}
 

@@ -33,14 +33,20 @@ type DijstraShortestPath[W WeightDijkstra] struct {
 
 // NewDikstraGraph calls NewGraphWeightedUnsafe[T], and return the wrapped graph.
 // Alternatively, you can create your own implementation of GraphWeighted[T].
-func NewDijkstraGraphUnsafe[W WeightDijkstra](directed bool) GraphDijkstra[W] {
-	return &GraphDijkstraImpl[W]{
+func NewDijkstraGraphUnsafe[W WeightDijkstra](
+	directed bool,
+) GraphDijkstra[W] {
+	graphImpl := &GraphDijkstraImpl[W]{
 		graph: new(HashMapGraphWeightedImpl[
 			NodeDijkstra[W],
 			EdgeWeighted[W, NodeDijkstra[W]],
 			W,
 		]),
 	}
+
+	graphImpl.SetDirection(directed)
+
+	return graphImpl
 }
 
 // NewDikstraGraph calls NewGraphWeighted[T], and return the wrapped graph.
