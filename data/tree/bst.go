@@ -4,7 +4,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Bst is BST implementation with nodeWrapper as node
+// Bst is BST implementation with nodeWrapper as node.
 type Bst[T constraints.Ordered] struct {
 	Root binTreeNode[T]
 }
@@ -25,8 +25,8 @@ func (b *Bst[T]) Insert(item T) {
 	)
 }
 
-func (b *Bst[T]) Remove(node T) bool {
-	return BstRemove(&b.Root, node) != nil
+func (b *Bst[T]) Remove(target T) bool {
+	return BstRemove(&b.Root, target) != nil
 }
 
 func (b *Bst[T]) Find(target T) bool {
@@ -38,13 +38,16 @@ func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]
 
 	for {
 		switch {
+		// Found leaf node
 		case curr == nil:
 			curr = node
 
 			return
 
+		// Do nothing if duplicate nodes
 		case node.value == curr.value:
-			// Do nothing if duplicate nodes
+			node.ok = true
+
 			return
 
 		case node.value < curr.value:
@@ -124,7 +127,7 @@ func BstRemove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNo
 }
 
 // Returns left leaf of a tree root
-func digLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
+func digLeft[T any](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for curr.left != nil && curr.left.ok {
 		curr = curr.left
@@ -134,7 +137,7 @@ func digLeft[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
 }
 
 // Returns right leaf of a tree root
-func digRight[T constraints.Ordered](root *binTreeNode[T]) *binTreeNode[T] {
+func digRight[T any](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for curr.right != nil && curr.right.ok {
 		curr = curr.right

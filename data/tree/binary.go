@@ -33,7 +33,7 @@ type BinaryTreeNode[T any] interface {
 	IsNull() bool
 }
 
-type binTreeNode[T comparable] struct {
+type binTreeNode[T any] struct {
 	value T
 	ok    bool
 
