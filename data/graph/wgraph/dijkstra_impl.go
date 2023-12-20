@@ -1,14 +1,13 @@
 package wgraph
 
 import (
-	"container/heap"
 	"fmt"
 	"reflect"
 
 	"github.com/pkg/errors"
 
 	"github.com/soyart/gsl/data"
-	"github.com/soyart/gsl/data/list"
+	"github.com/soyart/gsl/data/tree"
 )
 
 // GraphDijkstraImpl[T] wraps GraphWeightedImpl[T], where T is generic type numeric types and S is ~string.
@@ -78,12 +77,14 @@ func (g *GraphDijkstraImpl[T]) DijkstraShortestPathFrom(startNode NodeDijkstra[T
 	visited := make(map[NodeDijkstra[T]]bool)
 	parents := make(map[NodeDijkstra[T]]NodeDijkstra[T])
 
-	pq := list.NewPriorityQueue[T](data.Ascending)
-	heap.Push(pq, startNode)
+	// pq := list.NewPriorityQueue[T](data.Ascending)
+	// heap.Push(pq, startNode)
+	pq := tree.NewHeap[T](data.Ascending)
+	pq.PushGetter(startNode)
 
 	for !pq.IsEmpty() {
 		// Pop the top of pq and mark it as visited
-		popped := heap.Pop(pq)
+		popped := pq.PopGetter()
 		if popped == nil {
 			panic("popped nil - should not happen")
 		}
@@ -105,7 +106,7 @@ func (g *GraphDijkstraImpl[T]) DijkstraShortestPathFrom(startNode NodeDijkstra[T
 				continue
 			}
 
-			heap.Push(pq, edgeNode)
+			pq.PushGetter(edgeNode)
 
 			// If getting to edge from current is cheaper that the edge current cost state,
 			// update it to pass via current instead

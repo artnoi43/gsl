@@ -49,6 +49,18 @@ func (h *Heap[T]) Pop() *T {
 	return &rootValue
 }
 
+func (h *Heap[T]) PopGetter() data.Getter[T] {
+	rootNode := h.Items[0]
+	lastIdx := h.Len() - 1
+
+	h.Items[0] = h.Items[lastIdx]
+	h.Items = h.Items[:lastIdx]
+
+	h.heapifyDown(0)
+
+	return rootNode
+}
+
 func (h *Heap[T]) Len() int {
 	return len(h.Items)
 }
