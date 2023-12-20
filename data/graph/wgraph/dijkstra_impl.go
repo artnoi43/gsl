@@ -41,6 +41,7 @@ func (g *GraphDijkstraImpl[T]) AddEdgeWeightOrDistance(n1, n2 NodeDijkstra[T], w
 
 func (g *GraphDijkstraImpl[T]) AddEdge(n1, n2 NodeDijkstra[T], edge EdgeWeighted[T, NodeDijkstra[T]]) error {
 	var zeroValue T
+
 	weight := edge.GetWeight()
 	if weight < zeroValue {
 		return errors.Wrapf(ErrDijkstraNegativeWeightEdge, "negative edge weight %v", weight)
@@ -86,6 +87,7 @@ func (g *GraphDijkstraImpl[T]) DijkstraShortestPathFrom(startNode NodeDijkstra[T
 		if popped == nil {
 			panic("popped nil - should not happen")
 		}
+
 		current, ok := popped.(NodeDijkstra[T])
 		if !ok {
 			typeOfCurrent := reflect.TypeOf(current)
@@ -104,11 +106,13 @@ func (g *GraphDijkstraImpl[T]) DijkstraShortestPathFrom(startNode NodeDijkstra[T
 			}
 
 			heap.Push(pq, edgeNode)
+
 			// If getting to edge from current is cheaper that the edge current cost state,
 			// update it to pass via current instead
 			if newCost := current.GetValue() + edge.GetWeight(); newCost < edgeNode.GetValue() {
 				edgeNode.SetValueOrCost(newCost)
 				edgeNode.SetPrevious(current)
+
 				// Save (best) path answer to parents
 				parents[edgeNode] = current
 			}

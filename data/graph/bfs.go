@@ -21,10 +21,12 @@ func BFS[T, E any](
 	}
 
 	shortestPath, hops := BFSShortestPathReconstruct(rawPath, src, dst)
+
 	return shortestPath, hops, found
 }
 
-// BFSSearchGeneric traverses the graph in BFS manner, and collecting VFS traversal information in a map `prev`. It returns the map, and a boolean value denoting if dst was reachable from src
+// BFSSearchGeneric traverses the graph in BFS manner, and collecting VFS traversal information in a map `prev`.
+// It returns the map, and a boolean value denoting if dst was reachable from src
 func BFSSearchGeneric[T, E any](
 	g Graph[Node[T], E, any],
 	src Node[T],
@@ -38,12 +40,14 @@ func BFSSearchGeneric[T, E any](
 
 	visited := make(map[Node[T]]bool)
 	prev := make(map[Node[T]]Node[T])
+
 	var found bool
 	for !q.IsEmpty() {
 		popped := q.Pop()
 		if popped == nil {
 			panic("popped nil - should not happen")
 		}
+
 		current := *popped
 
 		neighbors := g.GetNodeNeighbors(current)
@@ -78,6 +82,7 @@ func BFSShortestPathReconstruct[T nodeValue](
 ) {
 	current := dst
 	shortestPath := []Node[T]{current}
+
 	var hops int
 	if current == src {
 		return shortestPath, hops
@@ -95,6 +100,7 @@ func BFSShortestPathReconstruct[T nodeValue](
 
 		shortestPath = append(shortestPath, next)
 		current = next
+
 		hops++
 	}
 
