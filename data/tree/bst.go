@@ -14,14 +14,20 @@ func NewBst[T constraints.Ordered]() *Bst[T] {
 }
 
 func (b *Bst[T]) Insert(item T) {
+	node := binTreeNode[T]{
+		value: item,
+		ok:    true,
+		left:  nil,
+		right: nil,
+	}
+
+	if !b.Root.ok {
+		b.Root = node
+	}
+
 	BstInsert(
 		&b.Root,
-		&binTreeNode[T]{
-			value: item,
-			ok:    true,
-			left:  nil,
-			right: nil,
-		},
+		&node,
 	)
 }
 

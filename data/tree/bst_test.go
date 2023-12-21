@@ -7,12 +7,14 @@ import (
 func TestBstInsertFind(t *testing.T) {
 	bst := new(Bst[int])
 
+	start := 1
 	limit := 10
-	for i := 0; i < limit; i++ {
+	for i := start; i < limit; i++ {
 		bst.Insert(i)
+		t.Logf("Root after inserted %d: %+v", i, bst.Root)
 	}
 
-	for i := 0; i < limit; i++ {
+	for i := start; i < limit; i++ {
 		if !bst.Find(i) {
 			t.Fatalf("missing node %d", i)
 		}
@@ -21,6 +23,12 @@ func TestBstInsertFind(t *testing.T) {
 	outOfRange := -1
 	if bst.Find(outOfRange) {
 		t.Fatalf("unexpected false positive for %d", outOfRange)
+	}
+
+	curr := &bst.Root
+	for curr != nil {
+		t.Logf("node %+v", curr)
+		curr = curr.right
 	}
 }
 
@@ -53,9 +61,11 @@ func TestBstRemoveEmpty(t *testing.T) {
 func TestBstRemove(t *testing.T) {
 	bst := new(Bst[int])
 
-	limit := 10
+	start := 1
+	limit := 12
 	target := 5
-	for i := 0; i < limit; i++ {
+
+	for i := start; i < limit; i++ {
 		bst.Insert(i)
 	}
 
@@ -67,7 +77,7 @@ func TestBstRemove(t *testing.T) {
 		t.Fatalf("found removed target %d", target)
 	}
 
-	for i := 0; i < limit; i++ {
+	for i := start; i < limit; i++ {
 		if !bst.Find(i) {
 			if i == target {
 				continue
