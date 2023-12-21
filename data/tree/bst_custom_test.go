@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"math/big"
 	"testing"
 )
 
@@ -96,6 +97,35 @@ func TestBstCustomRemove(t *testing.T) {
 	for i := 0; i < limit; i++ {
 		w := wrapper(i)
 		if !bst.Find(&w) {
+			if i == target {
+				continue
+			}
+
+			t.Fatalf("missing node %d", i)
+		}
+	}
+}
+
+func TestBstCustomRemoveBigInt(t *testing.T) {
+	bst := new(BstCustom[*big.Int])
+
+	limit := int64(10)
+	target := int64(5)
+
+	for i := int64(0); i < limit; i++ {
+		bst.Insert(big.NewInt(i))
+	}
+
+	if !bst.Remove(big.NewInt(target)) {
+		t.Fatalf("remove returned false on target %d", target)
+	}
+
+	if bst.Find(big.NewInt(target)) {
+		t.Fatalf("found removed target %d", target)
+	}
+
+	for i := int64(0); i < limit; i++ {
+		if !bst.Find(big.NewInt(i)) {
 			if i == target {
 				continue
 			}
