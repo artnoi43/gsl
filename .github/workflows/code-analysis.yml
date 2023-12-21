@@ -1,4 +1,4 @@
-name: Code Analysis & Tests
+name: code analysis
 on:
   workflow_dispatch:
   pull_request:
@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         go-version:
-          - "1.18.x"
+          - "stable"
           - "" # empty string = read version from go.mod
 
         os:
@@ -31,14 +31,13 @@ jobs:
           fetch-depth: "0"
 
       - name: Set up Go
-        uses: actions/setup-go@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
           go-version-file: "go.mod"
           cache: true
+          check_latest: true
+
       - run: echo "GOVERSION=$(go version)" >> $GITHUB_ENV
 
       - name: Update Pull Request Comment
@@ -49,14 +48,6 @@ jobs:
             ## 🔍 Running Code Analysis & Testing (${{ env.GOVERSION }})
             ${{ env.pr_info }}
             _Please wait for the result before merging this pull request._
-
-      - name: Install dependencies
-        run: go get ./...
-
-      - name: Test
-        run: go test ./...
-        env:
-          RUNNER_CI: true
 
       # Q: Why Reviewdog ?
       # A: Because golangci-lint action has some issues, not working on self-hosted runners and can't report errors detail on review comments.

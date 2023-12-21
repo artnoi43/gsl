@@ -6,13 +6,27 @@ import (
 	"testing"
 )
 
+var envsCi [2]string = [2]string{"CI", "GITHUB_ACTIONS"}
+
 func TestGroupConsecutive(t *testing.T) {
-	targetEnv := "RUNNER_CI"
-	_, found := os.LookupEnv(targetEnv)
-	if !found {
-		t.Skipf("Skip due to missing env %s", targetEnv)
+	ci := false
+	for i := range envsCi {
+		s, found := os.LookupEnv(envsCi[i])
+		if found && s != "" {
+			ci = true
+			break
+		}
 	}
 
+	if !ci {
+		t.Skip("Skipping tests due to test not being run on CI platform")
+		return
+	}
+
+	testGroupConsecutive(t)
+}
+
+func testGroupConsecutive(t *testing.T) {
 	type testCase[T GoNumber] struct {
 		in  []T
 		out [][2]T
