@@ -7,15 +7,15 @@ import (
 )
 
 type Heap[T any] struct {
-	Items   []data.Getter[T]
-	CmpFunc data.LessFunc[data.Getter[T]]
+	Items    []data.Getter[T]
+	LessFunc data.LessFunc[data.Getter[T]]
 }
 
 func NewHeap[T constraints.Ordered](
 	order data.SortOrder,
 ) *Heap[T] {
 	return &Heap[T]{
-		CmpFunc: data.FactoryLessFuncOrdered[T](order),
+		LessFunc: data.FactoryLessFuncOrdered[T](order),
 	}
 }
 
@@ -23,7 +23,7 @@ func NewHeapCmp[T data.CmpOrdered[T]](
 	order data.SortOrder,
 ) *Heap[T] {
 	return &Heap[T]{
-		CmpFunc: data.FactoryLessFuncCmp[T](order),
+		LessFunc: data.FactoryLessFuncCmp[T](order),
 	}
 }
 
@@ -88,7 +88,7 @@ func (h *Heap[T]) heapifyUp(from int) {
 	for curr != 0 {
 		parent := ParentIdx(curr)
 
-		if !h.CmpFunc(h.Items, curr, parent) {
+		if !h.LessFunc(h.Items, curr, parent) {
 			break
 		}
 
@@ -121,7 +121,7 @@ func (h *Heap[T]) heapifyDown(from int) {
 		switch {
 		case
 			childRight >= length,
-			h.CmpFunc(h.Items, childLeft, childRight):
+			h.LessFunc(h.Items, childLeft, childRight):
 
 			child = childLeft
 
@@ -129,7 +129,7 @@ func (h *Heap[T]) heapifyDown(from int) {
 			child = childRight
 		}
 
-		if h.CmpFunc(h.Items, curr, child) {
+		if h.LessFunc(h.Items, curr, child) {
 			break
 		}
 

@@ -27,7 +27,7 @@ func TestHeapifyUp(t *testing.T) {
 
 		parent := ParentIdx(curr)
 		if parent >= 0 {
-			if pq.CmpFunc(pq.Items, curr, parent) {
+			if pq.LessFunc(pq.Items, curr, parent) {
 				valueCurr := pq.Items[curr].GetValue()
 				valueParent := pq.Items[parent].GetValue()
 
@@ -45,7 +45,7 @@ func TestHeapifyUp(t *testing.T) {
 			continue
 		}
 
-		if !pq.CmpFunc(pq.Items, curr, childLeft) {
+		if !pq.LessFunc(pq.Items, curr, childLeft) {
 			valueCurr := pq.Items[curr].GetValue()
 			valueLeft := pq.Items[childLeft].GetValue()
 
@@ -62,7 +62,7 @@ func TestHeapifyUp(t *testing.T) {
 			continue
 		}
 
-		if !pq.CmpFunc(pq.Items, curr, childRight) {
+		if !pq.LessFunc(pq.Items, curr, childRight) {
 			valueCurr := pq.Items[curr].GetValue()
 			valueRight := pq.Items[childRight].GetValue()
 

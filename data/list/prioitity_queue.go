@@ -12,13 +12,13 @@ import (
 // PriorityQueue[T] wraps items []T and implements Go's heap.Interface.
 // tree.Heap is an alternative implementation with gsl's implementation of heaps.
 type PriorityQueue[T any] struct {
-	Items   []data.Getter[T]
-	CmpFunc data.LessFunc[data.Getter[T]]
+	Items    []data.Getter[T]
+	LessFunc data.LessFunc[data.Getter[T]]
 }
 
 func NewPriorityQueue[T constraints.Ordered](order data.SortOrder) *PriorityQueue[T] {
 	return &PriorityQueue[T]{
-		CmpFunc: data.FactoryLessFuncOrdered[T](order),
+		LessFunc: data.FactoryLessFuncOrdered[T](order),
 	}
 }
 
@@ -26,7 +26,7 @@ func NewPriorityQueue[T constraints.Ordered](order data.SortOrder) *PriorityQueu
 // for type T with Cmp(T), i.e. -1 -> less, 0 -> equal, 1 -> greater.
 func NewPrioirtyQueueCmp[T data.CmpOrdered[T]](order data.SortOrder) *PriorityQueue[T] {
 	return &PriorityQueue[T]{
-		CmpFunc: data.FactoryLessFuncCmp[T](order),
+		LessFunc: data.FactoryLessFuncCmp[T](order),
 	}
 }
 
@@ -36,12 +36,12 @@ func NewPriorityQueueCustom[T any](
 	lessFunc data.LessFunc[data.Getter[T]],
 ) *PriorityQueue[T] {
 	return &PriorityQueue[T]{
-		CmpFunc: lessFunc,
+		LessFunc: lessFunc,
 	}
 }
 
 func (q *PriorityQueue[T]) ChangeOrdering(lessFunc data.LessFunc[data.Getter[T]]) {
-	q.CmpFunc = lessFunc
+	q.LessFunc = lessFunc
 	heap.Init(q)
 }
 
@@ -50,7 +50,7 @@ func (q *PriorityQueue[T]) Len() int {
 }
 
 func (q *PriorityQueue[T]) Less(i, j int) bool {
-	return q.CmpFunc(q.Items, i, j)
+	return q.LessFunc(q.Items, i, j)
 }
 
 func (q *PriorityQueue[T]) Swap(i, j int) {
