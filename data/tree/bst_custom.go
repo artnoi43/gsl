@@ -12,7 +12,7 @@ func NewBstCustom[T data.CmpOrdered[T]]() *BstCustom[T] {
 	return &BstCustom[T]{}
 }
 
-func (b *BstCustom[T]) Insert(item T) {
+func (b *BstCustom[T]) Insert(item T) bool {
 	node := binTreeNode[T]{
 		value: item,
 		ok:    true,
@@ -22,9 +22,10 @@ func (b *BstCustom[T]) Insert(item T) {
 
 	if !b.Root.ok {
 		b.Root = node
+		return true
 	}
 
-	BstCustomInsert(
+	return BstCustomInsert(
 		&b.Root,
 		&node,
 	)
@@ -38,27 +39,30 @@ func (b *BstCustom[T]) Remove(target T) bool {
 	return BstCustomRemove(&b.Root, target) != nil
 }
 
-func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) {
+func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) bool {
 	curr := root
 
 	for {
 		if curr == nil {
 			curr = node
 
-			return
+			return true
 		}
 
 		cmp := node.value.Cmp(curr.value)
 
 		switch {
 		case cmp == 0:
-			curr.ok = true
-			return
+			exists := curr.ok
+			node.ok = true
+			curr = node
+
+			return !exists
 
 		case cmp < 0:
 			if curr.left == nil {
 				curr.left = node
-				return
+				return true
 			}
 
 			curr = curr.left
@@ -66,7 +70,7 @@ func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) {
 		case cmp > 0:
 			if curr.right == nil {
 				curr.right = node
-				return
+				return true
 			}
 
 			curr = curr.right

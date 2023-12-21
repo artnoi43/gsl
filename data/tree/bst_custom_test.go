@@ -9,9 +9,6 @@ type wrapper int
 
 func (w *wrapper) Cmp(other *wrapper) int {
 	switch {
-	case *w == *other:
-		return 0
-
 	case *w > *other:
 		return 1
 
@@ -19,19 +16,32 @@ func (w *wrapper) Cmp(other *wrapper) int {
 		return -1
 	}
 
-	panic("unhandled")
+	return 0
 }
 
 func TestBstCustomInsert(t *testing.T) {
 	bst := NewBstCustom[*wrapper]()
 
+	start := 1
 	limit := 10
-	for i := 0; i < limit; i++ {
+
+	for i := start; i < limit; i++ {
 		w := wrapper(i)
-		bst.Insert(&w)
+		inserted := bst.Insert(&w)
+		if !inserted {
+			t.Fatalf("Insert returned false for new value %d", i)
+		}
 	}
 
-	for i := 0; i < limit; i++ {
+	for i := start; i < limit; i++ {
+		w := wrapper(i)
+		inserted := bst.Insert(&w)
+		if inserted {
+			t.Fatalf("Insert returned false for new value %d", i)
+		}
+	}
+
+	for i := start; i < limit; i++ {
 		w := wrapper(i)
 		if !bst.Find(&w) {
 			t.Fatalf("missing node %d", i)
@@ -77,11 +87,12 @@ func TestBstCustomRemoveEmpty(t *testing.T) {
 func TestBstCustomRemove(t *testing.T) {
 	bst := new(BstCustom[*wrapper])
 
+	start := 1
 	limit := 10
 	target := 5
 	targetWrapper := wrapper(target)
 
-	for i := 0; i < limit; i++ {
+	for i := start; i < limit; i++ {
 		w := wrapper(i)
 		bst.Insert(&w)
 	}
@@ -94,7 +105,7 @@ func TestBstCustomRemove(t *testing.T) {
 		t.Fatalf("found removed target %d", target)
 	}
 
-	for i := 0; i < limit; i++ {
+	for i := start; i < limit; i++ {
 		w := wrapper(i)
 		if !bst.Find(&w) {
 			if i == target {
@@ -109,10 +120,11 @@ func TestBstCustomRemove(t *testing.T) {
 func TestBstCustomRemoveBigInt(t *testing.T) {
 	bst := new(BstCustom[*big.Int])
 
+	start := int64(1)
 	limit := int64(10)
 	target := int64(5)
 
-	for i := int64(0); i < limit; i++ {
+	for i := start; i < limit; i++ {
 		bst.Insert(big.NewInt(i))
 	}
 
@@ -124,7 +136,7 @@ func TestBstCustomRemoveBigInt(t *testing.T) {
 		t.Fatalf("found removed target %d", target)
 	}
 
-	for i := int64(0); i < limit; i++ {
+	for i := start; i < limit; i++ {
 		if !bst.Find(big.NewInt(i)) {
 			if i == target {
 				continue

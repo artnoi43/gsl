@@ -13,7 +13,7 @@ func NewBst[T constraints.Ordered]() *Bst[T] {
 	return new(Bst[T])
 }
 
-func (b *Bst[T]) Insert(item T) {
+func (b *Bst[T]) Insert(item T) bool {
 	node := binTreeNode[T]{
 		value: item,
 		ok:    true,
@@ -23,9 +23,11 @@ func (b *Bst[T]) Insert(item T) {
 
 	if !b.Root.ok {
 		b.Root = node
+
+		return true
 	}
 
-	BstInsert(
+	return BstInsert(
 		&b.Root,
 		&node,
 	)
@@ -39,7 +41,7 @@ func (b *Bst[T]) Find(target T) bool {
 	return BstFind(&b.Root, target)
 }
 
-func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
+func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) bool {
 	curr := root
 
 	for {
@@ -48,18 +50,21 @@ func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]
 		case curr == nil:
 			curr = node
 
-			return
+			return true
 
 		// Do nothing if duplicate nodes
 		case node.value == curr.value:
-			node.ok = true
+			exists := curr.ok
 
-			return
+			node.ok = true
+			curr = node
+
+			return !exists
 
 		case node.value < curr.value:
 			if curr.left == nil {
 				curr.left = node
-				return
+				return true
 			}
 
 			curr = curr.left
@@ -67,7 +72,7 @@ func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]
 		case node.value > curr.value:
 			if curr.right == nil {
 				curr.right = node
-				return
+				return true
 			}
 
 			curr = curr.right
@@ -152,32 +157,38 @@ func digRight[T any](root *binTreeNode[T]) *binTreeNode[T] {
 	return curr
 }
 
-func BstInsertRecurse[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) {
+func BstInsertRecurse[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) bool {
 	switch {
 	case !root.ok:
 		root = node
 		root.ok = true
 
-		return
+		return true
 
 	case node.value == root.value:
-		// Do nothing if duplicate nodes
-		return
+		exists := root.ok
+
+		node.ok = true
+		root = node
+
+		return !exists
 
 	case node.value < root.value:
 		if root.left == nil {
 			root.left = node
-			return
+			return true
 		}
 
-		BstInsertRecurse(root.left, node)
+		return BstInsertRecurse(root.left, node)
 
 	case node.value > root.value:
 		if root.right == nil {
 			root.right = node
-			return
+			return true
 		}
 
-		BstInsertRecurse(root.right, node)
+		return BstInsertRecurse(root.right, node)
 	}
+
+	return false
 }

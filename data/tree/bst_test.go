@@ -10,11 +10,20 @@ func TestBstInsertFind(t *testing.T) {
 	start := 1
 	limit := 10
 	for i := start; i < limit; i++ {
-		bst.Insert(i)
+		inserted := bst.Insert(i)
+		if !inserted {
+			t.Fatalf("Insert returned false after inserting new value %d", i)
+		}
+
 		t.Logf("Root after inserted %d: %+v", i, bst.Root)
 	}
 
 	for i := start; i < limit; i++ {
+		inserted := bst.Insert(i)
+		if inserted {
+			t.Fatalf("Insert returned true after replacing value %d with new node", i)
+		}
+
 		if !bst.Find(i) {
 			t.Fatalf("missing node %d", i)
 		}

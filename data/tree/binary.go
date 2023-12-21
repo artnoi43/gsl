@@ -6,8 +6,16 @@ import (
 
 // BinaryTreeBasic is basic, minimal binary tree with node type NODE
 type BinaryTreeBasic[NODE any] interface {
-	Insert(node NODE)
+	// Insert inserts a node to the tree,
+	// returning bool indicating if a node was added.
+	// False is returned if an existing node was replaced
+	// with new node, leaving tree size unchanged.
+	Insert(node NODE) bool
+
+	// Remove removes node, returning whether the removal
+	// was successful.
 	Remove(node NODE) bool
+
 	Find(node NODE) bool
 }
 
@@ -155,9 +163,9 @@ func InorderNodeRecurse[T any, NODE BinaryTreeNode[T]](
 	return nil
 }
 
-// BinTreeMax digs for smallest values in the subtree, returning
-// the node as well as the height.
-func BinTreeMax[T any](node BinaryTreeNode[T]) (BinaryTreeNode[T], uint) {
+// DigRight digs for smallest values in the subtree, returning
+// the node as well as the height to that node.
+func DigRight[T any](node BinaryTreeNode[T]) (BinaryTreeNode[T], uint) {
 	curr := node
 	var height uint
 
@@ -169,9 +177,9 @@ func BinTreeMax[T any](node BinaryTreeNode[T]) (BinaryTreeNode[T], uint) {
 	return curr, height
 }
 
-// BinTreeMin digs for smallest values in the subtree, returning
-// the node as well as the height.
-func BinTreeMin[T any](root BinaryTreeNode[T]) (BinaryTreeNode[T], uint) {
+// DigLeft digs for smallest values in the subtree, returning
+// the node as well as the height to that node.
+func DigLeft[T any](root BinaryTreeNode[T]) (BinaryTreeNode[T], uint) {
 	curr := root
 	var height uint
 
