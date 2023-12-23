@@ -27,36 +27,35 @@ func MergeSort[T constraints.Ordered](arr []T, ordering SortOrder) []T {
 		left := MergeSort[T](arr[:mid], ordering)
 		right := MergeSort[T](arr[mid:], ordering)
 
-		lp, rp := len(left)-1, len(right)-1
 		sorted := make([]T, length)
-		sp := length - 1
+		var sp, lp, rp int
 
-		for rp >= 0 && lp >= 0 {
+		for lp < len(left) && rp < len(right) {
 			l, r := left[lp], right[rp]
 
 			if lessFunc(l, r) {
-				sorted[sp] = r
-				rp--
-				sp--
+				sorted[sp] = l
+				lp++
+				sp++
 
 				continue
 			}
 
-			sorted[sp] = l
-			lp--
-			sp--
+			sorted[sp] = r
+			rp++
+			sp++
 		}
 
-		for lp >= 0 {
+		for lp < len(left) {
 			sorted[sp] = left[lp]
-			lp--
-			sp--
+			lp++
+			sp++
 		}
 
-		for rp >= 0 {
+		for rp < len(right) {
 			sorted[sp] = right[rp]
-			rp--
-			sp--
+			rp++
+			sp++
 		}
 
 		return sorted
