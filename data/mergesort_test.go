@@ -6,6 +6,7 @@ import (
 
 func TestMergeSort(t *testing.T) {
 	tests := [][]int{
+		{},
 		{1},
 		{1, 2, 3, -1},
 		{1, 2, 3, 4},
@@ -16,6 +17,10 @@ func TestMergeSort(t *testing.T) {
 
 	for i := range tests {
 		out := MergeSort[int](tests[i], Ascending)
+
+		if len(tests[i]) == 0 {
+			continue
+		}
 
 		prev := out[0]
 		for j := range out {
