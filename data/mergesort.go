@@ -25,8 +25,8 @@ func MergeSort[T constraints.Ordered](arr []T, ordering SortOrder) []T {
 
 	mid := length / 2
 
-	left := MergeSort[T](arr[:mid], ordering)
-	right := MergeSort[T](arr[mid:], ordering)
+	left := MergeSort(arr[:mid], ordering)
+	right := MergeSort(arr[mid:], ordering)
 
 	sorted := make([]T, length)
 
