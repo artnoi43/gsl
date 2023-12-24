@@ -29,35 +29,40 @@ func MergeSort[T constraints.Ordered](arr []T, ordering SortOrder) []T {
 	right := MergeSort[T](arr[mid:], ordering)
 
 	sorted := make([]T, length)
-	var sp, lp, rp int
 
+	// p points to insertion point in sorted,
+	// lp and rp are current read heads for left and right
+	var p, lp, rp int
+
+	// Merge left and right into sort until either one is used up,
+	// then blindly fill sorted with the remainers
 	lessFunc := LessFuncOrdered[T](ordering)
 	for lp < len(left) && rp < len(right) {
 		l, r := left[lp], right[rp]
 
 		if lessFunc(l, r) {
-			sorted[sp] = l
+			sorted[p] = l
 			lp++
-			sp++
+			p++
 
 			continue
 		}
 
-		sorted[sp] = r
+		sorted[p] = r
 		rp++
-		sp++
+		p++
 	}
 
 	for lp < len(left) {
-		sorted[sp] = left[lp]
+		sorted[p] = left[lp]
 		lp++
-		sp++
+		p++
 	}
 
 	for rp < len(right) {
-		sorted[sp] = right[rp]
+		sorted[p] = right[rp]
 		rp++
-		sp++
+		p++
 	}
 
 	return sorted
