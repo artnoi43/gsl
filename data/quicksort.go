@@ -4,7 +4,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-func QuickSortValuer[T constraints.Ordered](
+func QuickSortGetter[T constraints.Ordered](
 	arr []Getter[T],
 	ordering SortOrder,
 ) []Getter[T] {
@@ -36,8 +36,8 @@ func QuickSortValuer[T constraints.Ordered](
 		}
 	}
 
-	sorted := append(QuickSortValuer(left, ordering), pivot)
-	sorted = append(sorted, QuickSortValuer(right, ordering)...)
+	sorted := append(QuickSortGetter(left, ordering), pivot)
+	sorted = append(sorted, QuickSortGetter(right, ordering)...)
 
 	return sorted
 }
