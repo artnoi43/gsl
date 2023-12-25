@@ -65,18 +65,6 @@ func (n *binTreeNode[T]) IsLeaf() bool {
 	return n.left == nil && n.right == nil
 }
 
-func (n *binTreeNode[T]) hasBoth() bool {
-	return n.left != nil && n.right != nil
-}
-
-func (n *binTreeNode[T]) hasLeft() bool {
-	return n.left != nil
-}
-
-func (n *binTreeNode[T]) hasRight() bool {
-	return n.right != nil
-}
-
 func Inorder[POS any, NODE any](
 	tree BinaryTree[POS, NODE],
 	node POS,
@@ -86,7 +74,6 @@ func Inorder[POS any, NODE any](
 	curr := node
 
 	for !tree.NodeIsNull(curr) || !stack.IsEmpty() {
-
 		for !tree.NodeIsNull(curr) {
 			stack.Push(curr)
 			curr = tree.LeftChild(curr)
@@ -119,8 +106,7 @@ func InorderRecurse[POS any, NODE any](
 	return InorderRecurse(tree, tree.RightChild(node), f)
 }
 
-func InorderNode[T any, NODE BinaryTreeNode[T]](
-	tree BinaryTreeBasic[NODE],
+func InorderNode[NODE BinaryTreeNode[any]](
 	node NODE,
 	f func(NODE) error,
 ) error {

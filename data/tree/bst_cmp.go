@@ -4,15 +4,16 @@ import (
 	"github.com/soyart/gsl/data"
 )
 
-type BstCustom[T data.CmpOrdered[T]] struct {
+// BstCmp is for types with Cmp(T) int methods, e.g. *big.Int
+type BstCmp[T data.CmpOrdered[T]] struct {
 	Root binTreeNode[T]
 }
 
-func NewBstCustom[T data.CmpOrdered[T]]() *BstCustom[T] {
-	return &BstCustom[T]{}
+func NewBstCmp[T data.CmpOrdered[T]]() *BstCmp[T] {
+	return &BstCmp[T]{}
 }
 
-func (b *BstCustom[T]) Insert(item T) bool {
+func (b *BstCmp[T]) Insert(item T) bool {
 	node := binTreeNode[T]{
 		value: item,
 		ok:    true,
@@ -31,12 +32,12 @@ func (b *BstCustom[T]) Insert(item T) bool {
 	)
 }
 
-func (b *BstCustom[T]) Find(target T) bool {
-	return BstCustomFind[T](&b.Root, target)
+func (b *BstCmp[T]) Find(target T) bool {
+	return BstCmpFind[T](&b.Root, target)
 }
 
-func (b *BstCustom[T]) Remove(target T) bool {
-	return BstCustomRemove(&b.Root, target) != nil
+func (b *BstCmp[T]) Remove(target T) bool {
+	return BstCmpRemove(&b.Root, target) != nil
 }
 
 func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) bool {
@@ -44,7 +45,7 @@ func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) bool {
 
 	for {
 		if curr == nil {
-			curr = node
+			*curr = *node
 
 			return true
 		}
@@ -78,7 +79,7 @@ func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) bool {
 	}
 }
 
-func BstCustomFind[T data.CmpOrdered[T]](root *binTreeNode[T], target T) bool {
+func BstCmpFind[T data.CmpOrdered[T]](root *binTreeNode[T], target T) bool {
 	curr := root
 
 	for {
@@ -105,7 +106,7 @@ func BstCustomFind[T data.CmpOrdered[T]](root *binTreeNode[T], target T) bool {
 }
 
 // BstRemove removes target from subtree tree, returning the new root of the subtree
-func BstCustomRemove[T data.CmpOrdered[T]](root *binTreeNode[T], target T) *binTreeNode[T] {
+func BstCmpRemove[T data.CmpOrdered[T]](root *binTreeNode[T], target T) *binTreeNode[T] {
 	if root == nil {
 		return nil
 	}
@@ -114,10 +115,10 @@ func BstCustomRemove[T data.CmpOrdered[T]](root *binTreeNode[T], target T) *binT
 
 	switch {
 	case cmp < 0:
-		root.left = BstCustomRemove(root.left, target)
+		root.left = BstCmpRemove(root.left, target)
 
 	case cmp > 0:
-		root.right = BstCustomRemove(root.right, target)
+		root.right = BstCmpRemove(root.right, target)
 
 	// Do the actual removal
 	case cmp == 0:
@@ -133,7 +134,7 @@ func BstCustomRemove[T data.CmpOrdered[T]](root *binTreeNode[T], target T) *binT
 
 			root.ok = false
 			root.value = replacement.value
-			root.right = BstCustomRemove(root.right, replacement.value)
+			root.right = BstCmpRemove(root.right, replacement.value)
 		}
 	}
 

@@ -20,7 +20,7 @@ func (w *wrapper) Cmp(other *wrapper) int {
 }
 
 func TestBstCustomInsert(t *testing.T) {
-	bst := NewBstCustom[*wrapper]()
+	bst := NewBstCmp[*wrapper]()
 
 	start := 1
 	limit := 10
@@ -55,7 +55,7 @@ func TestBstCustomInsert(t *testing.T) {
 }
 
 func TestBstCustomRemoveEmpty(t *testing.T) {
-	bst := new(BstCustom[*wrapper])
+	bst := new(BstCmp[*wrapper])
 
 	items := []int{3, 1, 2, 0, 5}
 
@@ -85,7 +85,7 @@ func TestBstCustomRemoveEmpty(t *testing.T) {
 }
 
 func TestBstCustomRemove(t *testing.T) {
-	bst := new(BstCustom[*wrapper])
+	bst := new(BstCmp[*wrapper])
 
 	start := 1
 	limit := 10
@@ -118,7 +118,7 @@ func TestBstCustomRemove(t *testing.T) {
 }
 
 func TestBstCustomRemoveBigInt(t *testing.T) {
-	bst := new(BstCustom[*big.Int])
+	bst := new(BstCmp[*big.Int])
 
 	start := int64(1)
 	limit := int64(10)

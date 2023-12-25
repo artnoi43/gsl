@@ -92,7 +92,7 @@ func TestBstCountRemove(t *testing.T) {
 }
 
 func TestBstCountCustomInsertFind(t *testing.T) {
-	bst := new(BstCustom[*big.Int])
+	bst := new(BstCmp[*big.Int])
 	bstCount := NewBstCount[*big.Int](bst)
 
 	start := int64(1)

@@ -48,7 +48,7 @@ func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]
 		switch {
 		// Found leaf node
 		case curr == nil:
-			curr = node
+			*curr = *node
 
 			return true
 
@@ -148,6 +148,8 @@ func digLeft[T any](root *binTreeNode[T]) *binTreeNode[T] {
 }
 
 // Returns right leaf of a tree root
+//
+//nolint:unused
 func digRight[T any](root *binTreeNode[T]) *binTreeNode[T] {
 	curr := root
 	for curr.right != nil && curr.right.ok {
