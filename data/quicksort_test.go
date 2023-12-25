@@ -1,6 +1,7 @@
 package data
 
 import (
+	"math/big"
 	"testing"
 )
 
@@ -36,4 +37,23 @@ func TestQuickSort(t *testing.T) {
 	}
 
 	QuickSort(arr, Descending)
+}
+
+func TestQuickSortCmp(t *testing.T) {
+	ints := []int64{2, 3, 60, 1, 70, 234, -1}
+	arr := make([]*big.Int, len(ints))
+
+	for i := range ints {
+		arr[i] = big.NewInt(ints[i])
+	}
+
+	out := QuickSortCmp(arr, Ascending)
+
+	if out[0].Int64() != -1 {
+		t.Fatalf("unexpected result - expecting -1, got %d", out[0].Int64())
+	}
+
+	if out[len(out)-1].Int64() != 234 {
+		t.Fatalf("unexpected result - expecting 234, got %d", out[len(out)-1].Int64())
+	}
 }
