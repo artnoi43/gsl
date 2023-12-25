@@ -5,31 +5,31 @@ import (
 )
 
 func TestMergeSort(t *testing.T) {
-	tests := [][]int{
-		{},
-		{1},
-		{1, 2, 3, -1},
-		{1, 2, 3, 4},
-		{1, 2, 3, 4, 5},
-		{5, 4, 3, 2, 1},
-		{5, 3, 1, 20, -4, 8},
+	tests := testCasesDefault()
+	for i := range tests {
+		testCase := tests[i]
+		testSortFunc(t, testCase, MergeSort)
 	}
 
+	// See if it'll overflow on 10M ints
+	var s []int = make([]int, 10000000)
+	for i := 0; i < 10000000; i++ {
+		s[i] = i
+	}
+
+	MergeSort(s, Descending)
+}
+
+func TestMergeSortBigInts(t *testing.T) {
+	tests := testCasesBigInt()
 	for i := range tests {
-		out := MergeSort[int](tests[i], Ascending)
+		testSortFuncCmp(t, tests[i], MergeSortCmp)
+	}
+}
 
-		if len(tests[i]) == 0 {
-			continue
-		}
-
-		prev := out[0]
-		for j := range out {
-			elem := out[j]
-			if elem < prev {
-				t.Fatalf("unexpected value")
-			}
-
-			prev = elem
-		}
+func TestMergeSortCustomCmp(t *testing.T) {
+	tests := testCasesFoo()
+	for i := range tests {
+		testSortFuncCmp[*foo](t, tests[i], MergeSortCmp)
 	}
 }
