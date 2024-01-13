@@ -41,27 +41,26 @@ type BinaryTreeNode[T any] interface {
 	IsNull() bool
 }
 
-type binTreeNode[T any] struct {
+type BinaryTreeNodeWrapper[T any] struct {
 	value T
 	ok    bool
 
-	left  *binTreeNode[T]
-	right *binTreeNode[T]
+	left  *BinaryTreeNodeWrapper[T]
+	right *BinaryTreeNodeWrapper[T]
 }
 
-func (n *binTreeNode[T]) Left() BinaryTreeNode[T] { return n.left }
+func (n *BinaryTreeNodeWrapper[T]) Left() BinaryTreeNode[T] { return n.left }
 
-func (n *binTreeNode[T]) Right() BinaryTreeNode[T] { return n.right }
+func (n *BinaryTreeNodeWrapper[T]) Right() BinaryTreeNode[T] { return n.right }
 
-func (n *binTreeNode[T]) Value() T { return n.value }
+func (n *BinaryTreeNodeWrapper[T]) Value() T { return n.value }
 
-func (n *binTreeNode[T]) IsNull() bool {
+func (n *BinaryTreeNodeWrapper[T]) IsNull() bool {
 	return !n.ok &&
-		n.left == nil &&
-		n.right == nil
+		n.left == nil && n.right == nil
 }
 
-func (n *binTreeNode[T]) IsLeaf() bool {
+func (n *BinaryTreeNodeWrapper[T]) IsLeaf() bool {
 	return n.left == nil && n.right == nil
 }
 

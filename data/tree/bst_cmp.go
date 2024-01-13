@@ -6,7 +6,7 @@ import (
 
 // BstCmp is for types with Cmp(T) int methods, e.g. *big.Int
 type BstCmp[T data.CmpOrdered[T]] struct {
-	Root binTreeNode[T]
+	Root BinaryTreeNodeWrapper[T]
 }
 
 func NewBstCmp[T data.CmpOrdered[T]]() *BstCmp[T] {
@@ -14,7 +14,7 @@ func NewBstCmp[T data.CmpOrdered[T]]() *BstCmp[T] {
 }
 
 func (b *BstCmp[T]) Insert(item T) bool {
-	node := binTreeNode[T]{
+	node := BinaryTreeNodeWrapper[T]{
 		value: item,
 		ok:    true,
 		left:  nil,
@@ -26,7 +26,7 @@ func (b *BstCmp[T]) Insert(item T) bool {
 		return true
 	}
 
-	return BstCustomInsert(
+	return BstCmpInsert(
 		&b.Root,
 		&node,
 	)
@@ -40,7 +40,7 @@ func (b *BstCmp[T]) Remove(target T) bool {
 	return BstCmpRemove(&b.Root, target) != nil
 }
 
-func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) bool {
+func BstCmpInsert[T data.CmpOrdered[T]](root, node *BinaryTreeNodeWrapper[T]) bool {
 	curr := root
 
 	for {
@@ -50,7 +50,7 @@ func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) bool {
 			return true
 		}
 
-		cmp := node.value.Cmp(curr.value)
+		cmp := node.Value().Cmp(curr.Value())
 
 		switch {
 		case cmp == 0:
@@ -79,7 +79,7 @@ func BstCustomInsert[T data.CmpOrdered[T]](root, node *binTreeNode[T]) bool {
 	}
 }
 
-func BstCmpFind[T data.CmpOrdered[T]](root *binTreeNode[T], target T) bool {
+func BstCmpFind[T data.CmpOrdered[T]](root *BinaryTreeNodeWrapper[T], target T) bool {
 	curr := root
 
 	for {
@@ -106,7 +106,7 @@ func BstCmpFind[T data.CmpOrdered[T]](root *binTreeNode[T], target T) bool {
 }
 
 // BstRemove removes target from subtree tree, returning the new root of the subtree
-func BstCmpRemove[T data.CmpOrdered[T]](root *binTreeNode[T], target T) *binTreeNode[T] {
+func BstCmpRemove[T data.CmpOrdered[T]](root *BinaryTreeNodeWrapper[T], target T) *BinaryTreeNodeWrapper[T] {
 	if root == nil {
 		return nil
 	}

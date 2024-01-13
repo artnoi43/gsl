@@ -90,8 +90,7 @@ func DerefValues[T any](arr []*T) []T {
 		return nil
 	}
 
-	var t T // Default value
-
+	t := ZeroedValue[T]()
 	values := make([]T, len(arr))
 	for i := range arr {
 		if arr[i] == nil {
