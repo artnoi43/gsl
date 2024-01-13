@@ -165,8 +165,10 @@ func loopTestBFS[T any](
 				switch f := tf.(type) {
 				case genericBFS[int, Node[int]]:
 					shortestPath, hops, found = f(g.(Graph[Node[int], Node[int], any]), fromNode, toNode)
+
 				case hashMapBFS[int]:
 					shortestPath, hops, found = f(g, fromNode, toNode)
+
 				default:
 					t.Fatal("unexpected function type", reflect.TypeOf(f).String())
 				}
@@ -175,10 +177,12 @@ func loopTestBFS[T any](
 					t.Log(shortestPath)
 					t.Fatalf("unexpected found: %v, expected %v\n", found, expected.found)
 				}
+
 				if hops != expected.hops {
 					t.Log(shortestPath)
 					t.Fatalf("unexpected hops: %v, expected %v\n", hops, expected.hops)
 				}
+
 				if hops != len(shortestPath)-1 {
 					t.Fatal("unexpected relationship for hops and len(shortestPath)")
 				}
