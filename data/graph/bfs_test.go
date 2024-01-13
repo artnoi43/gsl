@@ -33,6 +33,24 @@ func testBFS(t *testing.T) {
 	makam := person{name: "makam", age: 5}
 	muji := person{name: "muji", age: 1}
 
+	people := []person{art, beagie, black, makam}
+	g := NewHashMapGraph[int](true)
+
+	for _, friend := range people {
+		g.AddNode(friend)
+	}
+
+	g.AddEdgeWeightOrDistance(art, beagie, nil)
+	g.AddEdgeWeightOrDistance(art, black, nil)
+	g.AddEdgeWeightOrDistance(art, banana, nil)
+	g.AddEdgeWeightOrDistance(art, muji, nil)
+	g.AddEdgeWeightOrDistance(beagie, art, nil)
+	g.AddEdgeWeightOrDistance(beagie, banana, nil)
+	g.AddEdgeWeightOrDistance(beagie, black, nil)
+	g.AddEdgeWeightOrDistance(banana, art, nil)
+	g.AddEdgeWeightOrDistance(banana, beagie, nil)
+	g.AddEdgeWeightOrDistance(black, makam, nil)
+
 	tests := map[person]map[person]bfsTestResult{
 		art: {
 			art: {
@@ -73,24 +91,6 @@ func testBFS(t *testing.T) {
 			},
 		},
 	}
-
-	people := []person{art, beagie, black, makam}
-	g := NewHashMapGraph[int](true)
-
-	for _, friend := range people {
-		g.AddNode(friend)
-	}
-
-	g.AddEdgeWeightOrDistance(art, beagie, nil)
-	g.AddEdgeWeightOrDistance(art, black, nil)
-	g.AddEdgeWeightOrDistance(art, banana, nil)
-	g.AddEdgeWeightOrDistance(art, muji, nil)
-	g.AddEdgeWeightOrDistance(beagie, art, nil)
-	g.AddEdgeWeightOrDistance(beagie, banana, nil)
-	g.AddEdgeWeightOrDistance(beagie, black, nil)
-	g.AddEdgeWeightOrDistance(banana, art, nil)
-	g.AddEdgeWeightOrDistance(banana, beagie, nil)
-	g.AddEdgeWeightOrDistance(black, makam, nil)
 
 	loopTestBFS[int](t, tests, g)
 }
