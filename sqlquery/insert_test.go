@@ -2,7 +2,7 @@ package sqlquery
 
 import "testing"
 
-func TestFmtInsertAll(t *testing.T) {
+func TestInsertAll(t *testing.T) {
 	foos := []*foo{
 		{id: 0, name: "a", age: 1},
 		{id: 1, name: "b", age: 2},

@@ -31,6 +31,25 @@ func ClauseColumns(columns []string) string {
 	return clauseColumns
 }
 
+func ClauseValues(placeholder Placeholder, start, lenColumns uint) string {
+	if lenColumns == 0 {
+		return ""
+	}
+
+	switch placeholder {
+	case Colon:
+		return ClauseValuesNumbered(start, lenColumns, ':')
+
+	case Dollar:
+		return ClauseValuesNumbered(start, lenColumns, '$')
+
+	case QuestionMark:
+		return ClauseValuesQuestionMark(lenColumns)
+	}
+
+	panic(fmt.Sprintf("invalid placeholder %d", placeholder))
+}
+
 func ClauseValuesQuestionMark(lenColumns uint) string {
 	clause := "("
 	for i := uint(0); i < lenColumns; i++ {
@@ -59,23 +78,4 @@ func ClauseValuesNumbered(start, lenColumns uint, placeholder rune) string {
 	clause += ")"
 
 	return clause
-}
-
-func ClauseValues(placeholder Placeholder, start, lenColumns uint) string {
-	if lenColumns == 0 {
-		return ""
-	}
-
-	switch placeholder {
-	case Colon:
-		return ClauseValuesNumbered(start, lenColumns, ':')
-
-	case Dollar:
-		return ClauseValuesNumbered(start, lenColumns, '$')
-
-	case QuestionMark:
-		return ClauseValuesQuestionMark(lenColumns)
-	}
-
-	panic(fmt.Sprintf("invalid placeholder %d", placeholder))
 }
