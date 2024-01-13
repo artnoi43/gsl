@@ -1,12 +1,25 @@
 package gsl
 
 import (
-	"github.com/soyart/gsl/data"
 	"golang.org/x/exp/constraints"
+
+	"github.com/soyart/gsl/data"
 )
 
 type GoNumber interface {
 	constraints.Integer | constraints.Float
+}
+
+// ZeroedValue returns default, zeroed value of type T.
+func ZeroedValue[T any]() T {
+	var t T
+
+	return t
+}
+
+// DefaultValue is just an alias to ZeroedValue
+func DefaultValue[T interface{}]() T {
+	return ZeroedValue[T]()
 }
 
 // GroupConsecutive *sorts* slice |s| in-place,

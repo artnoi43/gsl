@@ -3,9 +3,11 @@ package tree
 import (
 	"golang.org/x/exp/constraints"
 
+	"github.com/soyart/gsl"
 	"github.com/soyart/gsl/data"
 )
 
+// Heap is a binary heap implementation backed by Go slice.
 type Heap[T any] struct {
 	Items    []data.Getter[T]
 	LessFunc data.LessFunc[data.Getter[T]]
@@ -38,18 +40,20 @@ func (h *Heap[T]) PushGetter(getter data.Getter[T]) {
 }
 
 func (h *Heap[T]) Pop() *T {
-	rootValue := h.Items[0].GetValue()
-	lastIdx := h.Len() - 1
+	root := h.PopGetter()
+	if root == nil {
+		return nil
+	}
 
-	h.Items[0] = h.Items[lastIdx]
-	h.Items = h.Items[:lastIdx]
-
-	h.heapifyDown(0)
-
+	rootValue := root.GetValue()
 	return &rootValue
 }
 
 func (h *Heap[T]) PopGetter() data.Getter[T] {
+	if h.Len() == 0 {
+		return nil
+	}
+
 	rootNode := h.Items[0]
 	lastIdx := h.Len() - 1
 
@@ -69,7 +73,11 @@ func (h *Heap[T]) IsEmpty() bool {
 	return len(h.Items) == 0
 }
 
-func (h *Heap[T]) Peek() data.Getter[T] {
+func (h *Heap[T]) PeekGetter() data.Getter[T] {
+	if len(h.Items) == 0 {
+		return nil
+	}
+
 	return h.Items[0]
 }
 
@@ -80,7 +88,11 @@ func (h *Heap[T]) PopValue() T {
 }
 
 func (h *Heap[T]) PeekValue() T {
-	return h.Peek().GetValue()
+	if getter := h.PeekGetter(); getter != nil {
+		return getter.GetValue()
+	}
+
+	return gsl.ZeroedValue[T]()
 }
 
 func (h *Heap[T]) heapifyUp(from int) {

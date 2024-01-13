@@ -9,7 +9,7 @@ import (
 var ErrNotConvertible = errors.New("types are not convertible")
 
 func fmtError[T any](which string, val interface{}, err error) error {
-	var t T
+	t := ZeroedValue[T]()
 	typeVal, typeTarget := reflect.TypeOf(val).String(), reflect.TypeOf(t).String()
 	return errors.Wrapf(err, "cannot convert %s (of type %s) to type %s", which, typeVal, typeTarget)
 }

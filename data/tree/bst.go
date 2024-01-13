@@ -6,7 +6,7 @@ import (
 
 // Bst is BST implementation with nodeWrapper as node.
 type Bst[T constraints.Ordered] struct {
-	Root binTreeNode[T]
+	Root BinaryTreeNodeWrapper[T]
 }
 
 func NewBst[T constraints.Ordered]() *Bst[T] {
@@ -14,7 +14,7 @@ func NewBst[T constraints.Ordered]() *Bst[T] {
 }
 
 func (b *Bst[T]) Insert(item T) bool {
-	node := binTreeNode[T]{
+	node := BinaryTreeNodeWrapper[T]{
 		value: item,
 		ok:    true,
 		left:  nil,
@@ -41,7 +41,7 @@ func (b *Bst[T]) Find(target T) bool {
 	return BstFind(&b.Root, target)
 }
 
-func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) bool {
+func BstInsert[T constraints.Ordered](root *BinaryTreeNodeWrapper[T], node *BinaryTreeNodeWrapper[T]) bool {
 	curr := root
 
 	for {
@@ -80,7 +80,7 @@ func BstInsert[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]
 	}
 }
 
-func BstFind[T constraints.Ordered](root *binTreeNode[T], target T) bool {
+func BstFind[T constraints.Ordered](root *BinaryTreeNodeWrapper[T], target T) bool {
 	curr := root
 
 	for {
@@ -105,7 +105,7 @@ func BstFind[T constraints.Ordered](root *binTreeNode[T], target T) bool {
 }
 
 // BstRemove removes target from subtree tree, returning the new root of the subtree
-func BstRemove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNode[T] {
+func BstRemove[T constraints.Ordered](root *BinaryTreeNodeWrapper[T], target T) *BinaryTreeNodeWrapper[T] {
 	switch {
 	case root == nil:
 		return nil
@@ -138,7 +138,7 @@ func BstRemove[T constraints.Ordered](root *binTreeNode[T], target T) *binTreeNo
 }
 
 // Returns left leaf of a tree root
-func digLeft[T any](root *binTreeNode[T]) *binTreeNode[T] {
+func digLeft[T any](root *BinaryTreeNodeWrapper[T]) *BinaryTreeNodeWrapper[T] {
 	curr := root
 	for curr.left != nil && curr.left.ok {
 		curr = curr.left
@@ -150,7 +150,7 @@ func digLeft[T any](root *binTreeNode[T]) *binTreeNode[T] {
 // Returns right leaf of a tree root
 //
 //nolint:unused
-func digRight[T any](root *binTreeNode[T]) *binTreeNode[T] {
+func digRight[T any](root *BinaryTreeNodeWrapper[T]) *BinaryTreeNodeWrapper[T] {
 	curr := root
 	for curr.right != nil && curr.right.ok {
 		curr = curr.right
@@ -159,7 +159,7 @@ func digRight[T any](root *binTreeNode[T]) *binTreeNode[T] {
 	return curr
 }
 
-func BstInsertRecurse[T constraints.Ordered](root *binTreeNode[T], node *binTreeNode[T]) bool {
+func BstInsertRecurse[T constraints.Ordered](root *BinaryTreeNodeWrapper[T], node *BinaryTreeNodeWrapper[T]) bool {
 	switch {
 	case !root.ok:
 		root = node

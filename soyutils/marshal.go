@@ -6,6 +6,8 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
+
+	"github.com/soyart/gsl"
 )
 
 type (
@@ -19,7 +21,7 @@ func ReadAndUnmarshalFilePointer[T any](filename string, f unmarshalFunc) (*T, e
 		return nil, errors.Wrap(err, "failed to read file to unmarshal")
 	}
 
-	var t T
+	t := gsl.ZeroedValue[T]()
 	if err := f(b, &t); err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal file %s content", filename)
 	}
@@ -30,12 +32,11 @@ func ReadAndUnmarshalFilePointer[T any](filename string, f unmarshalFunc) (*T, e
 func ReadAndUnmarshalFile[T any](filename string, f unmarshalFunc) (T, error) {
 	p, err := ReadAndUnmarshalFilePointer[T](filename, f)
 	if err != nil {
-		var t T
-		return t, err
+		return gsl.ZeroedValue[T](), err
 	}
+
 	if p == nil {
-		var t T
-		return t, fmt.Errorf("got nil pointer after unmarshaling file %s", filename)
+		return gsl.ZeroedValue[T](), fmt.Errorf("got nil pointer after unmarshaling file %s", filename)
 	}
 
 	return *p, nil

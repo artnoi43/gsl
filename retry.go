@@ -121,7 +121,7 @@ func RetryWithReturn[T any](
 	T,
 	error,
 ) {
-	var t T
+	t := ZeroedValue[T]()
 	var err error
 
 	err = retry(func() error {
