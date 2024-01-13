@@ -1,6 +1,9 @@
 package graph
 
-import "github.com/soyart/gsl/data/list"
+import (
+	"github.com/soyart/gsl"
+	"github.com/soyart/gsl/data/list"
+)
 
 // BFS calls BFSSearch and uses its output to call BFSShortestPathReconstruct.
 // It then returns the shortest path (slice of nodes), the number of hops it takes from `src` to `dst`,
@@ -69,9 +72,8 @@ func BFSSearchGeneric[T, E any](
 	return prev, found
 }
 
-// BFSShortestPathReconstruct reconstructs inclusive path from src to dst,
-// and returns the slice of reconstructed path. The path is backward, that is,
-// the first element is dst, and the last element is src.
+// BFSShortestPathReconstruct returns inclusive path
+// from src to dst, with number of hops
 func BFSShortestPathReconstruct[T nodeValue](
 	backwardPath map[Node[T]]Node[T],
 	src Node[T],
@@ -103,6 +105,8 @@ func BFSShortestPathReconstruct[T nodeValue](
 
 		hops++
 	}
+
+	gsl.ReverseInPlace(shortestPath)
 
 	return shortestPath, hops
 }
