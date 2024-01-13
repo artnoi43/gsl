@@ -12,7 +12,7 @@ type GoNumber interface {
 // GroupConsecutive *sorts* slice |s| in-place,
 // and calls GroupConsecutiveSorted on |s|.
 func GroupConsecutive[N GoNumber](s []N) [][2]N {
-	return GroupConsecutiveSorted(data.QuickSort(s, data.Ascending))
+	return GroupConsecutiveSorted(data.MergeSort(s, data.Ascending))
 }
 
 // GroupConsecutiveSorted groups input numbers in slice []N |s|
