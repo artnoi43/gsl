@@ -41,7 +41,14 @@ func (s *SetListWrapper[T, L]) IsEmpty() bool {
 	return s.inner.Len() == 0
 }
 
-func WrapSetList[T comparable](inner BasicList[T]) *SetListWrapper[T, BasicList[T]] {
+func (s *SetListWrapper[T, L]) Inner() L {
+	return s.inner
+}
+
+// WrapSetListKeepInner returns a SetListWrapper over inner.
+// It does not remove duplicates in inner - only elements pushed thereafter
+// are checked against the hash table.
+func WrapSetListKeepInner[T comparable](inner BasicList[T]) *SetListWrapper[T, BasicList[T]] {
 	return &SetListWrapper[T, BasicList[T]]{
 		inner:      inner,
 		duplicates: make(map[T]struct{}),

@@ -9,11 +9,11 @@ import (
 
 func TestQueue(t *testing.T) {
 	values0 := []uint8{0, 1, 200, 20}
-	q0 := NewQueueUnsafe[uint8]()
+	q0 := NewQueue[uint8]()
 	testQueue(t, values0, q0)
 
 	values1 := []string{"foo", "bar", "baz"}
-	q1 := NewQueueUnsafe[string]()
+	q1 := NewQueue[string]()
 	testQueue(t, values1, q1)
 
 	// Composite type queue - any comparable types should be ok in tests
@@ -39,7 +39,7 @@ func TestQueue(t *testing.T) {
 	}
 }
 
-func testQueue[T comparable](t *testing.T, values []T, q *QueueImpl[T]) {
+func testQueue[T comparable](t *testing.T, values []T, q BasicList[T]) {
 	// Test Push
 	for _, expected := range values {
 		q.Push(expected)

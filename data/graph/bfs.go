@@ -38,7 +38,7 @@ func BFSSearchGeneric[T, E any](
 	map[Node[T]]Node[T],
 	bool,
 ) {
-	q := list.NewSafeQueue[Node[T]]()
+	q := list.NewQueueSafe[Node[T]]()
 	q.Push(src)
 
 	visited := make(map[Node[T]]bool)

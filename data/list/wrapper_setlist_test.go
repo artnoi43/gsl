@@ -22,8 +22,8 @@ func takeSafeSetList[T comparable](ssl SafeSetList[T, *SetListImpl[T]]) {
 	// ssl.HasDuplicate(zeroValue)
 }
 
-func testSetListWrapper(t *testing.T) {
-	setList := NewSetList([]int{1, 2, 1, 2})
+func testCompileSetList(t *testing.T) {
+	setList := ToSetList([]int{1, 2, 1, 2})
 	takeSetList[int](setList)
 	safeSetList := WrapSafeList[int](setList)
 	takeSafeSetList[int](safeSetList)
@@ -35,17 +35,18 @@ func testSetListWrapper(t *testing.T) {
 }
 
 func testSetListStack[T comparable](t *testing.T, data []T) {
-	set := NewSetList(data)
+	// Standard SetListImpl
+	set := ToSetList(data)
 
 	// Wrap stack with SetListWrapper and then wrap that shit with SafeListWrapper
-	stack := NewStackUnsafe[T]()              // *StackImpl[T]
-	setStack := WrapSetList[T](stack)         // *SetList[T, *Stack[T]]
-	safeSetStack := WrapSafeList[T](setStack) // *SafeList[T, *SetListWrapper[T]]
+	stack := NewStack[T]()                     // *StackImpl[T]
+	setStack := WrapSetListKeepInner[T](stack) // *SetList[T, *Stack[T]]
+	safeSetStack := WrapSafeList[T](setStack)  // *SafeList[T, *SetListWrapper[T]]
 
 	// Wrap anotherStack with SafeListWrapper and then wrap that shit with SetListWrapper
-	anotherStack := NewStackUnsafe[T]()        // *Stack[T]
-	safeStack := WrapSafeList[T](anotherStack) // *SafeList[T, *Stack[T]]
-	setSafeStack := WrapSetList[T](safeStack)  // *SetList[T, *SafeList[T, Stack[T]]]
+	anotherStack := NewStack[T]()                      // *Stack[T]
+	safeStack := WrapSafeList[T](anotherStack)         // *SafeList[T, *Stack[T]]
+	setSafeStack := WrapSetListKeepInner[T](safeStack) // *SetList[T, *SafeList[T, Stack[T]]]
 
 	// All 6 should implement BasicList[T] and Stack[T]
 	lists := []BasicList[T]{
@@ -84,15 +85,15 @@ func testSetListStack[T comparable](t *testing.T, data []T) {
 }
 
 func testSetListQueue[T comparable](t *testing.T, data []T) {
-	set := NewSetList(data)
+	set := ToSetList(data)
 
-	queue := NewQueue[T]()                    // *QueueImpl[T]
-	setQueue := WrapSetList[T](queue)         // *SetListWrapper[T, *QueueImpl[T]]
-	safeSetQueue := WrapSafeList[T](setQueue) // *SafeListWrapper[T, *SetListWrapper[T, *QueueImpl]]
+	queue := NewQueue[T]()                     // *QueueImpl[T]
+	setQueue := WrapSetListKeepInner[T](queue) // *SetListWrapper[T, *QueueImpl[T]]
+	safeSetQueue := WrapSafeList[T](setQueue)  // *SafeListWrapper[T, *SetListWrapper[T, *QueueImpl]]
 
-	anotherQueue := NewQueue[T]()             // *QueueImpl[T]
-	safeQueue := WrapSafeList[T](queue)       // *SafeListWrapper[T, *QueueImpl[T]]
-	setSafeQueue := WrapSetList[T](safeQueue) // *SetListWrapper[T, SafeListWrapper[T, *QueueImpl[T]]]
+	anotherQueue := NewQueue[T]()                      // *QueueImpl[T]
+	safeQueue := WrapSafeList[T](queue)                // *SafeListWrapper[T, *QueueImpl[T]]
+	setSafeQueue := WrapSetListKeepInner[T](safeQueue) // *SetListWrapper[T, SafeListWrapper[T, *QueueImpl[T]]]
 
 	// All 6 should implement BasicList[T] and Queue[T]
 	lists := []BasicList[T]{
@@ -141,6 +142,7 @@ func testSetPushAndPop[T comparable](t *testing.T, setList BasicList[T], data []
 		if popped == nil {
 			t.Fatal("popped nil - should not happen")
 		}
+
 		value := *popped
 		seenCounts[value]++
 	}

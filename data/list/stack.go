@@ -2,12 +2,12 @@ package list
 
 type StackImpl[T any] []T
 
-func NewStack[T any]() SafeList[T, *StackImpl[T]] {
-	return WrapSafeList[T](new(StackImpl[T]))
+func NewStack[T any]() *StackImpl[T] {
+	return new(StackImpl[T])
 }
 
-func NewStackUnsafe[T any]() *StackImpl[T] {
-	return new(StackImpl[T])
+func NewStackSafe[T any]() SafeList[T, *StackImpl[T]] {
+	return WrapSafeList[T](new(StackImpl[T]))
 }
 
 func (s *StackImpl[T]) Push(x T) {

@@ -4,7 +4,7 @@ import "testing"
 
 func TestSet(t *testing.T) {
 	data := []uint16{1, 2, 1, 2, 3, 4, 2, 1}
-	set := NewSetList(data)
+	set := ToSetList(data)
 
 	counts := make(map[uint16]int)
 	for !set.IsEmpty() {

@@ -4,5 +4,5 @@ import "testing"
 
 func TestWrappedList(t *testing.T) {
 	t.Run("SafeList", testSafeListWrapper)
-	t.Run("SetList", testSetListWrapper)
+	t.Run("SetList", testCompileSetList)
 }

@@ -2,7 +2,11 @@ package list
 
 type QueueImpl[T any] []T
 
-func NewSafeQueue[T any]() SafeList[T, *QueueImpl[T]] {
+func NewQueue[T any]() *QueueImpl[T] {
+	return new(QueueImpl[T])
+}
+
+func NewQueueSafe[T any]() SafeList[T, *QueueImpl[T]] {
 	return WrapSafeList[T](new(QueueImpl[T]))
 }
 
@@ -39,12 +43,4 @@ func (s *QueueImpl[T]) Len() int {
 func (s *QueueImpl[T]) IsEmpty() bool {
 	state := *s
 	return len(state) == 0
-}
-
-func NewQueue[T any]() SafeList[T, *QueueImpl[T]] {
-	return WrapSafeList[T](new(QueueImpl[T]))
-}
-
-func NewQueueUnsafe[T any]() *QueueImpl[T] {
-	return new(QueueImpl[T])
 }

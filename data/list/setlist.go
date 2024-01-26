@@ -1,20 +1,24 @@
 package list
 
+// SetListImpl implements SetList[T, L] and BasicList[T]
+//
 // A *set list* is a list (implements BasicList[T]) that has characteristics of a set.
 // No duplicate is allowed in a set list.
+//
 // If you want set functionality for other types, e.g., for QueueImpl[T],
 // then you can wrap the queue using WrapSetList(l BasicList[T]) to get a SetList[T, *QueueImpl[T]].
-
-// SetListImpl implements SetList[T, L] and BasicList[T]
 type SetListImpl[T comparable] struct {
 	haystack   []T
 	duplicates map[T]struct{}
 	length     int
 }
 
-// NewSetList[T] returns a new SetList[T, *SetListImpl[T]]. The values in src is iterated over and pushed in to the Set[T]
-// according to the set rules.
-func NewSetList[T comparable](src []T) SetList[T, *SetListImpl[T]] {
+func NewSetList[T comparable]() *SetListImpl[T] {
+	return new(SetListImpl[T])
+}
+
+// ToSetList iterates over src T and push it to a new SetListImpl[T]
+func ToSetList[T comparable](src []T) SetList[T, *SetListImpl[T]] {
 	var haystack []T
 	duplicates := make(map[T]struct{})
 	var length int
@@ -33,7 +37,6 @@ func NewSetList[T comparable](src []T) SetList[T, *SetListImpl[T]] {
 	}
 }
 
-// O(1)
 func (s *SetListImpl[T]) HasDuplicate(x T) bool {
 	_, found := s.duplicates[x]
 	return found

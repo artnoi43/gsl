@@ -16,11 +16,11 @@ func testSafeListWrapper(t *testing.T) {
 
 func testSafeList[T any](t *testing.T, values []T) {
 	// Those list types wrapped in SafeList[T, BasicList[T]] also implement BasicList[T]
-	basicStack := NewStack[T]()
+	basicStack := NewStackSafe[T]()
 	safeStack := WrapSafeList[T](basicStack)
 	basicQueue := NewQueue[T]()
 	safeQueue := WrapSafeList[T](basicQueue)
-	anotherSafeQueue := NewSafeQueue[T]()
+	anotherSafeQueue := NewQueueSafe[T]()
 	tests := []BasicList[T]{safeStack, safeQueue, anotherSafeQueue}
 
 	for _, l := range tests {

@@ -69,7 +69,7 @@ func Inorder[POS any, NODE any](
 	node POS,
 	f func(NODE) error,
 ) error {
-	stack := list.NewStack[POS]()
+	stack := list.NewStackSafe[POS]()
 	curr := node
 
 	for !tree.NodeIsNull(curr) || !stack.IsEmpty() {
@@ -109,7 +109,7 @@ func InorderNode[NODE BinaryTreeNode[any]](
 	node NODE,
 	f func(NODE) error,
 ) error {
-	stack := list.NewStack[NODE]()
+	stack := list.NewStackSafe[NODE]()
 	curr := node
 
 	for !curr.IsNull() || !stack.IsEmpty() {

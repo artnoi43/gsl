@@ -95,7 +95,7 @@ func OpenChar(closeChar rune) (rune, error) {
 //
 // Notes: Only openning/closing characters are concerned.
 func IsWellClosed(s string) error {
-	stack := list.NewStack[rune]()
+	stack := list.NewStackSafe[rune]()
 
 	for _, char := range s {
 		if IsOpenChar(char) {

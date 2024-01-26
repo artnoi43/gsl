@@ -1,3 +1,4 @@
 playground
 .DS_Store
-/soyutils/assets/marshal_test
+
+soyutils/test_assets/marshal_test.json
