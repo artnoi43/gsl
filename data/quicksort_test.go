@@ -4,6 +4,27 @@ import (
 	"testing"
 )
 
+func TestQuickSortNoCopy(t *testing.T) {
+	tests := [][]int{
+		{3, 1, 9, 2, 1, 8, 4},
+		{10, 40, 30, 80, 20},
+		{100, 200, 300, 400},
+	}
+
+	for i := range tests {
+		data := tests[i]
+		QuickSortNoCopy(data, Ascending, 0, len(data)-1)
+
+		prev := data[0]
+		for j := range data {
+			elem := data[j]
+			if elem < prev {
+				t.Fatal("unexpected elem < prev")
+			}
+		}
+	}
+}
+
 func TestQuickSort(t *testing.T) {
 	tests := testCasesDefault()
 	for i := range tests {

@@ -4,6 +4,37 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
+func swap[T any](v []T, i, j int) {
+	v[i], v[j] = v[j], v[i]
+}
+
+func QuickSortNoCopy[T constraints.Ordered](arr []T, ordering SortOrder, left, right int) {
+	if left >= right {
+		return
+	}
+
+	// [arr[left], ..., arr[mid], ...., arr[right]]
+	mid := (left + right) / 2
+
+	// [arr[mid], ..., arr[left], ...., arr[right]]
+	swap(arr, left, mid) // Move our pivot (chosen as the mid element) to the left
+
+	last := left
+	for i := left + 1; i <= right; i++ {
+		if arr[i] < arr[left] {
+			last++
+			swap(arr, i, last)
+		}
+	}
+
+	// [pivot, ...elems<=pivot... , last, .... elems>=pivot ....]
+
+	swap(arr, left, last) // Move pivot back
+
+	QuickSortNoCopy(arr, ordering, left, last-1)
+	QuickSortNoCopy(arr, ordering, last+1, right)
+}
+
 func QuickSort[T constraints.Ordered](arr []T, ordering SortOrder) []T {
 	l := len(arr)
 	// Base case
